@@ -12,13 +12,13 @@ export class UserService {
     return this.userModel.find().exec();
   }
 
-  async me(userId: string): Promise<User | null> {
-    return this.userModel.findById(userId).select('-password').exec();
-  }
-
   async create(name: string, email: string, password: string): Promise<User> {
     const newUser = new this.userModel({ name, email, password });
     return newUser.save();
+  }
+
+  async me(userId: string): Promise<User | null> {
+    return this.userModel.findById(userId).select('-password').exec();
   }
 
   async findById(id: string): Promise<User | null> {
