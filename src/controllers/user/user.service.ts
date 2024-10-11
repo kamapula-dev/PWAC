@@ -12,8 +12,20 @@ export class UserService {
     return this.userModel.find().exec();
   }
 
-  async create(name: string, email: string): Promise<User> {
-    const newUser = new this.userModel({ name, email });
+  async me(userId: string): Promise<User | null> {
+    return this.userModel.findById(userId).select('-password').exec();
+  }
+
+  async create(name: string, email: string, password: string): Promise<User> {
+    const newUser = new this.userModel({ name, email, password });
     return newUser.save();
+  }
+
+  async findById(id: string): Promise<User | null> {
+    return this.userModel.findById(id).exec();
+  }
+
+  async findByEmail(email: string): Promise<User> {
+    return this.userModel.findOne({ email }).exec();
   }
 }
