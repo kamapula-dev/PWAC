@@ -6,6 +6,8 @@ import { UserModule } from './controllers/user/user.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './controllers/auth/auth.module';
+import { MediaModule } from './controllers/media/media.module';
+import { PWAContentModule } from './controllers/pwa-content/pwa-content.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { AuthModule } from './controllers/auth/auth.module';
     }),
     UserModule,
     AuthModule,
+    MediaModule,
+    PWAContentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
