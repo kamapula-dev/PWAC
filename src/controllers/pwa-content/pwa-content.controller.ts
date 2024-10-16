@@ -7,6 +7,7 @@ import {
   Delete,
   Put,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { PWAContentService } from './pwa-content.service';
 import { CreatePWAContentDto } from './dto/create-pwa-content.dto';
@@ -22,20 +23,24 @@ export class PWAContentController {
   @Post()
   async create(
     @Body() createPWAContentDto: CreatePWAContentDto,
+    @Request() req,
   ): Promise<PWAContent> {
-    return this.pwaContentService.create(createPWAContentDto);
+    const userId = req.user._id;
+    return this.pwaContentService.create(createPWAContentDto, userId);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Get()
-  async findAll(): Promise<PWAContent[]> {
-    return this.pwaContentService.findAll();
+  async findAll(@Request() req): Promise<PWAContent[]> {
+    const userId = req.user._id;
+    return this.pwaContentService.findAll(userId);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<PWAContent> {
-    return this.pwaContentService.findOne(id);
+  async findOne(@Param('id') id: string, @Request() req): Promise<PWAContent> {
+    const userId = req.user._id;
+    return this.pwaContentService.findOne(id, userId);
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -43,13 +48,16 @@ export class PWAContentController {
   async update(
     @Param('id') id: string,
     @Body() updatePWAContentDto: UpdatePWAContentDto,
+    @Request() req,
   ): Promise<PWAContent> {
-    return this.pwaContentService.update(id, updatePWAContentDto);
+    const userId = req.user._id;
+    return this.pwaContentService.update(id, updatePWAContentDto, userId);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<void> {
-    return this.pwaContentService.remove(id);
+  async remove(@Param('id') id: string, @Request() req): Promise<void> {
+    const userId = req.user._id;
+    return this.pwaContentService.remove(id, userId);
   }
 }

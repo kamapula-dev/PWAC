@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { Media, MediaSchema } from './media.scheme';
 import { Review, ReviewSchema } from './review.scheme';
 
@@ -61,6 +61,9 @@ export class PWAContent extends Document {
 
   @Prop({ required: true })
   version: string;
+
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  user: Types.ObjectId;
 }
 
 export const PWAContentSchema = SchemaFactory.createForClass(PWAContent);
