@@ -9,7 +9,8 @@ export class MediaService {
   private readonly bucketName: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.bucketName = this.configService.get<string>('AWS_BUCKET_NAME');
+    this.bucketName = 'pwac-media';
+    console.log(this.configService.get<string>('AWS_BUCKET_NAME'));
     this.s3Client = new S3Client({
       region: this.configService.get<string>('AWS_REGION'),
       credentials: {
