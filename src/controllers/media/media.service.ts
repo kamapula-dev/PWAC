@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
 import { ConfigService } from '@nestjs/config';
-import { fromEnv } from '@aws-sdk/credential-providers';
 
 @Injectable()
 export class MediaService {
@@ -13,7 +12,12 @@ export class MediaService {
     this.bucketName = this.configService.get<string>('AWS_BUCKET_NAME');
     this.s3Client = new S3Client({
       region: this.configService.get<string>('AWS_REGION'),
-      credentials: fromEnv(),
+      credentials: {
+        accessKeyId: this.configService.get<string>('AWS_ACCESS_KEY_ID'),
+        secretAccessKey: this.configService.get<string>(
+          'AWS_SECRET_ACCESS_KEY',
+        ),
+      },
     });
   }
 
