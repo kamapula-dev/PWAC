@@ -30,17 +30,17 @@ export class PWAContentController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Get(':id')
-  async findOne(@Param('id') id: string, @Request() req): Promise<PWAContent> {
-    const userId = req.user._id;
-    return this.pwaContentService.findOne(id, userId);
-  }
-
-  @UseGuards(AuthGuard('jwt'))
   @Get()
   async findAll(@Request() req): Promise<PWAContent[]> {
     const userId = req.user._id;
     return this.pwaContentService.findAll(userId);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get(':id')
+  async findOne(@Param('id') id: string, @Request() req): Promise<PWAContent> {
+    const userId = req.user._id;
+    return this.pwaContentService.findOne(id, userId);
   }
 
   @UseGuards(AuthGuard('jwt'))
