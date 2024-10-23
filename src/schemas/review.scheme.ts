@@ -11,7 +11,6 @@ const AVAILABLE_COLORS = [
   '#C2185B',
 ];
 
-// Функция для назначения уникального цвета
 function assignUniqueColor(parentDocument: PWAContent) {
   if (parentDocument && parentDocument.reviews) {
     const usedColors = parentDocument.reviews.map(
@@ -47,7 +46,6 @@ export class Review extends Document {
   @Prop({
     required: true,
     default: function () {
-      // Получаем родительский документ и передаем его в функцию assignUniqueColor
       return assignUniqueColor(this.$parent());
     },
   })
