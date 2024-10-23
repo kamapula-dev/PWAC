@@ -38,11 +38,11 @@ export class PWAContent extends Document {
   @Prop({ required: true })
   rating: string;
 
-  @Prop({ required: true })
-  shortDescription: string;
+  @Prop()
+  description: string;
 
-  @Prop({ required: true })
-  fullDescription: string;
+  @Prop()
+  languages: string[];
 
   @Prop({ required: true })
   countOfReviewsFull: string;
@@ -64,6 +64,17 @@ export class PWAContent extends Document {
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   user: Types.ObjectId;
+
+  @Prop({
+    type: [Number],
+    required: true,
+    validate: {
+      validator: (v: number[]) =>
+        v.length === 5 && v.every((n) => n >= 1 && n <= 5),
+      message: 'Array must contain exactly 5 values between 1 and 5',
+    },
+  })
+  sliders: number[];
 }
 
 export const PWAContentSchema = SchemaFactory.createForClass(PWAContent);
