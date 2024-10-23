@@ -35,9 +35,6 @@ class ReviewDto {
   reviewIconColor: string;
 
   @IsString()
-  avatarTitle: string;
-
-  @IsString()
   reviewText: string;
 
   @IsString()
@@ -80,10 +77,7 @@ export class CreatePWAContentDto {
   rating: string;
 
   @IsString()
-  shortDescription: string;
-
-  @IsString()
-  fullDescription: string;
+  description: string;
 
   @IsString()
   countOfReviewsFull: string;

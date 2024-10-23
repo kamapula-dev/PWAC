@@ -1,4 +1,3 @@
-// app.module.ts
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -8,6 +7,8 @@ import { AppService } from './app.service';
 import { AuthModule } from './controllers/auth/auth.module';
 import { MediaModule } from './controllers/media/media.module';
 import { PWAContentModule } from './controllers/pwa-content/pwa-content.module';
+import { BullModule } from '@nestjs/bull';
+import { BuildPWAProcessor } from './controllers/pwa-content/build-pwa.processor';
 
 @Module({
   imports: [
@@ -18,6 +19,17 @@ import { PWAContentModule } from './controllers/pwa-content/pwa-content.module';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get<string>('MONGODB_URI'),
+      }),
+      inject: [ConfigService],
+    }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        redis: {
+          host: configService.get<string>('REDIS_HOST'),
+          port: configService.get<number>('REDIS_PORT'),
+          password: configService.get<string>('REDIS_PASSWORD'),
+        },
       }),
       inject: [ConfigService],
     }),

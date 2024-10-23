@@ -2,10 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from '../../schemas/user.schema';
+import { JobId } from 'bull';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<User>,
+  ) {}
 
   async findAll(): Promise<User[]> {
     return this.userModel.find().exec();
@@ -26,5 +29,31 @@ export class UserService {
 
   async findByEmail(email: string): Promise<User> {
     return this.userModel.findOne({ email }).exec();
+  }
+
+  async addJobToUser(
+    userId: string,
+    pwaId: string,
+    jobId: JobId,
+  ): Promise<void> {
+    await this.userModel.updateOne(
+      { _id: userId, 'pwas.pwaId': pwaId },
+      { $set: { 'pwas.$.jobId': jobId } },
+    );
+  }
+
+  async addPwa(
+    userId: string,
+    pwaData: {
+      pwaId: string;
+      url: string;
+      createdAt: Date;
+      archiveKey: string;
+    },
+  ): Promise<void> {
+    await this.userModel.updateOne(
+      { _id: userId },
+      { $push: { pwas: pwaData } },
+    );
   }
 }

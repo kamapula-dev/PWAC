@@ -38,11 +38,8 @@ export class PWAContent extends Document {
   @Prop({ required: true })
   rating: string;
 
-  @Prop({ required: true })
-  shortDescription: string;
-
-  @Prop({ required: true })
-  fullDescription: string;
+  @Prop()
+  description: string;
 
   @Prop({ required: true })
   countOfReviewsFull: string;
