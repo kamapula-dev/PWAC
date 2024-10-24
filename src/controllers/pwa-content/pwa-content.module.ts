@@ -15,6 +15,13 @@ import { BuildPWAProcessor } from './build-pwa.processor';
     ]),
     BullModule.registerQueue({
       name: 'buildPWA',
+      defaultJobOptions: {
+        attempts: 1,
+        backoff: 0,
+      },
+      settings: {
+        lockDuration: 300000,
+      },
     }),
     MediaModule,
     UserModule,

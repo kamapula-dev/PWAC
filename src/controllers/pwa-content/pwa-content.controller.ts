@@ -100,6 +100,13 @@ export class PWAContentController {
       return { status: 'error', message: 'Job not found' };
     }
 
+    const jobs = await this.buildQueue.getJobs(['waiting', 'active', 'completed', 'failed', 'delayed']);
+
+    // Выводим все задачи в консоль
+    jobs.forEach(job => {
+      console.log(job);
+    });
+
     const state = await job.getState();
 
     if (state === 'completed') {
