@@ -6,6 +6,10 @@ import {
   ValidateNested,
   IsOptional,
   IsEnum,
+  ArrayMinSize,
+  ArrayMaxSize,
+  Min,
+  Max,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -25,12 +29,14 @@ class ReviewDto {
   @IsString()
   reviewAuthorName: string;
 
+  @IsOptional()
   @IsString()
   reviewAuthorIcon: string;
 
   @IsNumber()
   reviewAuthorRating: number;
 
+  @IsOptional()
   @IsString()
   reviewIconColor: string;
 
@@ -88,6 +94,11 @@ export class CreatePWAContentDto {
   @IsString()
   appIcon: string;
 
+  @IsOptional()
+  @IsArray()
+  @Type(() => String)
+  languages: string[];
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => MediaDto)
@@ -100,4 +111,12 @@ export class CreatePWAContentDto {
 
   @IsString()
   version: string;
+
+  @IsArray()
+  @ArrayMinSize(5, { message: 'Array must contain exactly 5 values' })
+  @ArrayMaxSize(5, { message: 'Array must contain exactly 5 values' })
+  @IsNumber({}, { each: true, message: 'Each value must be a number' })
+  @Min(1, { each: true, message: 'Each value must be at least 1' })
+  @Max(5, { each: true, message: 'Each value must be at most 5' })
+  sliders: number[];
 }
