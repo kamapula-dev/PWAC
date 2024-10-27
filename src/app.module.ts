@@ -24,32 +24,14 @@ import { BuildPWAProcessor } from './controllers/pwa-content/build-pwa.processor
     }),
     BullModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => {
-        const redisClient = new Redis({
+      useFactory: (configService: ConfigService) => ({
+        redis: {
           host: configService.get<string>('REDIS_HOST'),
           port: configService.get<number>('REDIS_PORT'),
           password: configService.get<string>('REDIS_PASSWORD'),
-        });
-
-        try {
-          const result = await redisClient.ping();
-          if (result === 'PONG') {
-            console.log('Redis доступен и работает.');
-          } else {
-            console.log('Ответ от Redis не PONG:', result);
-          }
-        } catch (error) {
-          console.error('Ошибка подключения к Redis:', error.message);
-        }
-
-        return {
-          redis: {
-            host: configService.get<string>('REDIS_HOST'),
-            port: configService.get<number>('REDIS_PORT'),
-            password: configService.get<string>('REDIS_PASSWORD'),
-          },
-        };
-      },
+          connectTimeout: 10000
+        },
+      }),
       inject: [ConfigService],
     }),
     UserModule,
