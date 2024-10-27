@@ -26,9 +26,9 @@ import { BuildPWAProcessor } from './controllers/pwa-content/build-pwa.processor
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         redis: {
-          host: 'redis',
-          port: 6379,
-          password: '853c142b2f2340729557cb676258927ffb7a92c2f2b',
+          host: configService.get<string>('REDIS_HOST'),
+          port: configService.get<number>('REDIS_PORT'),
+          password: configService.get<string>('REDIS_PASSWORD'),
         },
       }),
       inject: [ConfigService],
