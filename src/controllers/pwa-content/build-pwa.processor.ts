@@ -11,9 +11,7 @@ export class BuildPWAProcessor {
   constructor(
     private readonly mediaService: MediaService,
     private readonly userService: UserService,
-  ) {
-    console.log('test');
-  }
+  ) {}
 
   @Process()
   async handleBuildPWAJob(job: Job) {
