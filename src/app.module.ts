@@ -8,7 +8,7 @@ import { AuthModule } from './controllers/auth/auth.module';
 import { MediaModule } from './controllers/media/media.module';
 import { PWAContentModule } from './controllers/pwa-content/pwa-content.module';
 import { BullModule } from '@nestjs/bull';
-import { BuildPWAProcessor } from './controllers/pwa-content/build-pwa.processor';
+import * as Redis from 'ioredis';
 
 @Module({
   imports: [
@@ -24,14 +24,32 @@ import { BuildPWAProcessor } from './controllers/pwa-content/build-pwa.processor
     }),
     BullModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        redis: {
+      useFactory: async (configService: ConfigService) => {
+        const redisClient = new Redis({
           host: configService.get<string>('REDIS_HOST'),
           port: configService.get<number>('REDIS_PORT'),
           password: configService.get<string>('REDIS_PASSWORD'),
-          connectTimeout: 10000
-        },
-      }),
+        });
+
+        try {
+          const result = await redisClient.ping();
+          if (result === 'PONG') {
+            console.log('Redis доступен и работает.');
+          } else {
+            console.log('Ответ от Redis не PONG:', result);
+          }
+        } catch (error) {
+          console.error('Ошибка подключения к Redis:', error.message);
+        }
+
+        return {
+          redis: {
+            host: configService.get<string>('REDIS_HOST'),
+            port: configService.get<number>('REDIS_PORT'),
+            password: configService.get<string>('REDIS_PASSWORD'),
+          },
+        };
+      },
       inject: [ConfigService],
     }),
     UserModule,
