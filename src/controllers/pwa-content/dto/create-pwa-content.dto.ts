@@ -38,6 +38,10 @@ class ReviewDto {
 
   @IsOptional()
   @IsString()
+  devResponse: string;
+
+  @IsOptional()
+  @IsString()
   reviewIconColor: string;
 
   @IsString()

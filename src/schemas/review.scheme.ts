@@ -43,6 +43,9 @@ export class Review extends Document {
   @Prop({ required: true })
   reviewAuthorRating: number;
 
+  @Prop()
+  devResponse: string;
+
   @Prop({
     required: true,
     default: function () {
