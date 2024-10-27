@@ -79,17 +79,22 @@ export class PWAContentController {
     @Request() req,
     @Res() res,
   ): Promise<void> {
-    const userId = req.user._id;
-    console.log('Adding job to the queue');
+    try {
+      const userId = req.user._id;
+      console.log('Adding job to the queue');
 
-    const job = await this.buildQueue.add({
-      pwaId: id,
-      userId,
-    });
+      const job = await this.buildQueue.add({
+        pwaId: id,
+        userId,
+      });
 
-    console.log(`Job ${job.id} added to the queue`);
+      console.log(`Job ${job.id} added to the queue`);
 
-    res.json({ jobId: job.id });
+      res.json({ jobId: job.id });
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
   }
 
   @Get('status/:jobId')
