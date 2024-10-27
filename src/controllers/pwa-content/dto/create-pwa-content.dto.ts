@@ -120,7 +120,6 @@ export class CreatePWAContentDto {
   @ArrayMinSize(5, { message: 'Array must contain exactly 5 values' })
   @ArrayMaxSize(5, { message: 'Array must contain exactly 5 values' })
   @IsNumber({}, { each: true, message: 'Each value must be a number' })
-  @Min(1, { each: true, message: 'Each value must be at least 1' })
   @Max(5, { each: true, message: 'Each value must be at most 5' })
   sliders: number[];
 }
