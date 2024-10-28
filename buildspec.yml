@@ -24,7 +24,7 @@ phases:
       - docker push $REPOSITORY_URI:latest
       - printf '[{"name":"pwac","imageUri":"%s"}]' $REPOSITORY_URI:latest > imagedefinitions.json
       - echo Updating the ECS service...
-      - aws ecs update-service --cluster PWAC --service pwac-service --force-new-deployment
+      - aws ecs update-service --cluster PWAC --service service --force-new-deployment
 artifacts:
   files: imagedefinitions.json
 
