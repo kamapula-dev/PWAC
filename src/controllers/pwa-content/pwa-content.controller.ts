@@ -55,6 +55,13 @@ export class PWAContentController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Delete(':id')
+  async remove(@Param('id') id: string, @Request() req): Promise<void> {
+    const userId = req.user._id;
+    return this.pwaContentService.remove(id, userId);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
   @Put(':id')
   async update(
     @Param('id') id: string,
@@ -63,13 +70,6 @@ export class PWAContentController {
   ): Promise<PWAContent> {
     const userId = req.user._id;
     return this.pwaContentService.update(id, updatePWAContentDto, userId);
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Delete(':id')
-  async remove(@Param('id') id: string, @Request() req): Promise<void> {
-    const userId = req.user._id;
-    return this.pwaContentService.remove(id, userId);
   }
 
   @UseGuards(AuthGuard('jwt'))
