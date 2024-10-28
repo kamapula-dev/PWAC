@@ -92,8 +92,19 @@ export class PWAContentController {
 
       res.json({ jobId: job.id });
     } catch (e) {
-      console.log(e);
+      console.log(e, 'Failed to add job to the queue');
       throw e;
+    }
+  }
+
+  @Get('check-redis')
+  async checkRedis(): Promise<string> {
+    try {
+      await this.buildQueue.client.ping();
+      return 'Redis connection is healthy';
+    } catch (error) {
+      console.error('Error connecting to Redis:', error);
+      throw error;
     }
   }
 
