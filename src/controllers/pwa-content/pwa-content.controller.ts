@@ -81,7 +81,7 @@ export class PWAContentController {
   ): Promise<void> {
     try {
       const userId = req.user._id;
-      console.log('Adding job to the queue');
+      console.log('Adding job to the queue job');
 
       const job = await this.buildQueue.add({
         pwaId: id,
