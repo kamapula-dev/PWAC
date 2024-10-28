@@ -97,7 +97,7 @@ export class PWAContentController {
     }
   }
 
-  @Get('check-redis')
+  @Get('redis-health/check-redis')
   async checkRedis(): Promise<string> {
     try {
       await this.buildQueue.client.ping();
