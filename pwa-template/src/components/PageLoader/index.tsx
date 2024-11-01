@@ -1,18 +1,20 @@
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
-import { useMixpanel } from "react-mixpanel-browser";
 import { useEffect } from "react";
-import { colors } from "../styles";
 
 const PageLoader = () => {
-  const mixpanel = useMixpanel();
   useEffect(() => {
-    const pwaLink = localStorage.getItem("pwaLink") as string;
-    if (mixpanel) {
-      mixpanel.track("pwa_openPage", { pwaLink });
-    }
-    window.location.href = pwaLink;
-  });
+    const intervalId = setInterval(() => {
+      const pwaLink = localStorage.getItem("pwaLink");
+      if (pwaLink) {
+        window.location.href = pwaLink;
+        clearInterval(intervalId);
+      }
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
     <Box
       display="flex"
@@ -20,11 +22,7 @@ const PageLoader = () => {
       alignItems="center"
       minHeight="100vh"
     >
-      <CircularProgress
-        sx={{ color: `${colors.primary}` }}
-        size={100}
-        thickness={5}
-      />
+      <CircularProgress sx={{ color: `#047a56` }} size={100} thickness={5} />
     </Box>
   );
 };

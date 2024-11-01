@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import { useIntl } from "react-intl";
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import ViewHeader from "../ViewHeader";
 import Dialog from "@mui/material/Dialog";
@@ -7,24 +8,9 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import {
-  ViewAppContainer,
-  AboutAppSectionTitle,
-  AboutGameTextContainer,
-  AppInfoContainer,
-  AppInfoRow,
-  AppInfoRowText,
-  AppInfoTitle,
-  HorizontalDivider,
-  MainContentSection,
-  Section,
-  AppCompatibilityContainer,
-  AppCompatibilityTitle,
-  ViewFooter,
-  InstallWrapper,
-} from "../styles";
 import { Button, IconButton } from "@mui/material";
-import InstallButton from "../InstallButton";
+import useSanity from "../../shared/hooks/useSanity";
+import { checkLocale } from "../../shared/helpers/languages";
 
 interface Props {
   setView: Dispatch<SetStateAction<string>>;
@@ -67,136 +53,127 @@ const AboutView: React.FC<Props> = ({ setView }) => {
     return `${month} ${day}, ${year}`;
   };
 
+  const { data } = useSanity(
+    "fullDescription, size, version, countOfDownloads"
+  );
+
+  if (!data) return null;
+
   return (
-    <ViewAppContainer>
+    <div>
       <ViewHeader id="details" setView={setView} />
-      <MainContentSection>
-        <AboutAppSectionTitle>
+      <section className="pt-[3.5em] mx-6">
+        <div className="text-[1.1rem] text-main font-sans pt-4 pb-4 flex items-center">
           {intl.formatMessage({ id: "about" })}
-        </AboutAppSectionTitle>
-        <AboutGameTextContainer>
-          {intl.formatMessage({ id: "aboutGameText1" })}
-          <br />
-          <br />
-          {intl.formatMessage({ id: "aboutGameText2" })}
-          <br />
-          <br />
-          {intl.formatMessage({ id: "aboutGameText3" })}
-          <br />
-          <br />
-          {intl.formatMessage({ id: "aboutGameText4" })}
-          <br />
-          <br />
-          {intl.formatMessage({ id: "aboutGameText5" })}
-          <br />
-          <br />
-          {intl.formatMessage({ id: "aboutGameText6" })}
-          <br />
-          <br />
-          {intl.formatMessage({ id: "aboutGameText7" })}
-          <br />
-          <br />
-          {intl.formatMessage({ id: "aboutGameText8" })}
-          <br />
-          <br />
-          {intl.formatMessage({ id: "aboutGameText9" })}
-          <br />
-          <br />
-          {intl.formatMessage({ id: "aboutGameText10" })}
-          <br />
-          <br />
-          {intl.formatMessage({ id: "aboutGameText11" })}
-        </AboutGameTextContainer>
-      </MainContentSection>
-      <HorizontalDivider />
-      <Section>
-        <AppInfoTitle>{intl.formatMessage({ id: "appInfo" })}</AppInfoTitle>
-        <AppInfoContainer>
-          <AppInfoRow>
-            <AppInfoRowText>
+        </div>
+        <div className="text-[1rem] text-main font-sans pb-4 whitespace-pre-wrap relative text-justify">
+          {data?.fullDescription[checkLocale()]}
+        </div>
+      </section>
+      <div className="bg-[#dadce0] h-[1px] w-full" />
+      <div className="px-6">
+        <div className="text-[1.1rem] text-main font-sans pt-4 pb-4 flex items-center">
+          {intl.formatMessage({ id: "whatsNew" })}
+
+          <FiberManualRecordIcon
+            style={{
+              color: `#047a56`,
+              fontSize: 12,
+              marginLeft: "6px",
+            }}
+          />
+        </div>
+        <div className="text-[1rem] text-main font-sans pb-4 whitespace-pre-wrap relative text-justify">
+          {intl.formatMessage({ id: "newBonuses" })}
+        </div>
+      </div>
+      <div className="bg-[#dadce0] h-[1px] w-full" />
+      <div className="px-6">
+        <div className="text-[1.1rem]font-sans pt-4">
+          {intl.formatMessage({ id: "appInfo" })}
+        </div>
+        <div className="flex flex-col gap-[2em] py-[2em]">
+          <div className="flex flex-row justify-between items-center">
+            <span className="text-[0.9rem]">
               {intl.formatMessage({ id: "version" })}
-            </AppInfoRowText>
-            <AppInfoRowText>2.12.14</AppInfoRowText>
-          </AppInfoRow>
-          <AppInfoRow>
-            <AppInfoRowText>
+            </span>
+            <span className="text-[0.9rem]">{data.version}</span>
+          </div>
+          <div className="flex flex-row justify-between items-center">
+            <span className="text-[0.9rem]">
               {intl.formatMessage({ id: "updatedOn" })}
-            </AppInfoRowText>
-            <AppInfoRowText>{getTodayDate()}</AppInfoRowText>
-          </AppInfoRow>
-          <AppInfoRow>
-            <AppInfoRowText>
+            </span>
+            <span className="text-[0.9rem]">{getTodayDate()}</span>
+          </div>
+          <div className="flex flex-row justify-between items-center">
+            <span className="text-[0.9rem]">
               {intl.formatMessage({ id: "downloads" })}
-            </AppInfoRowText>
-            <AppInfoRowText>
-              {intl.formatMessage({ id: "downloadsAmount" })}
-            </AppInfoRowText>
-          </AppInfoRow>
-          <AppInfoRow>
-            <AppInfoRowText>
+            </span>
+            <span className="text-[0.9rem]">{data.countOfDownloads}</span>
+          </div>
+          <div className="flex flex-row justify-between items-center">
+            <span className="text-[0.9rem]">
               {intl.formatMessage({ id: "downloadSize" })}
-            </AppInfoRowText>
-            <AppInfoRowText>15,23 MB</AppInfoRowText>
-          </AppInfoRow>
-          <AppInfoRow>
-            <AppInfoRowText>
+            </span>
+            <span className="text-[0.9rem]">{data.size}</span>
+          </div>
+          <div className="flex flex-row justify-between items-center">
+            <span className="text-[0.9rem]">
               {intl.formatMessage({ id: "offeredBy" })}
-            </AppInfoRowText>
-            <AppInfoRowText>MrBeast casino</AppInfoRowText>
-          </AppInfoRow>
-          <AppInfoRow>
-            <AppInfoRowText>
+            </span>
+            <span className="text-[0.9rem]">Nine Dev</span>
+          </div>
+          <div className="flex flex-row justify-between items-center">
+            <span className="text-[0.9rem]">
               {intl.formatMessage({ id: "releasedOn" })}
-            </AppInfoRowText>
-            <AppInfoRowText>
+            </span>
+            <span className="text-[0.9rem]">
               {intl.formatMessage({ id: "releaseDate" })}
-            </AppInfoRowText>
-          </AppInfoRow>
-        </AppInfoContainer>
-      </Section>
-      <HorizontalDivider />
-      <Section>
-        <AppCompatibilityTitle>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div className="bg-[#dadce0] h-[1px] w-full" />
+      <div className="px-6">
+        <div className="text-[1.1rem] text-main font-sans pt-4 pb-4 flex items-center justify-between">
           {intl.formatMessage({ id: "compatibilityTitle" })}
           <IconButton onClick={handleClickOpen}>
             <InfoOutlinedIcon />
           </IconButton>
-        </AppCompatibilityTitle>
-        <AppCompatibilityContainer>
-          <AppInfoRow>
-            <AppInfoRowText>
+        </div>
+        <div className="flex flex-col gap-[2em] py-[1em]">
+          <div className="flex flex-row justify-between items-center">
+            <span className="text-[0.9rem]">
               {intl.formatMessage({ id: "compatibility" })}
-            </AppInfoRowText>
-            <AppInfoRowText>
+            </span>
+            <span className="text-[0.9rem]">
               {intl.formatMessage({ id: "worksOnYourDevice" })}
-            </AppInfoRowText>
-          </AppInfoRow>
-          <AppInfoRow>
-            <AppInfoRowText>
+            </span>
+          </div>
+          <div className="flex flex-row justify-between items-center">
+            <span className="text-[0.9rem]">
               {intl.formatMessage({ id: "version" })}
-            </AppInfoRowText>
-            <AppInfoRowText>2.12.14</AppInfoRowText>
-          </AppInfoRow>
-          <AppInfoRow>
-            <AppInfoRowText>
+            </span>
+            <span className="text-[0.9rem]">2.12.14</span>
+          </div>
+          <div className="flex flex-row justify-between items-center">
+            <span className="text-[0.9rem]">
               {intl.formatMessage({ id: "downloadSize" })}
-            </AppInfoRowText>
-            <AppInfoRowText>15,23 MB</AppInfoRowText>
-          </AppInfoRow>
-          <AppInfoRow>
-            <AppInfoRowText>
+            </span>
+            <span className="text-[0.9rem]">15,23 MB</span>
+          </div>
+          <div className="flex flex-row justify-between items-center">
+            <span className="text-[0.9rem]">
               {intl.formatMessage({ id: "RequiredOS" })}
-            </AppInfoRowText>
-            <AppInfoRowText>{intl.formatMessage({ id: "OS" })}</AppInfoRowText>
-          </AppInfoRow>
-        </AppCompatibilityContainer>
-      </Section>
-      <HorizontalDivider style={{ paddingBottom: "3.5em" }} />
-      <ViewFooter>
-        <InstallWrapper>
-          <InstallButton appLink="/" />
-        </InstallWrapper>
-      </ViewFooter>
+            </span>
+            <span className="text-[0.9rem]">
+              {intl.formatMessage({ id: "OS" })}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div className="bg-[#dadce0] h-[1px] w-full" />
+
       <Dialog
         open={dialog}
         onClose={handleClose}
@@ -215,7 +192,7 @@ const AboutView: React.FC<Props> = ({ setView }) => {
           <Button onClick={handleClose}>OK</Button>
         </DialogActions>
       </Dialog>
-    </ViewAppContainer>
+    </div>
   );
 };
 

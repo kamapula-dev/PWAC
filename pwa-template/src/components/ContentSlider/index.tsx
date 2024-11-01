@@ -1,23 +1,12 @@
 import Slider from "react-slick";
-import { useMixpanel } from "react-mixpanel-browser";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import firstScreen from "../../images/firstScreen.webp";
-import secondScreen from "../../images/secondScreen.webp";
-import thirdScreen from "../../images/thirdScreen.webp";
-import fourthScreen from "../../images/fourthScreen.webp";
-import { ScreenContainer, ScreenWrapperItem, SliderContainer } from "../styles";
+import useSanity from "../../shared/hooks/useSanity";
 
 export default function ContentSlider() {
-  const mixpanel = useMixpanel();
+  const { data, urlFor } = useSanity("screens");
 
-  const handleScreenshotClick = (screenName: string) => {
-    if (mixpanel) {
-      mixpanel.track("landing_screenshots_tapped", {
-        "Screen Name": screenName,
-      });
-    }
-  };
+  if (!data) return null;
 
   const settings = {
     dots: false,
@@ -45,34 +34,13 @@ export default function ContentSlider() {
     ],
   };
   return (
-    <SliderContainer>
-      <div className="slider-container">
-        <Slider {...settings}>
-          <ScreenWrapperItem
-            onClick={() => handleScreenshotClick("First Screen")}
-          >
-            <ScreenContainer>
+    <div className="slider-container mb-4">
+      <Slider {...settings}>
+        {data?.screens.map((screen, index) => {
+          return (
+            <div className="pr-2" key={index}>
               <img
-                src={firstScreen}
-                width={360}
-                height={720}
-                alt="First screen"
-                style={{
-                  objectFit: "cover",
-                  width: "100%",
-                  height: "auto",
-                  borderRadius: "8px",
-                }}
-              />
-            </ScreenContainer>
-          </ScreenWrapperItem>
-
-          <ScreenWrapperItem
-            onClick={() => handleScreenshotClick("Second Screen")}
-          >
-            <ScreenContainer>
-              <img
-                src={secondScreen}
+                src={urlFor(screen)}
                 width={360}
                 height={720}
                 style={{
@@ -81,50 +49,12 @@ export default function ContentSlider() {
                   height: "auto",
                   borderRadius: "8px",
                 }}
-                alt="Second screen"
+                alt="Screen"
               />
-            </ScreenContainer>
-          </ScreenWrapperItem>
-
-          <ScreenWrapperItem
-            onClick={() => handleScreenshotClick("Third Screen")}
-          >
-            <ScreenContainer>
-              <img
-                src={thirdScreen}
-                width={360}
-                height={720}
-                style={{
-                  objectFit: "cover",
-                  width: "100%",
-                  height: "auto",
-                  borderRadius: "8px",
-                }}
-                alt="Third screen"
-              />
-            </ScreenContainer>
-          </ScreenWrapperItem>
-
-          <ScreenWrapperItem
-            onClick={() => handleScreenshotClick("Fourth Screen")}
-          >
-            <ScreenContainer>
-              <img
-                src={fourthScreen}
-                width={360}
-                height={720}
-                style={{
-                  objectFit: "cover",
-                  width: "100%",
-                  height: "auto",
-                  borderRadius: "8px",
-                }}
-                alt="Fourth screen"
-              />
-            </ScreenContainer>
-          </ScreenWrapperItem>
-        </Slider>
-      </div>
-    </SliderContainer>
+            </div>
+          );
+        })}
+      </Slider>
+    </div>
   );
 }

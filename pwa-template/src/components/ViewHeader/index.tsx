@@ -1,12 +1,5 @@
 import { IconButton } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import {
-  HeaderInfoContainer,
-  HeaderInfoText,
-  HeaderInfoTitle,
-  LogoSection,
-  ViewHeaderContainer,
-} from "../styles";
 import { useIntl } from "react-intl";
 import { Dispatch, SetStateAction } from "react";
 
@@ -22,16 +15,24 @@ const ViewHeader: React.FC<Props> = ({ setView, id }) => {
     setView("main");
   };
   return (
-    <ViewHeaderContainer>
+    <div className="h-[3.5em] w-full items-center flex fixed top-0 z-10 bg-white">
       <IconButton size="large" onClick={handleClick}>
         <ArrowBackIcon sx={{ color: "rgb(32, 33, 36)", fontSize: 24 }} />
       </IconButton>
-      <LogoSection src="/icon.webp" />
-      <HeaderInfoContainer>
-        <HeaderInfoTitle>{intl.formatMessage({ id: "name" })}</HeaderInfoTitle>
-        <HeaderInfoText>{intl.formatMessage({ id })}</HeaderInfoText>
-      </HeaderInfoContainer>
-    </ViewHeaderContainer>
+      <img
+        className="h-[calc(100%-1.5em)] mr-5 rounded-lg aspect-square"
+        src="/icon.webp"
+        alt="Logo"
+      />
+      <div className="flex flex-col">
+        <span className="overflow-hidden whitespace-nowrap text-ellipsis font-medium leading-[1.3rem] text-[0.8rem]">
+          {intl.formatMessage({ id: "name" })}
+        </span>
+        <span className="font-normal text-[0.8em]">
+          {intl.formatMessage({ id })}
+        </span>
+      </div>
+    </div>
   );
 };
 

@@ -1,30 +1,20 @@
 import CircularProgress from "@mui/material/CircularProgress";
-import {
-  AppImg,
-  LogoContainer,
-  LogoInProgressContainer,
-  LogoInProgressWrapper,
-} from "../styles";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../Redux/store/store";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
+  getInstallState,
   setFakeDownloadProgress,
-  setIsDownloaded,
-  stopFakeFakeDownload,
+  setInstallState,
 } from "../../Redux/feat/InstallSlice";
+import useSanity from "../../shared/hooks/useSanity";
+import { RootState } from "../../Redux/store/store";
+import { PWAInstallState } from "../../shared/models";
 
 function AppLogo() {
-  const [installProgressNumber, setInstallProgressNumber] = useState(0);
+  const installState = useSelector((state: RootState) =>
+    getInstallState(state.install)
+  );
   const dispatch = useDispatch();
-
-  const isInstalling = useSelector(
-    (state: RootState) => state.install.isInstalling
-  );
-
-  const isFakeDownloadStarted = useSelector(
-    (state: RootState) => state.install.fakeDownload
-  );
 
   useEffect(() => {
     const fakeInstall = async () => {
@@ -38,70 +28,62 @@ function AppLogo() {
         progress = Math.floor(progress);
 
         dispatch(setFakeDownloadProgress(progress));
-        setInstallProgressNumber(progress);
+        const elapsedTime = (Date.now() - startTime) / 1100;
 
-        const elapsedTime = (Date.now() - startTime) / 1000;
-
-        if (progress >= 100 && elapsedTime >= 8) {
+        if (progress >= 100 && elapsedTime >= 6) {
           clearInterval(interval);
-          dispatch(stopFakeFakeDownload());
-          dispatch(setFakeDownloadProgress(0));
-          dispatch(setIsDownloaded());
+          dispatch(setInstallState(PWAInstallState.downloaded));
         }
-      }, 1000);
+      }, 1100);
     };
-
-    if (isFakeDownloadStarted) {
+    if (installState === PWAInstallState.downloading) {
       fakeInstall();
     }
-  }, [isFakeDownloadStarted, dispatch]);
+  }, [installState]);
 
-  const showCircularProgress = isFakeDownloadStarted;
-  const showPermanentCircularProgress = isInstalling && !isFakeDownloadStarted;
-  const showLogo = !isInstalling && !isFakeDownloadStarted;
+  const showPermanentCircularProgress =
+    installState === PWAInstallState.downloading ||
+    installState === PWAInstallState.installing;
+  const showLogo =
+    installState === PWAInstallState.idle ||
+    installState === PWAInstallState.installed ||
+    installState === PWAInstallState.downloaded;
+
+  const { data, urlFor } = useSanity(`appIcon`);
+
+  if (!data) return null;
 
   return (
     <>
-      {showCircularProgress && (
-        <LogoInProgressWrapper>
-          <LogoInProgressContainer>
-            <AppImg src="/icon.webp" alt="App logo" />
-          </LogoInProgressContainer>
-
-          <CircularProgress
-            variant="determinate"
-            value={installProgressNumber}
-            disableShrink
-            size={56}
-            thickness={3}
-            sx={{
-              position: "absolute",
-              color: "primary.main",
-            }}
-          />
-        </LogoInProgressWrapper>
-      )}
       {showPermanentCircularProgress && (
-        <LogoInProgressWrapper>
-          <LogoInProgressContainer>
-            <AppImg src="/icon.webp" alt="App logo" />
-          </LogoInProgressContainer>
+        <div className="relative flex justify-center items-center w-16 h-16 mr-5">
+          <div className="w-14 h-14 rounded-full overflow-hidden relative">
+            <img
+              src={urlFor(data.appIcon)}
+              alt="App logo"
+              className="object-contain"
+            />
+          </div>
 
           <CircularProgress
             disableShrink
-            size={56}
-            thickness={3}
+            size={58}
+            thickness={2}
             sx={{
               position: "absolute",
-              color: "primary.main",
+              color: "#00875F",
             }}
           />
-        </LogoInProgressWrapper>
+        </div>
       )}
       {showLogo && (
-        <LogoContainer>
-          <AppImg src="/icon.webp" alt="App logo" />
-        </LogoContainer>
+        <div className="relative block overflow-hidden w-[70px] h-[70px] rounded-lg mr-5">
+          <img
+            src={urlFor(data.appIcon)}
+            alt="App logo"
+            className="object-contain"
+          />
+        </div>
       )}
     </>
   );

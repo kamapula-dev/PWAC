@@ -8,12 +8,11 @@ export default defineConfig({
     VitePWA({
       registerType: "prompt",
       includeAssets: ["favicon.ico", "apple-touch-icon.png", "mask-icon.svg"],
-      workbox: { globDirectory: "public/", globPatterns: ["images/*.webp"] },
       strategies: "injectManifest",
       manifest: {
-        name: "MrBeast casino",
+        name: "Plinko Win",
         display: "standalone",
-        short_name: "MrBeast casino",
+        short_name: "Plinko Win",
         theme_color: "#ffffff",
         start_url: "/",
         scope: "/",

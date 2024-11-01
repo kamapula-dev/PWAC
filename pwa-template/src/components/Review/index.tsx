@@ -9,20 +9,6 @@ import {
   blue,
 } from "@mui/material/colors";
 import { Rating } from "@mui/material";
-import {
-  DeveloperResponseContainer,
-  DeveloperResponseDate,
-  DeveloperResponseHeader,
-  DeveloperResponseName,
-  DeveloperResponseText,
-  ReviewAuthorContainer,
-  ReviewContainer,
-  ReviewDataContainer,
-  ReviewDate,
-  ReviewHeader,
-  ReviewText,
-  ReviewWrapper,
-} from "../styles";
 
 interface ReviewProps {
   avatarName: string;
@@ -32,8 +18,6 @@ interface ReviewProps {
   text: string;
   date: string;
   src?: string;
-  developerResponse?: boolean;
-  developerResponseText?: string;
 }
 
 const getAvatarColor = (color: string) => {
@@ -65,40 +49,40 @@ const Review: React.FC<ReviewProps> = ({
   text,
   date,
   src,
-  developerResponse,
-  developerResponseText,
 }) => {
   return (
-    <ReviewWrapper>
-      <ReviewContainer>
-        <ReviewHeader>
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-[0.8em] w-full">
+        <div className="flex gap-[1em] items-center">
           <Avatar src={src} sx={{ bgcolor: getAvatarColor(color) }}>
             {avatarName}
           </Avatar>
-          <ReviewAuthorContainer>{name}</ReviewAuthorContainer>
-        </ReviewHeader>
-        <ReviewDataContainer>
+          <div className="font-roboto font-normal text-main text-[0.875rem] leading-[1.25rem]">
+            {name}
+          </div>
+        </div>
+        <div className="flex gap-[0.5em] items-center">
           <Rating
             name="half-rating-read"
             defaultValue={stars}
             precision={1}
             readOnly
-            sx={{ color: "rgb(11, 87, 207)", fontSize: "14px" }}
+            sx={{ color: "rgb(0, 135, 95)", fontSize: "14px" }}
           />
-          <ReviewDate>{date}</ReviewDate>
-        </ReviewDataContainer>
-        <ReviewText>{text}</ReviewText>
-      </ReviewContainer>
-      {developerResponse && (
-        <DeveloperResponseContainer>
-          <DeveloperResponseHeader>
-            <DeveloperResponseName>MrBeast casino</DeveloperResponseName>
-            <DeveloperResponseDate>{date}</DeveloperResponseDate>
-          </DeveloperResponseHeader>
-          <DeveloperResponseText>{developerResponseText}</DeveloperResponseText>
-        </DeveloperResponseContainer>
-      )}
-    </ReviewWrapper>
+          <div className="leading-[1rem] text-[0.75em]">{date}</div>
+        </div>
+        <div
+          className="font-roboto font-normal text-secondary text-justify text-[0.875rem] leading-[1.25rem]"
+          style={{
+            textOverflow: "ellipsis",
+            letterSpacing: "0.0142857143em",
+            overflowWrap: "anywhere",
+          }}
+        >
+          {text}
+        </div>
+      </div>
+    </div>
   );
 };
 

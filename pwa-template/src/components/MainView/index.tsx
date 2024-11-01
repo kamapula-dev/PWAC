@@ -2,100 +2,19 @@ import { Dispatch, SetStateAction } from "react";
 import { useIntl } from "react-intl";
 import AppLogo from "../AppLogo";
 import StarIcon from "@mui/icons-material/Star";
-import { Rating } from "@mui/material";
-import {
-  MainContainer,
-  AppDescriptionSection,
-  AppNameContainer,
-  AppHeader,
-  AppHeaderInfoContainer,
-  AppStatisticsCard,
-  AppStatisticsCardItem,
-  VerticalDivider,
-  AppStatisticsCardItemTitle,
-  AppStatisticsCardItemContent,
-  AgeLogoContainer,
-  AboutGameContainer,
-  ShortDescriptionWrapper,
-  AppRateContainer,
-  AppRatesAndSection,
-  AppRatesAndReviewsContainer,
-  AppStarsContainer,
-  AppRatesCountContainer,
-  AppRatingContainer,
-  RatingContainer,
-  StarsCount,
-  RatingChart,
-  ReviewsSection,
-  AgeImg,
-} from "../styles";
+import { Divider, Rating } from "@mui/material";
 import InstallButton from "../InstallButton";
 import ContentSlider from "../ContentSlider";
 import OpenSectionButton from "../OpenSectionButton";
 import ChipSlider from "../ChipSlider";
 import Review from "../Review";
-import InstallationProgess from "../InstallationProgress";
-import RateApp from "../RateApp";
+import InstallationProgress from "../InstallationProgress";
+import useSanity from "../../shared/hooks/useSanity";
+import { checkLocale } from "../../shared/helpers/languages";
 
 interface Props {
   setView: Dispatch<SetStateAction<string>>;
 }
-
-const getDate = (decrement: number) => {
-  const today = new Date();
-  today.setDate(today.getDate() - decrement);
-
-  const dd = String(today.getDate()).padStart(2, "0");
-  const mm = String(today.getMonth() + 1).padStart(2, "0"); // January is 0!
-  const yy = String(today.getFullYear());
-
-  return dd + "." + mm + "." + yy;
-};
-
-const reviewsData = [
-  {
-    name: "Watson",
-    avatarName: "S",
-    color: "blueGrey",
-    stars: 5,
-    reviewKey: "Watson",
-    date: getDate(0),
-    src: "https://play-lh.googleusercontent.com/a-/ALV-UjUitVOQZoEb-JkE5x-6fJfa9gGoZ82zB5DaLHXWldUkE3M=s32-rw",
-    developerResponse: true,
-    developerResponseText: "DeveloperResponseWatson",
-  },
-  {
-    name: "Bibi",
-    avatarName: "F",
-    color: "blue",
-    stars: 5,
-    reviewKey: "Sheff816",
-    date: getDate(0),
-    developerResponse: true,
-    developerResponseText: "DeveloperResponseSheff816",
-  },
-  {
-    name: "Matthew",
-    avatarName: "M",
-    color: "deepPurple",
-    stars: 4,
-    reviewKey: "Matthew",
-    date: getDate(1),
-    src: "https://play-lh.googleusercontent.com/a-/ALV-UjUnmvE_tonNa6yGncMLT56DJk7EFjuOncgrj3ce2kv4_7g=s32-rw",
-    developerResponse: true,
-    developerResponseText: "DeveloperResponseMatthew",
-  },
-  {
-    name: "MassesOfPalpur",
-    avatarName: "M",
-    color: "deepPurple",
-    stars: 5,
-    reviewKey: "Matthew",
-    date: getDate(2),
-    developerResponse: true,
-    developerResponseText: "DeveloperResponseMassesOfPalpur",
-  },
-];
 
 const ratingsData = [
   { stars: 5, rating: 70 },
@@ -107,144 +26,172 @@ const ratingsData = [
 
 const MainView: React.FC<Props> = ({ setView }) => {
   const intl = useIntl();
+  const { data, urlFor } = useSanity(
+    `appName, rating, countOfReviews, countOfDownloads, countOfReviewsFull, countOfStars, reviews, shortDescription`
+  );
+
+  if (!data) return null;
+
+  const reviews =
+    data.reviews.length > 3 ? data.reviews.slice(0, 3) : data.reviews;
 
   return (
-    <MainContainer>
-      <AppDescriptionSection>
-        <AppHeader>
-          <AppLogo />
-          <AppHeaderInfoContainer>
-            <AppNameContainer>MrBeast casino</AppNameContainer>
-            <InstallationProgess />
-          </AppHeaderInfoContainer>
-        </AppHeader>
-        <AppStatisticsCard>
-          <AppStatisticsCardItem>
-            <AppStatisticsCardItemTitle>
-              4.8 <StarIcon fontSize="inherit" />
-            </AppStatisticsCardItemTitle>
-            <AppStatisticsCardItemContent>
-              {intl.formatMessage({
-                id: "reviews",
-                defaultMessage: "21K reviews",
-              })}
-            </AppStatisticsCardItemContent>
-          </AppStatisticsCardItem>
-          <VerticalDivider orientation="vertical" variant="inset" flexItem />
-          <AppStatisticsCardItem>
-            <AppStatisticsCardItemTitle>119К+</AppStatisticsCardItemTitle>
-            <AppStatisticsCardItemContent>
-              {intl.formatMessage({
-                id: "downloads",
-                defaultMessage: "Downloads",
-              })}
-            </AppStatisticsCardItemContent>
-          </AppStatisticsCardItem>
-          <VerticalDivider orientation="vertical" variant="inset" flexItem />
-          <AppStatisticsCardItem>
-            <AppStatisticsCardItemTitle>
-              <AgeLogoContainer>
-                <AgeImg src="/18.png" alt="Age icon" />
-              </AgeLogoContainer>
-            </AppStatisticsCardItemTitle>
-            <AppStatisticsCardItemContent>
-              {intl.formatMessage({ id: "age", defaultMessage: "Age" })}
-            </AppStatisticsCardItemContent>
-          </AppStatisticsCardItem>
-        </AppStatisticsCard>
-        <InstallButton appLink="/" />
-        <ContentSlider />
-        <AboutGameContainer>
-          <OpenSectionButton
-            mixPanelEvent="landing_btn_aboutApp_pressed"
-            id="about"
-            defaultMessage="About this game"
-            view="about"
-            setView={setView}
-          />
-        </AboutGameContainer>
-        <ShortDescriptionWrapper>
-          {intl.formatMessage({
-            id: "shortDescription",
-            defaultMessage:
-              "DON'T MISS A CHANCE - WIN $100,000 MrBeast casino is in touch!",
-          })}
-          <br />
-          <br />
-          {intl.formatMessage({
-            id: "shortDescriptionSecondParagraph",
-            defaultMessage: "Download the app and get £2500 Bonus.",
-          })}
-          <br />
-          <br />
-          {intl.formatMessage({
-            id: "shortDescriptionThirdParagraph",
-            defaultMessage:
-              "Get 250 FREE SPINS, 250 free tries to win JACKPOT.",
-          })}
-          <br />
-          <br />
-          {intl.formatMessage({
-            id: "shortDescriptionFourthParagraph",
-            defaultMessage:
-              "My team created this casino, where we simply give hundreds of millions of dollars to anyone who wishes!",
-          })}
-        </ShortDescriptionWrapper>
-        <ChipSlider />
-        <AboutGameContainer>
-          <OpenSectionButton
-            mixPanelEvent="landing_btn_ratingsApp_pressed"
-            id="ratingsAndReviews"
-            defaultMessage="Ratings and reviews"
-            view="reviews"
-            setView={setView}
-          />
-        </AboutGameContainer>
-      </AppDescriptionSection>
-
-      <AppRatesAndSection>
-        <AppRatesAndReviewsContainer>
-          <AppRateContainer>4.8</AppRateContainer>
-          <AppStarsContainer>
-            <Rating
-              name="half-rating-read"
-              defaultValue={4.6}
-              precision={0.1}
-              readOnly
-              sx={{ color: "rgb(11, 87, 207)", fontSize: "14px" }}
-            />
-          </AppStarsContainer>
-          <AppRatesCountContainer>21,301</AppRatesCountContainer>
-          <AppRatingContainer>
-            {ratingsData.map((data, index) => (
-              <RatingContainer key={index}>
-                <StarsCount>{data.stars}</StarsCount>
-                <RatingChart rating={data.rating} />
-              </RatingContainer>
-            ))}
-          </AppRatingContainer>
-        </AppRatesAndReviewsContainer>
-        <RateApp />
-      </AppRatesAndSection>
-      <ReviewsSection>
-        {reviewsData.map((review) => (
-          <Review
-            src={review.src ? review.src : undefined}
-            key={review.name}
-            name={review.name}
-            avatarName={review.avatarName}
-            color={review.color}
-            stars={review.stars}
-            text={intl.formatMessage({ id: review.reviewKey })}
-            date={review.date}
-            developerResponse
-            developerResponseText={intl.formatMessage({
-              id: review.developerResponseText,
+    <div className="pt-5 px-6">
+      <div className="flex mb-4">
+        <AppLogo />
+        <div className="flex flex-col text-[#00875F]">
+          <div className="text-black text-[22px] leading-7 font-medium">
+            {data?.appName ? data.appName : "Nine Casino"}
+          </div>
+          <InstallationProgress />
+        </div>
+      </div>
+      <div className="flex mb-5">
+        <div className="flex-1 flex flex-col justify-center items-center h-[44px]">
+          <div className="font-medium text-[13px] text-[#030303] flex gap-[2px] items-center justify-center mb-[5px]">
+            {data?.rating}
+            <StarIcon fontSize="inherit" />
+          </div>
+          <div className="text-[11px] text-gray-600 font-medium">
+            {data?.countOfReviews ? data.countOfReviews : "21K"}
+            {intl.formatMessage({
+              id: "reviews",
+              defaultMessage: "reviews",
             })}
+          </div>
+        </div>
+        <Divider
+          className="!p-0 !m-0"
+          orientation="vertical"
+          variant="inset"
+          flexItem
+        />
+        <div className="flex-1 flex flex-col justify-center items-center h-[44px]">
+          <div className="font-medium text-[13px] text-[#030303] flex gap-[2px] items-center justify-center mb-[5px]">
+            {data?.countOfDownloads}
+          </div>
+          <div className="text-[11px] text-gray-600 font-medium">
+            {intl.formatMessage({
+              id: "downloads",
+              defaultMessage: "Donwloads",
+            })}
+          </div>
+        </div>
+        <Divider
+          className="!p-0 !m-0"
+          orientation="vertical"
+          variant="inset"
+          flexItem
+        />
+        <div className="flex-1 flex flex-col justify-center items-center h-[44px]">
+          <div className="font-medium text-[13px] text-[#030303] flex gap-[2px] items-center justify-center mb-[5px]">
+            <div className="w-4 h-4 mb-0.5">
+              <img src="/18.png" alt="Age icon" />
+            </div>
+          </div>
+          <div className="text-[11px] text-gray-600 font-medium">
+            {intl.formatMessage({ id: "age", defaultMessage: "Age" })}
+          </div>
+        </div>
+      </div>
+      <InstallButton appLink="/" />
+      <ContentSlider />
+      <div className="flex justify-between items-center mb-4">
+        <OpenSectionButton
+          id="about"
+          defaultMessage="About this game"
+          view="about"
+          setView={setView}
+        />
+      </div>
+      <div className="text-left leading-6 text-[#5f6368] font-normal text-[14px] mb-3">
+        {data?.shortDescription[checkLocale()]}
+      </div>
+      <ChipSlider />
+      <div className="flex justify-between items-center mb-4">
+        <OpenSectionButton
+          id="ratingsAndReviews"
+          defaultMessage="Ratings and reviews"
+          view="reviews"
+          setView={setView}
+        />
+      </div>
+
+      <div
+        className="grid mb-6 gap-x-[2em]"
+        style={{
+          gridTemplateColumns: "auto 1fr",
+          gridTemplateRows: "auto auto auto",
+          gridTemplateAreas: `
+      "rating-big rating-right"
+      "rating-stars rating-right"
+      "rating-count rating-right"
+    `,
+        }}
+      >
+        <div className="text-[45px]" style={{ gridArea: "rating-big" }}>
+          {data?.rating}
+        </div>
+        <div className="flex mb-2" style={{ gridArea: "rating-stars" }}>
+          <Rating
+            name="half-rating-read"
+            defaultValue={data.countOfStars}
+            precision={0.1}
+            readOnly
+            sx={{ color: "rgb(0, 135, 95)", fontSize: "14px" }}
           />
-        ))}
-      </ReviewsSection>
-    </MainContainer>
+        </div>
+        <div
+          className="font-medium text-[0.8em]"
+          style={{ gridArea: "rating-count" }}
+        >
+          {data?.countOfReviewsFull}
+        </div>
+        <div
+          className="flex flex-col gap-[0.25em]"
+          style={{ gridArea: "rating-right" }}
+        >
+          {ratingsData.map((data, index) => (
+            <div
+              className="flex gap-[0.75em] justify-center items-center"
+              key={index}
+            >
+              <div className="font-medium text-[0.8em] w-[0.5em]">
+                {data.stars}
+              </div>
+              <div className="relative h-[0.5em] w-full bg-[#d9d9d9] rounded-[0.5em]">
+                <div
+                  className="absolute h-[0.5em] min-w-[0.5em] bg-[#00875f] rounded-[0.5em]"
+                  style={{ width: `${data.rating || 0}%` }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="flex flex-col gap-5">
+        {reviews.map((review) => {
+          const parts = review.reviewDate.split("-");
+          const formattedDate = `${parts[2]}/${parts[1]}/${parts[0].slice(-2)}`;
+          return (
+            <Review
+              src={
+                review.reviewAuthorIcon
+                  ? urlFor(review.reviewAuthorIcon)
+                  : undefined
+              }
+              key={review.reviewAuthorName}
+              name={review.reviewAuthorName}
+              avatarName={review.avatarTitle}
+              color={review.reviewIconColor}
+              stars={review.reviewAuthorRating}
+              text={review.reviewText[checkLocale()]}
+              date={formattedDate}
+            />
+          );
+        })}
+      </div>
+    </div>
   );
 };
 

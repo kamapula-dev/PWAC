@@ -1,58 +1,31 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { BeforeInstallPromptEvent } from "../../App";
+import { PWAInstallState } from "../../shared/models";
 
 export interface InstalState {
-  isInstalling: boolean;
-  fakeDownload: boolean;
-  isDownloaded: boolean;
+  installState: PWAInstallState;
   fakeDownloadProgress: string;
-  installPrompt: BeforeInstallPromptEvent | null;
 }
 
 const initialState: InstalState = {
-  isInstalling: false,
-  fakeDownload: false,
-  isDownloaded: false,
+  installState: PWAInstallState.idle,
   fakeDownloadProgress: "Waiting...",
-  installPrompt: null,
 };
 
 export const instalSlice = createSlice({
   name: "install",
   initialState,
   reducers: {
-    install: (state) => {
-      state.isInstalling = true;
-    },
-    startFakeDownload: (state) => {
-      state.fakeDownload = true;
-    },
-    stopFakeFakeDownload: (state) => {
-      state.fakeDownload = false;
-    },
-    stopInstalling: (state) => {
-      state.isInstalling = false;
-    },
-    setIsDownloaded: (state) => {
-      state.isDownloaded = true;
+    setInstallState: (state, action) => {
+      state.installState = action.payload;
     },
     setFakeDownloadProgress: (state, action) => {
       state.fakeDownloadProgress = action.payload + "% of 15 MB";
     },
-    setInstallPrompt: (state, action) => {
-      state.installPrompt = action.payload;
-    },
   },
 });
 
-export const {
-  install,
-  stopInstalling,
-  startFakeDownload,
-  stopFakeFakeDownload,
-  setIsDownloaded,
-  setFakeDownloadProgress,
-  setInstallPrompt,
-} = instalSlice.actions;
+export const { setInstallState, setFakeDownloadProgress } = instalSlice.actions;
+
+export const getInstallState = (state: InstalState) => state.installState;
 
 export default instalSlice.reducer;

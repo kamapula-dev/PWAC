@@ -43,14 +43,12 @@ export class PWAContentController {
     return this.pwaContentService.create(createPWAContentDto, userId);
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @Get()
   async findAll(@Request() req): Promise<PWAContent[]> {
     const userId = req.user._id;
     return this.pwaContentService.findAll(userId);
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @Get(':id')
   async findOne(@Param('id') id: string, @Request() req): Promise<PWAContent> {
     const userId = req.user._id;
