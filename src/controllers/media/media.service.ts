@@ -103,7 +103,6 @@ export class MediaService {
       await this.s3Client.send(command);
       Logger.log(`File with key ${fileKey} deleted successfully from S3.`);
     } catch (error) {
-      Logger.error(`Failed to delete file with key ${fileKey} from S3:`, error);
       throw new Error(`Error deleting file from S3`);
     }
   }
