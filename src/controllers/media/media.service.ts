@@ -11,6 +11,7 @@ import { fromEnv } from '@aws-sdk/credential-providers';
 import * as fs from 'fs';
 import * as archiver from 'archiver';
 import * as path from 'path';
+import { DeleteObjectCommand } from '@aws-sdk/client-s3';
 
 @Injectable()
 export class MediaService {
@@ -90,5 +91,23 @@ export class MediaService {
       archive.directory(distFolderPath, false);
       archive.finalize();
     });
+  }
+
+  async deleteArchive(fileKey: string): Promise<void> {
+    try {
+      const command = new DeleteObjectCommand({
+        Bucket: this.bucketName,
+        Key: fileKey,
+      });
+
+      await this.s3Client.send(command);
+      console.log(`File with key ${fileKey} deleted successfully from S3.`);
+    } catch (error) {
+      console.error(
+        `Failed to delete file with key ${fileKey} from S3:`,
+        error,
+      );
+      throw new Error(`Error deleting file from S3`);
+    }
   }
 }

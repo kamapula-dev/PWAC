@@ -8,7 +8,6 @@ import { AuthModule } from './controllers/auth/auth.module';
 import { MediaModule } from './controllers/media/media.module';
 import { PWAContentModule } from './controllers/pwa-content/pwa-content.module';
 import { BullModule } from '@nestjs/bull';
-import { BuildPWAProcessor } from './controllers/pwa-content/build-pwa.processor';
 
 @Module({
   imports: [

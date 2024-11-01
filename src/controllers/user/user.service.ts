@@ -42,11 +42,38 @@ export class UserService {
     );
   }
 
+  async updateUserPwas(
+    userId: string,
+    pwaData: {
+      pwaContentId: string;
+      createdAt: Date;
+      archiveKey: string;
+    },
+  ): Promise<void> {
+    const { pwaContentId, createdAt, archiveKey } = pwaData;
+
+    const result = await this.userModel.updateOne(
+      { _id: userId, 'pwas.pwaContentId': pwaContentId },
+      {
+        $set: {
+          'pwas.$.createdAt': createdAt,
+          'pwas.$.archiveKey': archiveKey,
+        },
+      },
+    );
+
+    if (result.matchedCount === 0) {
+      await this.userModel.updateOne(
+        { _id: userId },
+        { $push: { pwas: pwaData } },
+      );
+    }
+  }
+
   async addPwa(
     userId: string,
     pwaData: {
-      pwaId: string;
-      url: string;
+      pwaContentId: string;
       createdAt: Date;
       archiveKey: string;
     },

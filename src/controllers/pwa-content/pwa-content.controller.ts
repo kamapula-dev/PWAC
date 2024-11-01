@@ -9,6 +9,8 @@ import {
   UseGuards,
   Request,
   Res,
+  Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { PWAContentService } from './pwa-content.service';
@@ -20,6 +22,9 @@ import { MediaService } from '../media/media.service';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from '../user/user.service';
 import { Queue } from 'bull';
+import { User } from '../../schemas/user.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 @Controller('pwa-content')
 export class PWAContentController {
   constructor(
@@ -27,6 +32,7 @@ export class PWAContentController {
     private readonly mediaService: MediaService,
     private readonly configService: ConfigService,
     private readonly userService: UserService,
+    @InjectModel(User.name) private userModel: Model<User>,
     @InjectQueue('buildPWA') private readonly buildQueue: Queue,
   ) {}
 
@@ -81,33 +87,46 @@ export class PWAContentController {
   ): Promise<void> {
     try {
       const userId = req.user._id;
-      console.log('Adding job to the queue job');
+      Logger.log('Adding job to the queue job');
 
       const job = await this.buildQueue.add({
-        pwaId: id,
+        pwaContentId: id,
         userId,
       });
 
-      console.log(`Job ${job.id} added to the queue`);
+      Logger.log(`Job ${job.id} added to the queue`);
 
       res.json({ jobId: job.id });
     } catch (e) {
-      console.log(e, 'Failed to add job to the queue');
+      Logger.log(e, 'Failed to add job to the queue');
       throw e;
     }
   }
 
-  @Get(':id/check-redis')
-  async checkRedis(): Promise<string> {
+  @UseGuards(AuthGuard('jwt'))
+  @Get('get-signed-url/:pwaContentId')
+  async getSignedUrl(
+    @Param('pwaContentId') pwaContentId: string,
+  ): Promise<string> {
     try {
-      await this.buildQueue.client.ping();
-      return 'Redis connection is healthy';
+      const user = await this.userModel.findOne({
+        'pwas.pwaContentId': pwaContentId,
+      });
+
+      if (!user) {
+        throw new NotFoundException('PWA not found');
+      }
+
+      const pwa = user.pwas.find((p) => p.pwaContentId === pwaContentId);
+
+      return this.mediaService.getSignedUrl(pwa.archiveKey);
     } catch (error) {
-      console.error('Error connecting to Redis:', error);
+      Logger.error(error);
       throw error;
     }
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get('status/:jobId')
   async checkBuildStatus(@Param('jobId') jobId: string): Promise<any> {
     const job = await this.buildQueue.getJob(jobId);
@@ -115,18 +134,6 @@ export class PWAContentController {
     if (!job) {
       return { status: 'error', message: 'Job not found' };
     }
-
-    const jobs = await this.buildQueue.getJobs([
-      'waiting',
-      'active',
-      'completed',
-      'failed',
-      'delayed',
-    ]);
-
-    jobs.forEach((job) => {
-      console.log(job);
-    });
 
     const state = await job.getState();
 

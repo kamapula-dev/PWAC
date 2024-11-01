@@ -69,8 +69,7 @@ export class PWAContent extends Document {
     type: [Number],
     required: true,
     validate: {
-      validator: (v: number[]) =>
-        v.length === 5 && v.every((n) => n <= 5),
+      validator: (v: number[]) => v.length === 5 && v.every((n) => n <= 5),
       message: 'Array must contain exactly 5 values between 0 and 5',
     },
   })

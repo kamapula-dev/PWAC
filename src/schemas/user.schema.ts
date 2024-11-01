@@ -15,16 +15,16 @@ export class User extends Document {
   @Prop({
     type: [
       {
-        pwaId: { type: String, required: true },
-        url: { type: String, required: true },
+        pwaContentId: { type: String, required: true },
+        archiveKey: { type: String, required: true },
         createdAt: { type: Date, default: Date.now },
       },
     ],
     default: [],
   })
   pwas: {
-    pwaId: string;
-    url: string;
+    pwaContentId: string;
+    archiveKey: string;
     createdAt: Date;
   }[];
 }

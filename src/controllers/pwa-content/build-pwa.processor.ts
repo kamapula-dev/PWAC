@@ -5,44 +5,40 @@ import * as path from 'path';
 import { exec } from 'child_process';
 import { MediaService } from '../media/media.service';
 import { UserService } from '../user/user.service';
+import { Logger } from '@nestjs/common';
 
 @Processor('buildPWA')
 export class BuildPWAProcessor {
   constructor(
     private readonly mediaService: MediaService,
     private readonly userService: UserService,
-  ) {
-    console.log('MediaService:', !!mediaService);
-    console.log('UserService:', !!userService);
-  }
+  ) {}
 
   @Process()
   async handleBuildPWAJob(job: Job) {
     try {
-      const { pwaId, userId } = job.data;
+      const { pwaContentId, userId } = job.data;
 
-      console.log(
-        `Job started for PWA ID: ${pwaId}, User ID: ${userId}, Job ID: ${job.id}`,
+      Logger.log(
+        `Job started for PWA-content ID: ${pwaContentId}, User ID: ${userId}, Job ID: ${job.id}`,
       );
 
       const projectRoot = path.resolve(__dirname, '../../..');
       const templatePath = path.join(projectRoot, 'pwa-template');
       const tempBuildFolder = path.join(
         projectRoot,
-        `temp-build-${pwaId}-${Date.now()}`,
+        `temp-build-${pwaContentId}-${Date.now()}`,
       );
 
       try {
         fs.mkdirSync(tempBuildFolder, { recursive: true });
         fs.cpSync(templatePath, tempBuildFolder, { recursive: true });
       } catch (error) {
-        console.error('Error during folder creation or file copying:', error);
+        Logger.error('Error during folder creation or file copying:', error);
         throw new Error('Failed to prepare build environment');
       }
 
-      const buildCommand = `PWA_CONTENT_ID=${pwaId} npm run build`;
-
-      console.log(35);
+      const buildCommand = `PWA_CONTENT_ID=${pwaContentId} npm run build`;
 
       try {
         await new Promise<void>((resolve, reject) => {
@@ -51,52 +47,71 @@ export class BuildPWAProcessor {
             { cwd: tempBuildFolder },
             (error, stdout, stderr) => {
               if (error) {
-                console.error(`Build error: ${stderr}`);
+                Logger.error(`Build error: ${stderr}`);
                 return reject(new Error(`Error during build: ${stderr}`));
               }
-              console.log('Build output:', stdout);
+
+              Logger.log('Build output:', stdout);
               resolve();
             },
           );
         });
-        console.log(52);
       } catch (error) {
-        console.error('Error during build process:', error);
+        Logger.error('Error during build process:', error);
         throw new Error('Error during build');
       }
-      console.log(56);
+
       const distFolderPath = path.join(tempBuildFolder, 'dist');
       let archiveKey: string;
       let signedUrl: string;
-      console.log(60);
-      console.log('Uploading dist folder to S3...');
+
+      Logger.log('Checking for existing PWA...');
+
+      const user = await this.userService.findById(userId);
+      const existingPwa = user.pwas.find(
+        (p) => p.pwaContentId === pwaContentId,
+      );
+
+      if (existingPwa) {
+        try {
+          await this.mediaService.deleteArchive(existingPwa.archiveKey);
+          Logger.log(`Old archive deleted for PWA-content ID: ${pwaContentId}`);
+        } catch (error) {
+          Logger.error('Error deleting old archive from S3:', error);
+          throw new Error('Error deleting old archive from S3');
+        }
+      }
+
+      Logger.log('Uploading dist folder to S3...');
+
       try {
         archiveKey = await this.mediaService.uploadDistFolder(distFolderPath);
-        console.log('Dist folder uploaded, archiveKey:', archiveKey);
+        Logger.log('Dist folder uploaded');
         signedUrl = await this.mediaService.getSignedUrl(archiveKey);
-        console.log('Signed URL generated:', signedUrl);
+        Logger.log('Signed URL generated:', signedUrl);
       } catch (error) {
-        console.error('Error during upload to S3:', error);
+        Logger.error('Error during upload to S3:', error);
         throw new Error('Error during upload to S3');
       }
 
-      const pwaData = {
-        pwaId,
-        url: signedUrl,
-        createdAt: new Date(),
-        archiveKey,
-      };
-      await this.userService.addPwa(userId, pwaData);
+      await this.userService.updateUserPwas(
+        userId,
+        existingPwa || {
+          pwaContentId,
+          createdAt: new Date(),
+          archiveKey,
+        },
+      );
 
       try {
         fs.rmSync(tempBuildFolder, { recursive: true, force: true });
       } catch (error) {
-        console.error(`Error deleting temporary folder:`, error);
+        Logger.error(`Error deleting temporary folder:`, error);
         throw error;
       }
 
-      console.log(
-        `Job completed for PWA ID: ${pwaId}, User ID: ${userId}, Job ID: ${job.id}`,
+      Logger.log(
+        `Job completed for PWA-content ID: ${pwaContentId}, User ID: ${userId}, Job ID: ${job.id}`,
       );
 
       return signedUrl;
