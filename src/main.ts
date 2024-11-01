@@ -16,7 +16,7 @@ async function bootstrap() {
   );
   app.useGlobalFilters(new ValidationExceptionFilter());
 
-  await app.listen(80);
+  await app.listen(3000);
 }
 
 (async () => bootstrap())();

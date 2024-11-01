@@ -22,9 +22,7 @@ import { MediaService } from '../media/media.service';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from '../user/user.service';
 import { Queue } from 'bull';
-import { User } from '../../schemas/user.schema';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+
 @Controller('pwa-content')
 export class PWAContentController {
   constructor(
@@ -32,7 +30,6 @@ export class PWAContentController {
     private readonly mediaService: MediaService,
     private readonly configService: ConfigService,
     private readonly userService: UserService,
-    @InjectModel(User.name) private userModel: Model<User>,
     @InjectQueue('buildPWA') private readonly buildQueue: Queue,
   ) {}
 
@@ -107,11 +104,11 @@ export class PWAContentController {
   @Get('get-signed-url/:pwaContentId')
   async getSignedUrl(
     @Param('pwaContentId') pwaContentId: string,
+    @Request() req,
   ): Promise<string> {
     try {
-      const user = await this.userModel.findOne({
-        'pwas.pwaContentId': pwaContentId,
-      });
+      const userId = req.user._id;
+      const user = await this.userService.findById(userId);
 
       if (!user) {
         throw new NotFoundException('PWA not found');

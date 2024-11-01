@@ -4,9 +4,9 @@ import { PWAContentService } from './pwa-content.service';
 import { PWAContentController } from './pwa-content.controller';
 import { PWAContent, PWAContentSchema } from '../../schemas/pwa-content.scheme';
 import { MediaModule } from '../media/media.module';
-import { UserModule } from '../user/user.module';
 import { BullModule } from '@nestjs/bull';
 import { BuildPWAProcessor } from './build-pwa.processor';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -15,16 +15,9 @@ import { BuildPWAProcessor } from './build-pwa.processor';
     ]),
     BullModule.registerQueue({
       name: 'buildPWA',
-      defaultJobOptions: {
-        attempts: 1,
-        backoff: 0,
-      },
-      settings: {
-        lockDuration: 300000,
-      },
     }),
-    MediaModule,
     UserModule,
+    MediaModule,
   ],
   controllers: [PWAContentController],
   providers: [PWAContentService, BuildPWAProcessor],

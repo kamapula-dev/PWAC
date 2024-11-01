@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   S3Client,
   PutObjectCommand,
@@ -101,12 +101,9 @@ export class MediaService {
       });
 
       await this.s3Client.send(command);
-      console.log(`File with key ${fileKey} deleted successfully from S3.`);
+      Logger.log(`File with key ${fileKey} deleted successfully from S3.`);
     } catch (error) {
-      console.error(
-        `Failed to delete file with key ${fileKey} from S3:`,
-        error,
-      );
+      Logger.error(`Failed to delete file with key ${fileKey} from S3:`, error);
       throw new Error(`Error deleting file from S3`);
     }
   }
