@@ -1,6 +1,5 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import { useIntl } from "react-intl";
-import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import ViewHeader from "../ViewHeader";
 import Dialog from "@mui/material/Dialog";
@@ -9,16 +8,16 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { Button, IconButton } from "@mui/material";
-import useSanity from "../../shared/hooks/useSanity";
-import { checkLocale } from "../../shared/helpers/languages";
+import { PwaContent } from "../../shared/models";
 
 interface Props {
   setView: Dispatch<SetStateAction<string>>;
+  pwaContent: PwaContent;
 }
 
-const AboutView: React.FC<Props> = ({ setView }) => {
+const AboutView: React.FC<Props> = ({ setView, pwaContent }) => {
+  console.log(pwaContent);
   const intl = useIntl();
-
   const [dialog, setDialog] = useState(false);
 
   const handleClickOpen = () => {
@@ -53,40 +52,22 @@ const AboutView: React.FC<Props> = ({ setView }) => {
     return `${month} ${day}, ${year}`;
   };
 
-  const { data } = useSanity(
-    "fullDescription, size, version, countOfDownloads"
-  );
-
-  if (!data) return null;
-
   return (
     <div>
-      <ViewHeader id="details" setView={setView} />
+      <ViewHeader
+        appIcon={pwaContent.appIcon}
+        id="details"
+        developerName={pwaContent.developerName}
+        setView={setView}
+      />
       <section className="pt-[3.5em] mx-6">
         <div className="text-[1.1rem] text-main font-sans pt-4 pb-4 flex items-center">
           {intl.formatMessage({ id: "about" })}
         </div>
         <div className="text-[1rem] text-main font-sans pb-4 whitespace-pre-wrap relative text-justify">
-          {data?.fullDescription[checkLocale()]}
+          {pwaContent.description}
         </div>
       </section>
-      <div className="bg-[#dadce0] h-[1px] w-full" />
-      <div className="px-6">
-        <div className="text-[1.1rem] text-main font-sans pt-4 pb-4 flex items-center">
-          {intl.formatMessage({ id: "whatsNew" })}
-
-          <FiberManualRecordIcon
-            style={{
-              color: `#047a56`,
-              fontSize: 12,
-              marginLeft: "6px",
-            }}
-          />
-        </div>
-        <div className="text-[1rem] text-main font-sans pb-4 whitespace-pre-wrap relative text-justify">
-          {intl.formatMessage({ id: "newBonuses" })}
-        </div>
-      </div>
       <div className="bg-[#dadce0] h-[1px] w-full" />
       <div className="px-6">
         <div className="text-[1.1rem]font-sans pt-4">
@@ -97,7 +78,7 @@ const AboutView: React.FC<Props> = ({ setView }) => {
             <span className="text-[0.9rem]">
               {intl.formatMessage({ id: "version" })}
             </span>
-            <span className="text-[0.9rem]">{data.version}</span>
+            <span className="text-[0.9rem]">{pwaContent.version}</span>
           </div>
           <div className="flex flex-row justify-between items-center">
             <span className="text-[0.9rem]">
@@ -109,19 +90,19 @@ const AboutView: React.FC<Props> = ({ setView }) => {
             <span className="text-[0.9rem]">
               {intl.formatMessage({ id: "downloads" })}
             </span>
-            <span className="text-[0.9rem]">{data.countOfDownloads}</span>
+            <span className="text-[0.9rem]">{pwaContent.countOfDownloads}</span>
           </div>
           <div className="flex flex-row justify-between items-center">
             <span className="text-[0.9rem]">
               {intl.formatMessage({ id: "downloadSize" })}
             </span>
-            <span className="text-[0.9rem]">{data.size}</span>
+            <span className="text-[0.9rem]">{pwaContent.size}</span>
           </div>
           <div className="flex flex-row justify-between items-center">
             <span className="text-[0.9rem]">
               {intl.formatMessage({ id: "offeredBy" })}
             </span>
-            <span className="text-[0.9rem]">Nine Dev</span>
+            <span className="text-[0.9rem]">{pwaContent.developerName}</span>
           </div>
           <div className="flex flex-row justify-between items-center">
             <span className="text-[0.9rem]">
@@ -160,7 +141,7 @@ const AboutView: React.FC<Props> = ({ setView }) => {
             <span className="text-[0.9rem]">
               {intl.formatMessage({ id: "downloadSize" })}
             </span>
-            <span className="text-[0.9rem]">15,23 MB</span>
+            <span className="text-[0.9rem]">{pwaContent.size}</span>
           </div>
           <div className="flex flex-row justify-between items-center">
             <span className="text-[0.9rem]">

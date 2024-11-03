@@ -1,25 +1,38 @@
-import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
-import MainView from "./components/MainView";
-import AboutView from "./components/AboutView";
-import PwaView from "./components/PwaView";
-import ReviewsView from "./components/ReviewsView";
-import useSanity from "./shared/hooks/useSanity";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useState } from 'react';
+import Cookies from 'js-cookie';
+import MainView from './components/MainView';
+import AboutView from './components/AboutView';
+import PwaView from './components/PwaView';
+import ReviewsView from './components/ReviewsView';
+import axios from 'axios';
+import { PwaContent } from './shared/models';
+
+declare const window: any;
 
 export interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
 }
 
 export default function App() {
-  const { data } = useSanity("pwaLink");
-  const [view, setView] = useState("main");
+  const [view, setView] = useState('main');
   const [isPWAActive, setIsPWAActive] = useState(false);
-  console.log(import.meta.env.VITE_PWA_CONTENT_ID);
+  const [pwaContent, setPwaContent] = useState<PwaContent | null>(null);
+
+  useEffect(() => {
+    const getPwaContent = async () => {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/pwa-content/${import.meta.env.VITE_PWA_CONTENT_ID}/trusted`,
+      );
+      setPwaContent(response.data);
+    };
+    getPwaContent();
+  }, []);
 
   useEffect(() => {
     const isPWAActivated = window.matchMedia(
-      "(display-mode: standalone)"
+      '(display-mode: standalone)',
     ).matches;
 
     setIsPWAActive(isPWAActivated);
@@ -30,7 +43,7 @@ export default function App() {
       }${
         window.location.search
       }#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(
-        window.location.href
+        window.location.href,
       )};end`;
 
       window.location.href = intentUrl;
@@ -38,66 +51,90 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (data?.pwaLink) {
+    console.log('useEffect');
+    const handleBeforeInstallPrompt = (e: Event) => {
+      console.log('beforeinstallprompt');
+      const event = e as BeforeInstallPromptEvent;
+      console.log(event);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener(
+        'beforeinstallprompt',
+        handleBeforeInstallPrompt,
+      );
+    };
+  }, []);
+
+  useEffect(() => {
+    if (pwaContent?.pwaLink) {
       setTimeout(() => {
         const searchParams = new URLSearchParams(window.location.search);
 
-        let newPwaLink = data.pwaLink;
-        let pixelId: string | null = "";
+        let newPwaLink = pwaContent.pwaLink;
+        let pixelId: string | null = '';
 
-        const fbc = Cookies.get("_fbc");
-        const fbp = Cookies.get("_fbp");
+        const fbc = Cookies.get('_fbc');
+        const fbp = Cookies.get('_fbp');
 
         const domain = window.location.hostname;
 
         newPwaLink += `${
-          newPwaLink.includes("?") ? "&" : "?"
+          newPwaLink.includes('?') ? '&' : '?'
         }sub_id_5=${domain}`;
 
-        if (searchParams.has("idpixel") || searchParams.has("sub_id_7")) {
-          pixelId = searchParams.has("idpixel")
-            ? searchParams.get("idpixel")
-            : searchParams.get("sub_id_7");
+        if (searchParams.has('idpixel') || searchParams.has('sub_id_7')) {
+          pixelId = searchParams.has('idpixel')
+            ? searchParams.get('idpixel')
+            : searchParams.get('sub_id_7');
           newPwaLink += `${
-            newPwaLink.includes("?") ? "&" : "?"
+            newPwaLink.includes('?') ? '&' : '?'
           }sub_id_7=${pixelId}`;
         }
 
         if (fbp && fbc) {
           newPwaLink += `${
-            newPwaLink.includes("?") ? "&" : "?"
+            newPwaLink.includes('?') ? '&' : '?'
           }sub_id_8=${fbp}&sub_id_9=${fbc}`;
         }
 
         searchParams.forEach((value, key) => {
-          if (key !== "idpixel" && key !== "sub_id_7") {
+          if (key !== 'idpixel' && key !== 'sub_id_7') {
             newPwaLink += `${
-              newPwaLink.includes("?") ? "&" : "?"
+              newPwaLink.includes('?') ? '&' : '?'
             }${key}=${value}`;
           }
         });
 
-        const pwaLink = localStorage.getItem("pwaLink");
+        const pwaLink = localStorage.getItem('pwaLink');
         if (!pwaLink) {
-          localStorage.setItem("pwaLink", newPwaLink);
+          localStorage.setItem('pwaLink', newPwaLink);
         }
       }, 3000);
     }
-  }, [data]);
+  }, [pwaContent]);
+
+  if (!pwaContent) return <></>;
 
   let currentView;
 
   switch (view) {
-    case "main":
-      currentView = <MainView setView={setView} />;
+    case 'main':
+      currentView = <MainView pwaContent={pwaContent} setView={setView} />;
       break;
-    case "about":
-      currentView = <AboutView setView={setView} />;
+    case 'about':
+      currentView = <AboutView setView={setView} pwaContent={pwaContent} />;
       break;
-    case "reviews":
-      currentView = <ReviewsView setView={setView} />;
+    case 'reviews':
+      currentView = <ReviewsView pwaContent={pwaContent} setView={setView} />;
       break;
   }
 
-  return isPWAActive ? <PwaView /> : <>{currentView}</>;
+  return isPWAActive ? (
+    <PwaView pwaLink={pwaContent.pwaLink} />
+  ) : (
+    <>{currentView}</>
+  );
 }

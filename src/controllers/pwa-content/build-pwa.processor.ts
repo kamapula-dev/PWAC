@@ -33,12 +33,20 @@ export class BuildPWAProcessor {
       try {
         fs.mkdirSync(tempBuildFolder, { recursive: true });
         fs.cpSync(templatePath, tempBuildFolder, { recursive: true });
+
+        const envFilePath = path.join(tempBuildFolder, '.env');
+        const envContent = `
+          VITE_PWA_CONTENT_ID=${pwaContentId}
+          VITE_API_URL=https://pwac.world
+        `;
+        fs.writeFileSync(envFilePath, envContent);
+        Logger.log(`.env file created at ${envFilePath}`);
       } catch (error) {
         Logger.error('Error during folder creation or file copying:', error);
         throw new Error('Failed to prepare build environment');
       }
 
-      const buildCommand = `PWA_CONTENT_ID=${pwaContentId} npm run build`;
+      const buildCommand = `VITE_PWA_CONTENT_ID=${pwaContentId} npm run build`;
 
       try {
         await new Promise<void>((resolve, reject) => {

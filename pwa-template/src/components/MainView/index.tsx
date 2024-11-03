@@ -9,51 +9,43 @@ import OpenSectionButton from "../OpenSectionButton";
 import ChipSlider from "../ChipSlider";
 import Review from "../Review";
 import InstallationProgress from "../InstallationProgress";
-import useSanity from "../../shared/hooks/useSanity";
-import { checkLocale } from "../../shared/helpers/languages";
+import { PwaContent } from "../../shared/models";
 
 interface Props {
   setView: Dispatch<SetStateAction<string>>;
+  pwaContent: PwaContent;
 }
 
-const ratingsData = [
-  { stars: 5, rating: 70 },
-  { stars: 4, rating: 15 },
-  { stars: 3, rating: 10 },
-  { stars: 2, rating: 1 },
-  { stars: 1, rating: 3 },
-];
-
-const MainView: React.FC<Props> = ({ setView }) => {
+const MainView: React.FC<Props> = ({ setView, pwaContent }) => {
   const intl = useIntl();
-  const { data, urlFor } = useSanity(
-    `appName, rating, countOfReviews, countOfDownloads, countOfReviewsFull, countOfStars, reviews, shortDescription`
-  );
-
-  if (!data) return null;
 
   const reviews =
-    data.reviews.length > 3 ? data.reviews.slice(0, 3) : data.reviews;
+    pwaContent.reviews.length > 3
+      ? pwaContent.reviews.slice(0, 3)
+      : pwaContent.reviews;
 
   return (
     <div className="pt-5 px-6">
       <div className="flex mb-4">
-        <AppLogo />
+        <AppLogo logoUrl={pwaContent.appIcon} />
         <div className="flex flex-col text-[#00875F]">
           <div className="text-black text-[22px] leading-7 font-medium">
-            {data?.appName ? data.appName : "Nine Casino"}
+            {pwaContent.appName}
           </div>
-          <InstallationProgress />
+          <InstallationProgress
+            developerName={pwaContent.developerName}
+            isVerified={pwaContent.verified}
+          />
         </div>
       </div>
       <div className="flex mb-5">
         <div className="flex-1 flex flex-col justify-center items-center h-[44px]">
           <div className="font-medium text-[13px] text-[#030303] flex gap-[2px] items-center justify-center mb-[5px]">
-            {data?.rating}
+            {pwaContent.rating}
             <StarIcon fontSize="inherit" />
           </div>
           <div className="text-[11px] text-gray-600 font-medium">
-            {data?.countOfReviews ? data.countOfReviews : "21K"}
+            {pwaContent.countOfReviews}&nbsp;
             {intl.formatMessage({
               id: "reviews",
               defaultMessage: "reviews",
@@ -68,12 +60,12 @@ const MainView: React.FC<Props> = ({ setView }) => {
         />
         <div className="flex-1 flex flex-col justify-center items-center h-[44px]">
           <div className="font-medium text-[13px] text-[#030303] flex gap-[2px] items-center justify-center mb-[5px]">
-            {data?.countOfDownloads}
+            {pwaContent.countOfDownloads}
           </div>
           <div className="text-[11px] text-gray-600 font-medium">
             {intl.formatMessage({
               id: "downloads",
-              defaultMessage: "Donwloads",
+              defaultMessage: "Downloads",
             })}
           </div>
         </div>
@@ -95,7 +87,7 @@ const MainView: React.FC<Props> = ({ setView }) => {
         </div>
       </div>
       <InstallButton appLink="/" />
-      <ContentSlider />
+      <ContentSlider pwaContent={pwaContent} />
       <div className="flex justify-between items-center mb-4">
         <OpenSectionButton
           id="about"
@@ -104,10 +96,10 @@ const MainView: React.FC<Props> = ({ setView }) => {
           setView={setView}
         />
       </div>
-      <div className="text-left leading-6 text-[#5f6368] font-normal text-[14px] mb-3">
-        {data?.shortDescription[checkLocale()]}
+      <div className="text-left leading-6 text-[#5f6368] font-normal text-[14px] mb-4">
+        {pwaContent.description}
       </div>
-      <ChipSlider />
+      <ChipSlider pwaContent={pwaContent} />
       <div className="flex justify-between items-center mb-4">
         <OpenSectionButton
           id="ratingsAndReviews"
@@ -130,12 +122,12 @@ const MainView: React.FC<Props> = ({ setView }) => {
         }}
       >
         <div className="text-[45px]" style={{ gridArea: "rating-big" }}>
-          {data?.rating}
+          {pwaContent.rating}
         </div>
         <div className="flex mb-2" style={{ gridArea: "rating-stars" }}>
           <Rating
             name="half-rating-read"
-            defaultValue={data.countOfStars}
+            defaultValue={pwaContent.countOfStars}
             precision={0.1}
             readOnly
             sx={{ color: "rgb(0, 135, 95)", fontSize: "14px" }}
@@ -145,24 +137,24 @@ const MainView: React.FC<Props> = ({ setView }) => {
           className="font-medium text-[0.8em]"
           style={{ gridArea: "rating-count" }}
         >
-          {data?.countOfReviewsFull}
+          {pwaContent.countOfReviewsFull}
         </div>
         <div
           className="flex flex-col gap-[0.25em]"
           style={{ gridArea: "rating-right" }}
         >
-          {ratingsData.map((data, index) => (
+          {pwaContent.sliders.map((data, index) => (
             <div
               className="flex gap-[0.75em] justify-center items-center"
               key={index}
             >
               <div className="font-medium text-[0.8em] w-[0.5em]">
-                {data.stars}
+                {5 - index}
               </div>
               <div className="relative h-[0.5em] w-full bg-[#d9d9d9] rounded-[0.5em]">
                 <div
-                  className="absolute h-[0.5em] min-w-[0.5em] bg-[#00875f] rounded-[0.5em]"
-                  style={{ width: `${data.rating || 0}%` }}
+                  className="absolute h-[0.5em] min-w-[0.1em] bg-[#00875f] rounded-[0.5em]"
+                  style={{ width: `${(data * 100) / 5 || 0}%` }}
                 />
               </div>
             </div>
@@ -171,22 +163,15 @@ const MainView: React.FC<Props> = ({ setView }) => {
       </div>
       <div className="flex flex-col gap-5">
         {reviews.map((review) => {
-          const parts = review.reviewDate.split("-");
-          const formattedDate = `${parts[2]}/${parts[1]}/${parts[0].slice(-2)}`;
           return (
             <Review
-              src={
-                review.reviewAuthorIcon
-                  ? urlFor(review.reviewAuthorIcon)
-                  : undefined
-              }
+              reviewIconColor={review.reviewIconColor}
+              src={review.reviewAuthorIcon}
               key={review.reviewAuthorName}
               name={review.reviewAuthorName}
-              avatarName={review.avatarTitle}
-              color={review.reviewIconColor}
               stars={review.reviewAuthorRating}
-              text={review.reviewText[checkLocale()]}
-              date={formattedDate}
+              text={review.reviewText}
+              date={review.reviewDate}
             />
           );
         })}

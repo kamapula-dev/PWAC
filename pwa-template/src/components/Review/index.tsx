@@ -1,60 +1,33 @@
 import Avatar from "@mui/material/Avatar";
-import {
-  deepOrange,
-  red,
-  brown,
-  blueGrey,
-  deepPurple,
-  green,
-  blue,
-} from "@mui/material/colors";
 import { Rating } from "@mui/material";
 
 interface ReviewProps {
-  avatarName: string;
   name: string;
-  color: string;
   stars: number;
   text: string;
   date: string;
   src?: string;
+  reviewIconColor: string;
 }
 
-const getAvatarColor = (color: string) => {
-  switch (color) {
-    case "orange":
-      return deepOrange[500];
-    case "red":
-      return red[500];
-    case "brown":
-      return brown[500];
-    case "blueGrey":
-      return blueGrey[500];
-    case "deepPurple":
-      return deepPurple[500];
-    case "green":
-      return green[500];
-    case "blue":
-      return blue[500];
-    default:
-      return brown[500];
-  }
-};
-
 const Review: React.FC<ReviewProps> = ({
-  avatarName,
   name,
-  color,
+  reviewIconColor,
   stars,
   text,
   date,
   src,
 }) => {
+  const avatarName = name
+    .split(" ")
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase();
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-[0.8em] w-full">
         <div className="flex gap-[1em] items-center">
-          <Avatar src={src} sx={{ bgcolor: getAvatarColor(color) }}>
+          <Avatar src={src} sx={{ bgcolor: `${reviewIconColor}` }}>
             {avatarName}
           </Avatar>
           <div className="font-roboto font-normal text-main text-[0.875rem] leading-[1.25rem]">

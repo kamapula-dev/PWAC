@@ -6,11 +6,11 @@ import {
   setFakeDownloadProgress,
   setInstallState,
 } from "../../Redux/feat/InstallSlice";
-import useSanity from "../../shared/hooks/useSanity";
+
 import { RootState } from "../../Redux/store/store";
 import { PWAInstallState } from "../../shared/models";
 
-function AppLogo() {
+function AppLogo({ logoUrl }: { logoUrl: string }) {
   const installState = useSelector((state: RootState) =>
     getInstallState(state.install)
   );
@@ -49,19 +49,15 @@ function AppLogo() {
     installState === PWAInstallState.installed ||
     installState === PWAInstallState.downloaded;
 
-  const { data, urlFor } = useSanity(`appIcon`);
-
-  if (!data) return null;
-
   return (
     <>
       {showPermanentCircularProgress && (
         <div className="relative flex justify-center items-center w-16 h-16 mr-5">
           <div className="w-14 h-14 rounded-full overflow-hidden relative">
             <img
-              src={urlFor(data.appIcon)}
+              src={logoUrl}
               alt="App logo"
-              className="object-contain"
+              className="w-full h-full object-cover"
             />
           </div>
 
@@ -79,9 +75,9 @@ function AppLogo() {
       {showLogo && (
         <div className="relative block overflow-hidden w-[70px] h-[70px] rounded-lg mr-5">
           <img
-            src={urlFor(data.appIcon)}
+            src={logoUrl}
             alt="App logo"
-            className="object-contain"
+            className="w-full h-full object-cover"
           />
         </div>
       )}

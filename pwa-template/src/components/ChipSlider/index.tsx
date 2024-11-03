@@ -2,38 +2,27 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Chip } from "@mui/material";
-import { useIntl } from "react-intl";
+import { PwaContent } from "../../shared/models";
 
-const chipLabels = [
-  { id: "casino", defaultMessage: "Casino" },
-  { id: "slots", defaultMessage: "Slots" },
-  { id: "online", defaultMessage: "Online" },
-  { id: "offline", defaultMessage: "Offline" },
-];
-
-export default function ChipSlider() {
-  const intl = useIntl();
-
+const ChipSlider = ({ pwaContent }: { pwaContent: PwaContent }) => {
   const settings = {
     dots: false,
     infinite: false,
-    slidesToShow: 3,
     slidesToScroll: 1,
     initialSlide: 0,
     variableWidth: true,
   };
 
+  if (!pwaContent.tags || pwaContent.tags.length === 0) return null;
+
   return (
     <div className="mb-4">
-      <div className="slider-container">
+      <div className="slider-container w-full">
         <Slider {...settings}>
-          {chipLabels.map((labelKey) => (
-            <div className="pr-3" key={labelKey.id}>
+          {pwaContent?.tags?.map((label) => (
+            <div className="pr-3" key={label}>
               <Chip
-                label={intl.formatMessage({
-                  id: labelKey.id,
-                  defaultMessage: labelKey.defaultMessage,
-                })}
+                label={label}
                 variant="outlined"
                 sx={{
                   borderRadius: "8px",
@@ -46,4 +35,6 @@ export default function ChipSlider() {
       </div>
     </div>
   );
-}
+};
+
+export default ChipSlider;

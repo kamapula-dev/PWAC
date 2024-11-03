@@ -6,9 +6,16 @@ import { Dispatch, SetStateAction } from "react";
 interface Props {
   setView: Dispatch<SetStateAction<string>>;
   id: string;
+  developerName: string;
+  appIcon: string;
 }
 
-const ViewHeader: React.FC<Props> = ({ setView, id }) => {
+const ViewHeader: React.FC<Props> = ({
+  setView,
+  id,
+  developerName,
+  appIcon,
+}) => {
   const intl = useIntl();
 
   const handleClick = () => {
@@ -20,13 +27,13 @@ const ViewHeader: React.FC<Props> = ({ setView, id }) => {
         <ArrowBackIcon sx={{ color: "rgb(32, 33, 36)", fontSize: 24 }} />
       </IconButton>
       <img
-        className="h-[calc(100%-1.5em)] mr-5 rounded-lg aspect-square"
-        src="/icon.webp"
+        className="h-[calc(100%-1.5em)] mr-5 rounded-lg object-cover aspect-square"
+        src={appIcon}
         alt="Logo"
       />
       <div className="flex flex-col">
         <span className="overflow-hidden whitespace-nowrap text-ellipsis font-medium leading-[1.3rem] text-[0.8rem]">
-          {intl.formatMessage({ id: "name" })}
+          {developerName}
         </span>
         <span className="font-normal text-[0.8em]">
           {intl.formatMessage({ id })}

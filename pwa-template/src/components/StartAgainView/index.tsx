@@ -3,11 +3,10 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import { useIntl } from "react-intl";
 
-const StartAgainView = () => {
+const StartAgainView = ({ pwaLink }: { pwaLink: string }) => {
   const intl = useIntl();
 
   const handleClick = () => {
-    const pwaLink = localStorage.getItem("pwaLink") as string;
     window.location.href = pwaLink;
   };
 

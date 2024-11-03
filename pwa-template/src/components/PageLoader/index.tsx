@@ -2,18 +2,15 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import { useEffect } from "react";
 
-const PageLoader = () => {
+const PageLoader = ({ pwaLink }: { pwaLink: string }) => {
   useEffect(() => {
     const intervalId = setInterval(() => {
-      const pwaLink = localStorage.getItem("pwaLink");
-      if (pwaLink) {
-        window.location.href = pwaLink;
-        clearInterval(intervalId);
-      }
+      window.location.href = pwaLink;
+      clearInterval(intervalId);
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [pwaLink]);
 
   return (
     <Box
