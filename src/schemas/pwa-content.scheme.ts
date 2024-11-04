@@ -3,7 +3,7 @@ import { Document, Types } from 'mongoose';
 import { Media, MediaSchema } from './media.scheme';
 import { Review, ReviewSchema } from './review.scheme';
 
-@Schema()
+@Schema({ timestamps: true })
 export class PWAContent extends Document {
   @Prop({ required: true })
   appName: string;
