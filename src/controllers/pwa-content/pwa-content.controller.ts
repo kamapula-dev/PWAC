@@ -81,6 +81,34 @@ export class PWAContentController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Post(':id/copy')
+  async copyPWAContent(
+    @Param('id') id: string,
+    @Request() req,
+  ): Promise<PWAContent> {
+    const userId = req.user._id;
+
+    const originalPWAContent = await this.pwaContentService.findOne(id, userId);
+
+    if (!originalPWAContent) {
+      throw new NotFoundException('Original PWA Content not found');
+    }
+
+    const copiedPWAContentDto = {
+      ...originalPWAContent.toObject(),
+      appName: `${originalPWAContent.appName} - Copy`,
+    };
+
+    delete copiedPWAContentDto._id;
+    delete copiedPWAContentDto.createdAt;
+    delete copiedPWAContentDto.updatedAt;
+
+    console.log(copiedPWAContentDto, 'copiedPWAContentDto');
+
+    return this.pwaContentService.create(copiedPWAContentDto, userId);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
   @Get(':id/build')
   async buildPWA(
     @Param('id') id: string,
