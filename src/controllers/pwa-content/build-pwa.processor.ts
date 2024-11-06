@@ -22,22 +22,12 @@ export class BuildPWAProcessor {
     try {
       const { pwaContentId, appIcon, userId } = job.data;
 
-      Logger.log(
-          `Job started for PWA-content ID: ${pwaContentId}, User ID: ${userId}, Job ID: ${job.id}`,
-      );
-
-      console.log(29);
+      Logger.log(`Job started for PWA-content ID: ${pwaContentId}, User ID: ${userId}, Job ID: ${job.id}`);
 
       const projectRoot = path.resolve(__dirname, '../../..');
       const templatePath = path.join(projectRoot, 'pwa-template');
-      const tempBuildFolder = path.join(
-          projectRoot,
-          `temp-build-${pwaContentId}-${Date.now()}`,
-      );
+      const tempBuildFolder = path.join(projectRoot, `temp-build-${pwaContentId}-${Date.now()}`);
 
-      console.log(50);
-      const fileExtension = path.extname(appIcon);
-      console.log(53);
       try {
         fs.mkdirSync(tempBuildFolder, { recursive: true });
         fs.cpSync(templatePath, tempBuildFolder, { recursive: true });
@@ -47,7 +37,6 @@ export class BuildPWAProcessor {
           VITE_PWA_CONTENT_ID=${pwaContentId}
           VITE_API_URL=https://pwac.world
         `;
-        console.log(63);
         fs.writeFileSync(envFilePath, envContent);
         Logger.log(`.env file created at ${envFilePath}`);
       } catch (error) {
@@ -55,78 +44,38 @@ export class BuildPWAProcessor {
         throw new Error('Failed to prepare build environment');
       }
 
-      console.log(71);
-
-      const tempIconPath = path.join(
-          tempBuildFolder,
-          'public',
-          `icon${fileExtension}`,
-      );
+      // Create the 'public' directory before downloading the icon
+      const publicFolderPath = path.join(tempBuildFolder, 'public');
       try {
-        console.log(79);
+        fs.mkdirSync(publicFolderPath, { recursive: true });
+        Logger.log(`Public folder created at ${publicFolderPath}`);
+      } catch (error) {
+        Logger.error('Error creating public folder:', error);
+        throw new Error('Failed to create public folder');
+      }
+
+      const tempIconPath = path.join(publicFolderPath, `icon${path.extname(appIcon)}`);
+      try {
         await this.downloadImage(appIcon, tempIconPath);
         Logger.log(`App icon downloaded and saved at ${tempIconPath}`);
       } catch (error) {
-        console.log(error, 83);
         Logger.error('Error downloading app icon:', error);
         throw new Error('Failed to download app icon');
       }
-      console.log(87);
+
       const generateAssetsCommand = `npm run generate-pwa-assets`;
       try {
-        await new Promise<void>((resolve, reject) => {
-          exec(
-              generateAssetsCommand,
-              { cwd: tempBuildFolder },
-              (error, stdout, stderr) => {
-                if (error) {
-                  Logger.error(`Error during assets generation: ${stderr}`);
-                  return reject(
-                      new Error(`Error during assets generation: ${stderr}`),
-                  );
-                }
-
-                Logger.log('Assets generation output:', stdout);
-                resolve();
-              },
-          );
-        });
-
-        console.log(108)
+        await this.executeCommand(generateAssetsCommand, tempBuildFolder);
+        Logger.log('Assets generation completed');
       } catch (error) {
-        console.log(error, 110)
         Logger.error('Error during PWA assets generation:', error);
         throw new Error('Error during PWA assets generation');
       }
 
-      const assetsFolderPath = path.join(tempBuildFolder, 'public');
-      try {
-        const generatedFiles = fs.readdirSync(assetsFolderPath);
-        Logger.log('Generated assets in public folder:');
-        generatedFiles.forEach((file) => {
-          Logger.log(`  - ${file}`);
-        });
-      } catch (error) {
-        Logger.error('Error reading generated assets folder:', error);
-      }
-
       const buildCommand = `npm run build`;
       try {
-        await new Promise<void>((resolve, reject) => {
-          exec(
-              buildCommand,
-              { cwd: tempBuildFolder },
-              (error, stdout, stderr) => {
-                if (error) {
-                  Logger.error(`Build error: ${stderr}`);
-                  return reject(new Error(`Error during build: ${stderr}`));
-                }
-
-                Logger.log('Build output:', stdout);
-                resolve();
-              },
-          );
-        });
+        await this.executeCommand(buildCommand, tempBuildFolder);
+        Logger.log('Build completed successfully');
       } catch (error) {
         Logger.error('Error during build process:', error);
         throw new Error('Error during build');
@@ -137,11 +86,8 @@ export class BuildPWAProcessor {
       let signedUrl: string;
 
       Logger.log('Checking for existing PWA...');
-
       const user = await this.userService.findById(userId);
-      const existingPwa = user.pwas.find(
-          (p) => p.pwaContentId === pwaContentId,
-      );
+      const existingPwa = user.pwas.find((p) => p.pwaContentId === pwaContentId);
 
       if (existingPwa) {
         try {
@@ -154,10 +100,8 @@ export class BuildPWAProcessor {
       }
 
       Logger.log('Uploading dist folder to S3...');
-
       try {
         archiveKey = await this.mediaService.uploadDistFolder(distFolderPath);
-        Logger.log('Dist folder uploaded');
         signedUrl = await this.mediaService.getSignedUrl(archiveKey);
         Logger.log('Signed URL generated:', signedUrl);
       } catch (error) {
@@ -165,14 +109,7 @@ export class BuildPWAProcessor {
         throw new Error('Error during upload to S3');
       }
 
-      await this.userService.updateUserPwas(
-          userId,
-          existingPwa || {
-            pwaContentId,
-            createdAt: new Date(),
-            archiveKey,
-          },
-      );
+      await this.userService.updateUserPwas(userId, existingPwa || { pwaContentId, createdAt: new Date(), archiveKey });
 
       try {
         fs.rmSync(tempBuildFolder, { recursive: true, force: true });
@@ -181,10 +118,7 @@ export class BuildPWAProcessor {
         throw error;
       }
 
-      Logger.log(
-          `Job completed for PWA-content ID: ${pwaContentId}, User ID: ${userId}, Job ID: ${job.id}`,
-      );
-
+      Logger.log(`Job completed for PWA-content ID: ${pwaContentId}, User ID: ${userId}, Job ID: ${job.id}`);
       return signedUrl;
     } catch (e) {
       throw e;
@@ -193,16 +127,25 @@ export class BuildPWAProcessor {
 
   private async downloadImage(url: string, filePath: string): Promise<void> {
     const writer = fs.createWriteStream(filePath);
-    const response = await axios({
-      url,
-      method: 'GET',
-      responseType: 'stream',
-    });
+    const response = await axios({ url, method: 'GET', responseType: 'stream' });
 
     return new Promise((resolve, reject) => {
       response.data.pipe(writer);
       writer.on('finish', resolve);
       writer.on('error', reject);
+    });
+  }
+
+  private async executeCommand(command: string, cwd: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      exec(command, { cwd }, (error, stdout, stderr) => {
+        if (error) {
+          Logger.error(`Command error: ${stderr}`);
+          return reject(new Error(`Command failed: ${stderr}`));
+        }
+        Logger.log('Command output:', stdout);
+        resolve();
+      });
     });
   }
 }
