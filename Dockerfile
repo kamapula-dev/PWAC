@@ -4,7 +4,8 @@ WORKDIR /usr/src/app
 
 RUN apt-get update && apt-get install -y \
     libpng-dev zlib1g-dev libjpeg-dev build-essential \
-    libtool autoconf automake nasm
+    libtool autoconf automake nasm \
+    libvips-dev curl python3 make g++ build-essential
 
 COPY package*.json ./
 
@@ -13,7 +14,7 @@ RUN npm install --omit=optional
 COPY . .
 
 WORKDIR /usr/src/app/pwa-template
-RUN npm install
+RUN npm install && npm install --platform=linux --arch=x64 sharp
 
 WORKDIR /usr/src/app
 RUN npm run build
@@ -24,7 +25,8 @@ WORKDIR /usr/src/app
 
 RUN apt-get update && apt-get install -y \
     libpng-dev zlib1g-dev libjpeg-dev build-essential \
-    libtool autoconf automake nasm
+    libtool autoconf automake nasm \
+    libvips-dev curl python3 make g++ build-essential
 
 COPY --from=build /usr/src/app/dist ./dist
 COPY --from=build /usr/src/app/package*.json ./

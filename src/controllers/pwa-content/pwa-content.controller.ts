@@ -117,10 +117,17 @@ export class PWAContentController {
   ): Promise<void> {
     try {
       const userId = req.user._id;
+      const pwaContent = await this.pwaContentService.findOne(id, userId);
+
+      if (!pwaContent.appIcon) {
+        throw new Error(`appIcon not found for PWA-content with id: ${id}`);
+      }
+
       Logger.log('Adding job to the queue job');
 
       const job = await this.buildQueue.add({
         pwaContentId: id,
+        appIcon: pwaContent.appIcon,
         userId,
       });
 

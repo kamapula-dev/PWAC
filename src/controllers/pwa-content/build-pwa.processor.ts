@@ -20,11 +20,13 @@ export class BuildPWAProcessor {
   @Process()
   async handleBuildPWAJob(job: Job) {
     try {
-      const { pwaContentId, userId } = job.data;
+      const { pwaContentId, appIcon, userId } = job.data;
 
       Logger.log(
           `Job started for PWA-content ID: ${pwaContentId}, User ID: ${userId}, Job ID: ${job.id}`,
       );
+
+      console.log(29);
 
       const projectRoot = path.resolve(__dirname, '../../..');
       const templatePath = path.join(projectRoot, 'pwa-template');
@@ -33,18 +35,9 @@ export class BuildPWAProcessor {
           `temp-build-${pwaContentId}-${Date.now()}`,
       );
 
-      const pwaContent = await this.pwaContentService.findOne(
-          pwaContentId,
-          userId,
-      );
-
-      if (!pwaContent || !pwaContent.appIcon) {
-        throw new Error('PWA content or appIcon not found');
-      }
-
-      const appIconUrl = pwaContent.appIcon;
-      const fileExtension = path.extname(appIconUrl);
-
+      console.log(50);
+      const fileExtension = path.extname(appIcon);
+      console.log(53);
       try {
         fs.mkdirSync(tempBuildFolder, { recursive: true });
         fs.cpSync(templatePath, tempBuildFolder, { recursive: true });
@@ -54,6 +47,7 @@ export class BuildPWAProcessor {
           VITE_PWA_CONTENT_ID=${pwaContentId}
           VITE_API_URL=https://pwac.world
         `;
+        console.log(63);
         fs.writeFileSync(envFilePath, envContent);
         Logger.log(`.env file created at ${envFilePath}`);
       } catch (error) {
@@ -61,20 +55,24 @@ export class BuildPWAProcessor {
         throw new Error('Failed to prepare build environment');
       }
 
+      console.log(71);
+
       const tempIconPath = path.join(
           tempBuildFolder,
           'public',
           `icon${fileExtension}`,
       );
       try {
-        await this.downloadImage(appIconUrl, tempIconPath);
+        console.log(79);
+        await this.downloadImage(appIcon, tempIconPath);
         Logger.log(`App icon downloaded and saved at ${tempIconPath}`);
       } catch (error) {
+        console.log(error, 83);
         Logger.error('Error downloading app icon:', error);
         throw new Error('Failed to download app icon');
       }
-
-      const generateAssetsCommand = `pwa-assets-generator --preset minimal public/icon${fileExtension}`;
+      console.log(87);
+      const generateAssetsCommand = `npm run generate-pwa-assets`;
       try {
         await new Promise<void>((resolve, reject) => {
           exec(
@@ -93,7 +91,10 @@ export class BuildPWAProcessor {
               },
           );
         });
+
+        console.log(108)
       } catch (error) {
+        console.log(error, 110)
         Logger.error('Error during PWA assets generation:', error);
         throw new Error('Error during PWA assets generation');
       }
