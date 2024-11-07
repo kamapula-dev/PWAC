@@ -78,7 +78,7 @@ const MainView: React.FC<Props> = ({ setView, pwaContent }) => {
         <div className="flex-1 flex flex-col justify-center items-center h-[44px]">
           <div className="font-medium text-[13px] text-[#030303] flex gap-[2px] items-center justify-center mb-[5px]">
             <div className="w-4 h-4 mb-0.5">
-              <img src="../../../assets/18.png" alt="Age icon" />
+              <img src="/18.png" alt="Age icon" />
             </div>
           </div>
           <div className="text-[11px] text-gray-600 font-medium">

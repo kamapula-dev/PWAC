@@ -49,9 +49,15 @@ export class BuildPWAProcessor {
       try {
         fs.mkdirSync(publicFolderPath, { recursive: true });
         Logger.log(`Public folder created at ${publicFolderPath}`);
+
+        // Copy the default icon from assets to public
+        const assetsIconPath = path.join(templatePath, 'assets', '18.png');
+        const destinationIconPath = path.join(publicFolderPath, '18.png');
+        fs.copyFileSync(assetsIconPath, destinationIconPath);
+        Logger.log(`Default icon copied from ${assetsIconPath} to ${destinationIconPath}`);
       } catch (error) {
-        Logger.error('Error creating public folder:', error);
-        throw new Error('Failed to create public folder');
+        Logger.error('Error creating public folder or copying default icon:', error);
+        throw new Error('Failed to create public folder or copy default icon');
       }
 
       const tempIconPath = path.join(publicFolderPath, `icon${path.extname(appIcon)}`);
