@@ -24,11 +24,11 @@ const ContentSlider: React.FC<Props> = ({ pwaContent }) => {
   return (
     <div className="slider-container  mb-4">
       <Slider {...settings}>
-        {pwaContent.images.map((screen, index) => {
+        {pwaContent.images.map(({url, id}) => {
           return (
-            <div className="pr-1" key={index}>
+            <div className="pr-1" key={id || url}>
               <img
-                src={screen.url}
+                src={url}
                 width={82}
                 height={176}
                 className="object-cover w-[82px] h-[176px] rounded-lg"
