@@ -56,5 +56,15 @@
   "dataSafety": "Data safety",
   "dataSafetyText": "Here's more information the developer has provided about the kinds of data this app may collect and share, and security practices the app may follow. Data practices may vary based on your app version, use, region, and age. ",
   "securityPractices": "Security practices",
-  "moreBy": "More by"
+  "moreBy": "More by",
+  "ratesAndReviewsAreVerified": "Ratings and reviews are verified. They were left by users with the same type of device as yours.",
+  "allReviews": "All reviews",
+  "safetyContent": "To ensure safety, it’s essential to understand how developers collect your data and share it with third parties. Security and privacy practices may vary based on how you use the app, as well as your region and age. The information below is provided by the developer and may change in the future.",
+  "thirdParty": "This app may share the specified types of data with third parties.",
+  "locationDisclosure": "Location, App Info and Performance, and Device or Other Identifiers",
+  "noDataCollected": "No data is collected.",
+  "learnMore": "Learn more about",
+  "developerDataCollection": "how developers disclose data collection…",
+  "dataNotEncrypted": "Data is not encrypted.",
+  "dataCanNotBeDeleted": "Data cannot be deleted."
 }

@@ -121,7 +121,7 @@ const InstallButton: React.FC<Props> = ({ appLink }) => {
     <div className="flex justify-between gap-2">
       {installState === PWAInstallState.downloading && (
         <button
-          className="h-9 rounded-[60px] bg-[#00875F] w-full text-white font-semibold mb-[22px] transition duration-300 hover:bg-[#00704A] active:scale-95 disabled:bg-gray-300"
+          className="h-9 rounded-[60px] bg-primary w-full text-white font-semibold mb-[22px] transition duration-300 active:scale-95 disabled:bg-gray-300"
           onClick={() => dispatch(setInstallState(PWAInstallState.idle))}
         >
           {intl.formatMessage({
@@ -131,7 +131,7 @@ const InstallButton: React.FC<Props> = ({ appLink }) => {
         </button>
       )}
       <button
-        className="h-9 rounded-[60px] bg-[#00875F] w-full text-white font-semibold mb-[22px] transition duration-300 hover:bg-[#00704A] active:scale-95 disabled:bg-gray-300"
+        className="h-9 rounded-[60px] bg-primary  w-full text-white font-semibold mb-[22px] transition duration-300 active:scale-95 disabled:bg-gray-300"
         onClick={handleButtonClick}
         disabled={
           installState === PWAInstallState.downloading ||

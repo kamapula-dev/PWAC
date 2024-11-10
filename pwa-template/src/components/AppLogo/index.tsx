@@ -52,7 +52,7 @@ function AppLogo({ logoUrl }: { logoUrl: string }) {
   return (
     <>
       {showPermanentCircularProgress && (
-        <div className="relative flex justify-center items-center w-16 h-16 mr-5">
+        <div className="relative flex justify-center items-center w-[70px] h-[70px] mr-4">
           <div className="w-14 h-14 rounded-full overflow-hidden relative">
             <img
               src={logoUrl}
@@ -73,7 +73,7 @@ function AppLogo({ logoUrl }: { logoUrl: string }) {
         </div>
       )}
       {showLogo && (
-        <div className="relative block overflow-hidden w-[70px] h-[70px] rounded-lg mr-5">
+        <div className="relative block overflow-hidden w-[70px] h-[70px] rounded-xl mr-5">
           <img
             src={logoUrl}
             alt="App logo"

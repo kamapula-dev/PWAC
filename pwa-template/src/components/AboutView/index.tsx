@@ -1,14 +1,9 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { useIntl } from "react-intl";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import ViewHeader from "../ViewHeader";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import { Button, IconButton } from "@mui/material";
 import { PwaContent } from "../../shared/models";
+import moment from "moment";
+import { motion } from "framer-motion";
 
 interface Props {
   setView: Dispatch<SetStateAction<string>>;
@@ -16,164 +11,94 @@ interface Props {
 }
 
 const AboutView: React.FC<Props> = ({ setView, pwaContent }) => {
-  console.log(pwaContent);
   const intl = useIntl();
-  const [dialog, setDialog] = useState(false);
 
-  const handleClickOpen = () => {
-    setDialog(true);
-  };
-
-  const handleClose = () => {
-    setDialog(false);
-  };
-
-  const getTodayDate = () => {
-    const today = new Date();
-    const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-
-    const month = monthNames[today.getMonth()];
-    const day = today.getDate();
-    const year = today.getFullYear();
-
-    return `${month} ${day}, ${year}`;
+  const slideVariants = {
+    hidden: { x: "-100%", opacity: 0 },
+    visible: { x: 0, opacity: 1 },
+    exit: { x: "-100%", opacity: 0 },
   };
 
   return (
-    <div>
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      exit="hidden"
+      variants={slideVariants}
+      transition={{ duration: 0.25, ease: "easeInOut" }}
+    >
       <ViewHeader
         appIcon={pwaContent.appIcon}
-        id="details"
         developerName={pwaContent.developerName}
         setView={setView}
+        appName={pwaContent.appName}
       />
-      <section className="pt-[3.5em] mx-6">
-        <div className="text-[1.1rem] text-main font-sans pt-4 pb-4 flex items-center">
+      <section className="pt-[56px] mx-6 pb-4">
+        <div className="text-base text-main font-sans pt-4 pb-3 flex items-center">
           {intl.formatMessage({ id: "about" })}
         </div>
-        <div className="text-[1rem] text-main font-sans pb-4 whitespace-pre-wrap relative text-justify">
+        <div className="text-sm whitespace-pre-wrap relative text-justify text-[#605D64]">
           {pwaContent.description}
         </div>
       </section>
-      <div className="bg-[#dadce0] h-[1px] w-full" />
-      <div className="px-6">
-        <div className="text-[1.1rem]font-sans pt-4">
-          {intl.formatMessage({ id: "appInfo" })}
-        </div>
-        <div className="flex flex-col gap-[2em] py-[2em]">
-          <div className="flex flex-row justify-between items-center">
-            <span className="text-[0.9rem]">
-              {intl.formatMessage({ id: "version" })}
-            </span>
-            <span className="text-[0.9rem]">{pwaContent.version}</span>
+      <div className="bg-[#C6C6C6] h-[1px] w-full" />
+      <div className="px-6 py-4">
+        <div className="flex flex-col gap-9 text-sm leading-5 text-[#605D64]">
+          <div className="text-base text-black">
+            {intl.formatMessage({ id: "appInfo" })}
           </div>
           <div className="flex flex-row justify-between items-center">
-            <span className="text-[0.9rem]">
-              {intl.formatMessage({ id: "updatedOn" })}
-            </span>
-            <span className="text-[0.9rem]">{getTodayDate()}</span>
+            <span>{intl.formatMessage({ id: "version" })}</span>
+            <span>{pwaContent.version}</span>
           </div>
           <div className="flex flex-row justify-between items-center">
-            <span className="text-[0.9rem]">
-              {intl.formatMessage({ id: "downloads" })}
-            </span>
-            <span className="text-[0.9rem]">{pwaContent.countOfDownloads}</span>
+            <span>{intl.formatMessage({ id: "updatedOn" })}</span>
+            <span>{moment(pwaContent.lastUpdate).format("DD.MM.YYYY")}</span>
           </div>
           <div className="flex flex-row justify-between items-center">
-            <span className="text-[0.9rem]">
-              {intl.formatMessage({ id: "downloadSize" })}
-            </span>
-            <span className="text-[0.9rem]">{pwaContent.size}</span>
+            <span>{intl.formatMessage({ id: "downloads" })}</span>
+            <span>{pwaContent.countOfDownloads}</span>
           </div>
           <div className="flex flex-row justify-between items-center">
-            <span className="text-[0.9rem]">
-              {intl.formatMessage({ id: "offeredBy" })}
-            </span>
-            <span className="text-[0.9rem]">{pwaContent.developerName}</span>
+            <span>{intl.formatMessage({ id: "downloadSize" })}</span>
+            <span>{pwaContent.size}</span>
           </div>
           <div className="flex flex-row justify-between items-center">
-            <span className="text-[0.9rem]">
-              {intl.formatMessage({ id: "releasedOn" })}
-            </span>
-            <span className="text-[0.9rem]">
-              {intl.formatMessage({ id: "releaseDate" })}
-            </span>
+            <span>{intl.formatMessage({ id: "offeredBy" })}</span>
+            <span>{pwaContent.developerName}</span>
+          </div>
+          <div className="flex flex-row justify-between items-center">
+            <span>{intl.formatMessage({ id: "releasedOn" })}</span>
+            <span>{intl.formatMessage({ id: "releaseDate" })}</span>
           </div>
         </div>
       </div>
-      <div className="bg-[#dadce0] h-[1px] w-full" />
-      <div className="px-6">
-        <div className="text-[1.1rem] text-main font-sans pt-4 pb-4 flex items-center justify-between">
-          {intl.formatMessage({ id: "compatibilityTitle" })}
-          <IconButton onClick={handleClickOpen}>
-            <InfoOutlinedIcon />
-          </IconButton>
-        </div>
-        <div className="flex flex-col gap-[2em] py-[1em]">
-          <div className="flex flex-row justify-between items-center">
-            <span className="text-[0.9rem]">
-              {intl.formatMessage({ id: "compatibility" })}
-            </span>
-            <span className="text-[0.9rem]">
-              {intl.formatMessage({ id: "worksOnYourDevice" })}
-            </span>
+      <div className="bg-[#C6C6C6] h-[1px] w-full" />
+      <div className="px-6 py-4">
+        <div className="flex flex-col gap-9 text-sm leading-5 text-[#605D64]">
+          <div className="text-base text-black">
+            {intl.formatMessage({ id: "compatibilityTitle" })}
           </div>
           <div className="flex flex-row justify-between items-center">
-            <span className="text-[0.9rem]">
-              {intl.formatMessage({ id: "version" })}
-            </span>
-            <span className="text-[0.9rem]">2.12.14</span>
+            <span>{intl.formatMessage({ id: "compatibility" })}</span>
+            <span>{intl.formatMessage({ id: "worksOnYourDevice" })}</span>
           </div>
           <div className="flex flex-row justify-between items-center">
-            <span className="text-[0.9rem]">
-              {intl.formatMessage({ id: "downloadSize" })}
-            </span>
-            <span className="text-[0.9rem]">{pwaContent.size}</span>
+            <span>{intl.formatMessage({ id: "version" })}</span>
+            <span>{pwaContent.version}</span>
           </div>
           <div className="flex flex-row justify-between items-center">
-            <span className="text-[0.9rem]">
-              {intl.formatMessage({ id: "RequiredOS" })}
-            </span>
-            <span className="text-[0.9rem]">
-              {intl.formatMessage({ id: "OS" })}
-            </span>
+            <span>{intl.formatMessage({ id: "downloadSize" })}</span>
+            <span>{pwaContent.size}</span>
+          </div>
+          <div className="flex flex-row justify-between items-center">
+            <span>{intl.formatMessage({ id: "RequiredOS" })}</span>
+            <span>{intl.formatMessage({ id: "OS" })}</span>
           </div>
         </div>
       </div>
-      <div className="bg-[#dadce0] h-[1px] w-full" />
-
-      <Dialog
-        open={dialog}
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {intl.formatMessage({ id: "modalTitle" })}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {intl.formatMessage({ id: "modalText" })}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>OK</Button>
-        </DialogActions>
-      </Dialog>
-    </div>
+      <div className="bg-[#C6C6C6] h-[1px] w-full" />
+    </motion.div>
   );
 };
 

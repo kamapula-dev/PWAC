@@ -12,9 +12,9 @@ import { PWAContentService } from './pwa-content.service';
 @Processor('buildPWA')
 export class BuildPWAProcessor {
   constructor(
-      private readonly mediaService: MediaService,
-      private readonly userService: UserService,
-      private readonly pwaContentService: PWAContentService,
+    private readonly mediaService: MediaService,
+    private readonly userService: UserService,
+    private readonly pwaContentService: PWAContentService,
   ) {}
 
   @Process()
@@ -22,11 +22,16 @@ export class BuildPWAProcessor {
     try {
       const { pwaContentId, appIcon, userId } = job.data;
 
-      Logger.log(`Job started for PWA-content ID: ${pwaContentId}, User ID: ${userId}, Job ID: ${job.id}`);
+      Logger.log(
+        `Job started for PWA-content ID: ${pwaContentId}, User ID: ${userId}, Job ID: ${job.id}`,
+      );
 
       const projectRoot = path.resolve(__dirname, '../../..');
       const templatePath = path.join(projectRoot, 'pwa-template');
-      const tempBuildFolder = path.join(projectRoot, `temp-build-${pwaContentId}-${Date.now()}`);
+      const tempBuildFolder = path.join(
+        projectRoot,
+        `temp-build-${pwaContentId}-${Date.now()}`,
+      );
 
       try {
         fs.mkdirSync(tempBuildFolder, { recursive: true });
@@ -54,13 +59,21 @@ export class BuildPWAProcessor {
         const assetsIconPath = path.join(templatePath, 'assets', '18.png');
         const destinationIconPath = path.join(publicFolderPath, '18.png');
         fs.copyFileSync(assetsIconPath, destinationIconPath);
-        Logger.log(`Default icon copied from ${assetsIconPath} to ${destinationIconPath}`);
+        Logger.log(
+          `Default icon copied from ${assetsIconPath} to ${destinationIconPath}`,
+        );
       } catch (error) {
-        Logger.error('Error creating public folder or copying default icon:', error);
+        Logger.error(
+          'Error creating public folder or copying default icon:',
+          error,
+        );
         throw new Error('Failed to create public folder or copy default icon');
       }
 
-      const tempIconPath = path.join(publicFolderPath, `icon${path.extname(appIcon)}`);
+      const tempIconPath = path.join(
+        publicFolderPath,
+        `icon${path.extname(appIcon)}`,
+      );
       try {
         await this.downloadImage(appIcon, tempIconPath);
         Logger.log(`App icon downloaded and saved at ${tempIconPath}`);
@@ -93,7 +106,9 @@ export class BuildPWAProcessor {
 
       Logger.log('Checking for existing PWA...');
       const user = await this.userService.findById(userId);
-      const existingPwa = user.pwas.find((p) => p.pwaContentId === pwaContentId);
+      const existingPwa = user.pwas.find(
+        (p) => p.pwaContentId === pwaContentId,
+      );
 
       if (existingPwa) {
         try {
@@ -115,7 +130,10 @@ export class BuildPWAProcessor {
         throw new Error('Error during upload to S3');
       }
 
-      await this.userService.updateUserPwas(userId, existingPwa || { pwaContentId, createdAt: new Date(), archiveKey });
+      await this.userService.updateUserPwas(
+        userId,
+        existingPwa || { pwaContentId, createdAt: new Date(), archiveKey },
+      );
 
       try {
         fs.rmSync(tempBuildFolder, { recursive: true, force: true });
@@ -124,16 +142,23 @@ export class BuildPWAProcessor {
         throw error;
       }
 
-      Logger.log(`Job completed for PWA-content ID: ${pwaContentId}, User ID: ${userId}, Job ID: ${job.id}`);
+      Logger.log(
+        `Job completed for PWA-content ID: ${pwaContentId}, User ID: ${userId}, Job ID: ${job.id}`,
+      );
       return signedUrl;
     } catch (e) {
+      await job.moveToFailed(new Error(e), true);
       throw e;
     }
   }
 
   private async downloadImage(url: string, filePath: string): Promise<void> {
     const writer = fs.createWriteStream(filePath);
-    const response = await axios({ url, method: 'GET', responseType: 'stream' });
+    const response = await axios({
+      url,
+      method: 'GET',
+      responseType: 'stream',
+    });
 
     return new Promise((resolve, reject) => {
       response.data.pipe(writer);

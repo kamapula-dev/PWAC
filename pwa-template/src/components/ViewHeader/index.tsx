@@ -1,43 +1,35 @@
-import { IconButton } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useIntl } from "react-intl";
 import { Dispatch, SetStateAction } from "react";
+import ArrowLeft from "../../shared/icons/ArrowLeft";
 
 interface Props {
   setView: Dispatch<SetStateAction<string>>;
-  id: string;
   developerName: string;
+  appName: string;
   appIcon: string;
 }
 
 const ViewHeader: React.FC<Props> = ({
   setView,
-  id,
   developerName,
   appIcon,
+  appName,
 }) => {
-  const intl = useIntl();
-
   const handleClick = () => {
     setView("main");
   };
   return (
-    <div className="h-[3.5em] w-full items-center flex fixed top-0 z-10 bg-white">
-      <IconButton size="large" onClick={handleClick}>
-        <ArrowBackIcon sx={{ color: "rgb(32, 33, 36)", fontSize: 24 }} />
-      </IconButton>
+    <div className="h-[56px] gap-5 w-full items-center flex fixed top-0 z-10 bg-white px-4 border-0 border-b border-solid border-[#C6C6C6]">
+      <button onClick={handleClick} className="flex items-center">
+        <ArrowLeft />
+      </button>
       <img
-        className="h-[calc(100%-1.5em)] mr-5 rounded-lg object-cover aspect-square"
+        className="h-[30px] w-[30px] rounded-lg object-cover aspect-square"
         src={appIcon}
         alt="Logo"
       />
-      <div className="flex flex-col">
-        <span className="overflow-hidden whitespace-nowrap text-ellipsis font-medium leading-[1.3rem] text-[0.8rem]">
-          {developerName}
-        </span>
-        <span className="font-normal text-[0.8em]">
-          {intl.formatMessage({ id })}
-        </span>
+      <div className="flex flex-col font-medium text-sm">
+        <span className="text-[#020202]">{appName}</span>
+        <span className="text-primary">{developerName}</span>
       </div>
     </div>
   );

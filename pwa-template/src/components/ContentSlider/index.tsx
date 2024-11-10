@@ -1,7 +1,3 @@
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-
 import { PwaContent } from "../../shared/models";
 
 interface Props {
@@ -9,35 +5,24 @@ interface Props {
 }
 
 const ContentSlider: React.FC<Props> = ({ pwaContent }) => {
-  const settings = {
-    responsive: [
-      {
-        breakpoint: 480,
-        settings: {
-          slidesToShow: 3.5,
-          slidesToScroll: 1,
-          initialSlide: 1,
-        },
-      },
-    ],
-  };
   return (
-    <div className="slider-container  mb-4">
-      <Slider {...settings}>
-        {pwaContent.images.map(({url, id}) => {
-          return (
-            <div className="pr-1" key={id || url}>
+    <div className="mb-6 overflow-x-auto whitespace-nowrap scroll-smooth snap-normal no-scrollbar">
+      <div className="flex space-x-4">
+        {pwaContent.images.map((screen, index) => (
+          <div
+            key={index}
+            className="bg-gray-300 rounded-lg flex-shrink-0 w-[94px] h-[167px] snap-start scrollbar-hide"
+          >
+            {screen.url && (
               <img
-                src={url}
-                width={82}
-                height={176}
-                className="object-cover w-[82px] h-[176px] rounded-lg"
+                src={screen.url}
                 alt="Screen"
+                className="object-fill w-full h-full rounded-lg"
               />
-            </div>
-          );
-        })}
-      </Slider>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

@@ -103,8 +103,6 @@ export class PWAContentController {
     delete copiedPWAContentDto.createdAt;
     delete copiedPWAContentDto.updatedAt;
 
-    console.log(copiedPWAContentDto, 'copiedPWAContentDto');
-
     return this.pwaContentService.create(copiedPWAContentDto, userId);
   }
 
@@ -177,7 +175,11 @@ export class PWAContentController {
     if (state === 'completed') {
       return { status: 'completed', url: job.returnvalue };
     } else if (state === 'failed') {
-      return { status: 'failed', message: 'Job failed' };
+      return {
+        status: 'failed',
+        message: 'Job failed',
+        body: job.failedReason || 'No error body available',
+      };
     }
 
     return { status: state };
