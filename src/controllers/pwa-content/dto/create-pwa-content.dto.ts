@@ -55,6 +55,10 @@ export class CreatePWAContentDto {
   @IsString()
   appName: string;
 
+  @IsOptional()
+  @IsString()
+  pwaName?: string;
+
   @IsString()
   developerName: string;
 

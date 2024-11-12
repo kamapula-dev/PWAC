@@ -8,6 +8,9 @@ export class PWAContent extends Document {
   @Prop({ required: true })
   appName: string;
 
+  @Prop()
+  pwaName?: string;
+
   @Prop({ required: true })
   developerName: string;
 
