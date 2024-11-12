@@ -8,12 +8,11 @@ import {
   IsEnum,
   ArrayMinSize,
   ArrayMaxSize,
-  Min,
   Max,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
-class MediaDto {
+export class MediaDto {
   @IsOptional()
   @IsString()
   id?: string;
@@ -25,7 +24,7 @@ class MediaDto {
   type: string;
 }
 
-class ReviewDto {
+export class ReviewDto {
   @IsString()
   reviewAuthorName: string;
 

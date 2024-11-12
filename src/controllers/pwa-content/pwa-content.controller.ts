@@ -5,12 +5,11 @@ import {
   Body,
   Param,
   Delete,
-  Put,
   UseGuards,
   Request,
   Res,
   Logger,
-  NotFoundException,
+  NotFoundException, Patch,
 } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { PWAContentService } from './pwa-content.service';
@@ -70,12 +69,12 @@ export class PWAContentController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Put(':id')
+  @Patch(':id')
   async update(
-    @Param('id') id: string,
-    @Body() updatePWAContentDto: UpdatePWAContentDto,
-    @Request() req,
-  ): Promise<PWAContent> {
+      @Param('id') id: string,
+      @Body() updatePWAContentDto: UpdatePWAContentDto,
+      @Request() req,
+  ) {
     const userId = req.user._id;
     return this.pwaContentService.update(id, updatePWAContentDto, userId);
   }
