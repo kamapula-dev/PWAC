@@ -39,7 +39,10 @@ export class PWAContent extends Document {
   rating: string;
 
   @Prop()
-  description: string;
+  shortDescription: string;
+
+  @Prop()
+  fullDescription: string;
 
   @Prop()
   languages: string[];

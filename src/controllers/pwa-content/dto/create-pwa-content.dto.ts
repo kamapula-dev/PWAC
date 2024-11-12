@@ -87,7 +87,10 @@ export class CreatePWAContentDto {
   rating: string;
 
   @IsString()
-  description: string;
+  shortDescription: string;
+
+  @IsString()
+  fullDescription: string;
 
   @IsString()
   countOfReviewsFull: string;
