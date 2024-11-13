@@ -19,6 +19,10 @@ export class UpdatePWAContentDto {
     pwaName?: string;
 
     @IsOptional()
+    @IsBoolean()
+    hasPaidContentTitle?: boolean;
+
+    @IsOptional()
     @IsString()
     developerName?: string;
 

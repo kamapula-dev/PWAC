@@ -58,6 +58,10 @@ export class CreatePWAContentDto {
   @IsString()
   pwaName?: string;
 
+  @IsOptional()
+  @IsBoolean()
+  hasPaidContentTitle?: boolean;
+
   @IsString()
   developerName: string;
 
