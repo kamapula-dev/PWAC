@@ -1,0 +1,77 @@
+.monster-select.ant-select {
+  background-color: #161724;
+  border: 1px solid #161724;
+  box-sizing: border-box;
+  border-radius: 8px;
+  color: white;
+  padding: 0;
+  height: 42px;
+
+  &:hover {
+    border-color: #36395a;
+  }
+
+  &:focus,
+  &.ant-select-focused {
+    border-color: #161724 !important;
+    outline: none;
+  }
+
+  &.ant-select-open {
+    border-color: #161724 !important;
+  }
+
+  .ant-select-selector {
+    background-color: #161724 !important;
+    border: none;
+    color: white;
+    padding: 0;
+  }
+
+  .ant-select-selection-placeholder {
+    color: #5f6280;
+  }
+
+  .ant-select-selection-item {
+    color: white;
+  }
+
+  .ant-select-arrow {
+    color: white;
+  }
+
+  .ant-select-item-option-selected {
+    background-color: transparent !important;
+    color: white !important;
+    border: none !important;
+  }
+
+  .ant-select-item-option-active {
+    background-color: transparent !important;
+  }
+
+  .ant-select-item-option:focus {
+    outline: none !important;
+  }
+}
+
+.ant-select-dropdown {
+  background-color: #20223b !important;
+}
+
+.ant-select-item-option {
+  background-color: #20223b !important;
+  color: white !important;
+}
+
+.ant-select-item-option-active {
+  background-color: #36395a !important;
+}
+
+.monster-select.ant-select .ant-select-selection-item-remove {
+  color: #515aca !important;
+}
+
+.monster-select.ant-select .ant-select-selection-item-remove:hover {
+  color: #7678d8 !important;
+}

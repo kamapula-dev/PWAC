@@ -1,0 +1,27 @@
+.monster-select {
+  .ant-slider-track {
+    background-color: #5d8d7f !important;
+  }
+
+  .ant-slider-rail {
+    background-color: #161724 !important;
+  }
+
+  .ant-slider-handle {
+    &::after {
+      content: "";
+      box-shadow: 0 0 0 2px #02e314;
+      background-color: #02e314;
+    }
+  }
+}
+
+:where(.css-dev-only-do-not-override-11lehqq).ant-slider
+  .ant-slider-handle:hover::after,
+:where(.css-dev-only-do-not-override-11lehqq).ant-slider
+  .ant-slider-handle:active::after,
+:where(.css-dev-only-do-not-override-11lehqq).ant-slider
+  .ant-slider-handle:focus::after {
+  box-shadow: none;
+  outline: none;
+}

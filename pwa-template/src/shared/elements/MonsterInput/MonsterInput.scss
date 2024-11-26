@@ -1,0 +1,79 @@
+.monster-input.ant-input,
+.monster-input.ant-input-textarea {
+  background-color: #20223b;
+  border: 1px solid #161724;
+  box-sizing: border-box;
+  border-radius: 8px;
+  color: white;
+  padding: 12px;
+
+  &:hover {
+    border-color: #36395a;
+  }
+
+  &:focus {
+    border-color: #36395a;
+    outline: none;
+  }
+
+  &:focus-within {
+    border-color: #36395a;
+  }
+
+  &::placeholder {
+    color: #5f6280;
+  }
+
+  &.ant-input-disabled,
+  &.ant-input-textarea-disabled {
+    background-color: #161724;
+    border-color: #383b66;
+    color: #5f6280;
+
+    &::placeholder {
+      color: #5f6280;
+    }
+  }
+}
+
+.ant-input,
+.ant-input-textarea {
+  background-color: #161724 !important;
+  border: 1px solid #161724;
+  box-sizing: border-box;
+  border-radius: 8px;
+  color: white;
+  padding: 12px;
+
+  &.ant-input-disabled,
+  &.ant-input-textarea-disabled {
+    background-color: #161724;
+    border-color: #383b66;
+    color: #5f6280;
+
+    &::placeholder {
+      color: #5f6280;
+    }
+  }
+}
+
+.ant-input:hover,
+.ant-input-textarea:hover {
+  border-color: #36395a;
+}
+
+.ant-input:focus,
+.ant-input-textarea:focus {
+  border-color: #36395a;
+  outline: none;
+}
+
+.ant-input:focus-within,
+.ant-input-textarea:focus-within {
+  border-color: #36395a;
+}
+
+.ant-input::placeholder,
+.ant-input-textarea::placeholder {
+  color: #5f6280;
+}

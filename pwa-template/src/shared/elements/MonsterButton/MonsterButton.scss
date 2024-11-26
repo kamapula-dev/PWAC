@@ -1,0 +1,20 @@
+.monster-btn.ant-btn {
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  background-color: #515aca;
+  border-radius: 8px;
+  font-family: "Roboto", sans-serif;
+  color: white;
+}
+
+.monster-btn.ant-btn:hover {
+  background-color: #6b73e8 !important;
+}
+
+.monster-btn.ant-btn[disabled],
+.monster-btn.ant-btn.ant-btn-disabled {
+  background-color: #383b66;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: not-allowed;
+}

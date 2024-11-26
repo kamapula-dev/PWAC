@@ -1,0 +1,33 @@
+.monster-switch {
+  width: 50px;
+  height: 25px;
+
+  .ant-switch {
+    width: 100%;
+    height: 100%;
+    border-radius: 50px;
+    background-color: #d9d9d9;
+    transition: none !important;
+
+    &:hover {
+      background-color: #d9d9d9 !important;
+    }
+  }
+
+  .ant-switch-handle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: left 0.2s;
+  }
+}
+
+:where(.css-dev-only-do-not-override-11lehqq).ant-switch.ant-switch-checked {
+  background-color: #161724 !important;
+
+  .ant-switch-handle::before {
+    background-color: #02e314 !important;
+  }
+}

@@ -1,0 +1,185 @@
+.monster-datePicker {
+  background-color: #161724;
+  border-color: #161724;
+  color: white;
+
+  .ant-picker-input > input {
+    color: white;
+  }
+
+  .ant-picker-suffix {
+    color: white;
+  }
+
+  .ant-picker {
+    border-color: #383b66;
+  }
+
+  .ant-picker-cell-selected .ant-picker-cell-inner {
+    background-color: #383b66;
+    color: white;
+  }
+
+  .ant-picker-dropdown {
+    background-color: #161724;
+
+    .ant-picker-cell {
+      color: white;
+    }
+
+    .ant-picker-cell-in-view.ant-picker-cell-today
+      .ant-picker-cell-inner::before {
+      border-color: white;
+    }
+  }
+
+  .ant-picker-input > input::placeholder {
+    color: #5f6280;
+  }
+
+  &:hover {
+    color: white;
+  }
+
+  .ant-picker-focused .ant-picker-input > input,
+  .ant-picker-open .ant-picker-input > input {
+    color: white;
+  }
+
+  .ant-picker-focused .ant-picker-suffix,
+  .ant-picker-open .ant-picker-suffix {
+    color: white;
+  }
+
+  .ant-picker-focused .ant-picker,
+  .ant-picker-open .ant-picker {
+    border-color: #383b66;
+  }
+
+  &.ant-picker-disabled {
+    background-color: #202132;
+    color: #5f6280;
+    border-color: #383b66;
+
+    .ant-picker-input > input {
+      color: #5f6280;
+    }
+
+    .ant-picker-suffix {
+      color: #5f6280;
+    }
+
+    &:hover {
+      border-color: #383b66;
+    }
+  }
+}
+
+:where(.css-dev-only-do-not-override-11lehqq).ant-picker-outlined:focus,
+:where(.css-dev-only-do-not-override-11lehqq).ant-picker-outlined:focus-within {
+  background-color: #161724;
+}
+
+:where(.css-dev-only-do-not-override-11lehqq).ant-picker-outlined:focus,
+:where(.css-dev-only-do-not-override-11lehqq).ant-picker-outlined:focus-within {
+  border-color: #383b66;
+}
+
+:where(.css-dev-only-do-not-override-11lehqq).ant-picker-outlined:hover {
+  background-color: #161724;
+  border-color: #383b66;
+}
+
+:where(.css-dev-only-do-not-override-11lehqq).ant-picker:hover
+  .ant-picker-suffix:not(:last-child) {
+  opacity: 100;
+}
+
+:where(.css-dev-only-do-not-override-11lehqq).ant-picker-disabled {
+  background-color: #202132;
+  color: #5f6280;
+  border-color: #383b66;
+
+  .ant-picker-input > input {
+    color: #5f6280;
+  }
+
+  .ant-picker-suffix {
+    color: #5f6280;
+  }
+
+  &:hover {
+    border-color: #383b66;
+  }
+}
+
+:where(
+    .css-dev-only-do-not-override-11lehqq
+  ).ant-picker-outlined.ant-picker-disabled:hover:not([disabled]),
+:where(
+    .css-dev-only-do-not-override-11lehqq
+  ).ant-picker-outlined[disabled]:hover:not([disabled]) {
+  background-color: #161724;
+  border-color: #383b66;
+}
+
+:where(.css-dev-only-do-not-override-11lehqq).ant-picker-dropdown
+  .ant-picker-panel-container {
+  background-color: #161724;
+}
+
+:where(.css-dev-only-do-not-override-11lehqq).ant-picker-dropdown
+  .ant-picker-cell-in-view.ant-picker-cell-selected:not(
+    .ant-picker-cell-disabled
+  )
+  .ant-picker-cell-inner,
+:where(.css-dev-only-do-not-override-11lehqq).ant-picker-dropdown
+  .ant-picker-cell-in-view.ant-picker-cell-range-start:not(
+    .ant-picker-cell-disabled
+  )
+  .ant-picker-cell-inner,
+:where(.css-dev-only-do-not-override-11lehqq).ant-picker-dropdown
+  .ant-picker-cell-in-view.ant-picker-cell-range-end:not(
+    .ant-picker-cell-disabled
+  )
+  .ant-picker-cell-inner {
+  background-color: #515aca;
+}
+
+:where(.css-dev-only-do-not-override-11lehqq).ant-picker-dropdown
+  .ant-picker-cell
+  .ant-picker-cell-inner {
+  color: white;
+}
+
+:where(.css-dev-only-do-not-override-11lehqq).ant-picker-dropdown
+  .ant-picker-header-view
+  > button {
+  color: white;
+}
+
+:where(.css-dev-only-do-not-override-11lehqq).ant-picker-dropdown
+  .ant-picker-header
+  button {
+  color: white;
+}
+
+:where(.css-dev-only-do-not-override-11lehqq).ant-picker-dropdown
+  .ant-picker-header
+  > button:hover {
+  color: white;
+}
+
+:where(.css-dev-only-do-not-override-11lehqq).ant-picker-dropdown
+  .ant-picker-content
+  th {
+  color: white;
+}
+
+:where(.css-dev-only-do-not-override-11lehqq) a:hover {
+  color: white;
+}
+
+:where(.css-11lehqq).ant-picker-outlined:hover {
+  background-color: #161724 !important;
+}

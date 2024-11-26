@@ -1,5 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
-
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Reem+Kufi+Ink&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -16,6 +16,67 @@
   }
 }
 
+.rename-field-input {
+  background: rgb(32 34 59 / 0.9) !important;
+  color: #6b7280 !important;
+}
+
+.rename-pwa-modal .ant-modal-content,
+.rename-pwa-modal .ant-modal-title {
+  background: #515aca !important;
+}
+
+/* .ant-modal-footer button.ant-btn-primary {
+  background: #00ff11;
+  color: #161724;
+  font-weight: bold;
+}
+
+:where(.css-dev-only-do-not-override-11lehqq).ant-btn-default {
+  color: #161724;
+  font-weight: bold;
+}
+
+:where(.css-dev-only-do-not-override-11lehqq).ant-btn-primary:not(
+    :disabled
+  ):not(.ant-btn-disabled):hover {
+  background: #20223b !important;
+}
+
+.ant-btn-default:hover {
+  background: #20223b !important;
+  border-color: #20223b !important;
+  color: #ffffff !important;
+} */
+
+.anticon.anticon-close.ant-modal-close-icon svg {
+  fill: #ffffff !important;
+}
+
+:where(.css-dev-only-do-not-override-11lehqq).ant-modal .ant-modal-title {
+  color: #ffffff;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hidden {
+  -ms-overflow-style: none; /* для IE и Edge */
+  scrollbar-width: none; /* для Firefox */
+}
+
+html {
+  overflow: hidden;
+}
+
 body {
+  overflow: auto;
+}
+
+html,
+body,
+#root {
   font-family: "Roboto", sans-serif;
+  height: 100%;
 }
