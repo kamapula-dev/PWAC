@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { Media, MediaSchema } from './media.scheme';
 import { Review, ReviewSchema } from './review.scheme';
+import * as deepl from 'deepl-node';
 
 @Schema({ timestamps: true })
 export class PWAContent extends Document {
@@ -18,7 +19,7 @@ export class PWAContent extends Document {
   developerName: string;
 
   @Prop({ required: true })
-  countOfDownloads: string;
+  countOfDownloads: Map<string, string>;
 
   @Prop({ required: true })
   countOfReviews: string;
@@ -45,13 +46,13 @@ export class PWAContent extends Document {
   rating: string;
 
   @Prop()
-  shortDescription: string;
+  shortDescription: Map<string, string>;
 
   @Prop()
-  fullDescription: string;
+  fullDescription: Map<string, string>;
 
   @Prop()
-  languages: string[];
+  languages?: deepl.TargetLanguageCode[];
 
   @Prop({ required: true })
   countOfReviewsFull: string;

@@ -9,7 +9,8 @@ import {
   Request,
   Res,
   Logger,
-  NotFoundException, Patch,
+  NotFoundException,
+  Patch,
 } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { PWAContentService } from './pwa-content.service';
@@ -21,16 +22,21 @@ import { MediaService } from '../media/media.service';
 import { ConfigService } from '@nestjs/config';
 import { UserService } from '../user/user.service';
 import { Queue } from 'bull';
+import * as deepl from 'deepl-node';
 
 @Controller('pwa-content')
 export class PWAContentController {
+  private readonly translator: deepl.Translator;
   constructor(
     private readonly pwaContentService: PWAContentService,
     private readonly mediaService: MediaService,
     private readonly configService: ConfigService,
     private readonly userService: UserService,
     @InjectQueue('buildPWA') private readonly buildQueue: Queue,
-  ) {}
+  ) {
+    const deeplApiKey = this.configService.get<string>('DEEPL_API_KEY');
+    this.translator = new deepl.Translator(deeplApiKey);
+  }
 
   @UseGuards(AuthGuard('jwt'))
   @Post()
@@ -39,6 +45,31 @@ export class PWAContentController {
     @Request() req,
   ): Promise<PWAContent> {
     const userId = req.user._id;
+    const { languages } = createPWAContentDto;
+
+    await Promise.all(
+      [
+        createPWAContentDto.fullDescription,
+        createPWAContentDto.shortDescription,
+        createPWAContentDto.countOfDownloads,
+      ].map(async (property) => {
+        const initialText = Object.values(property)[0];
+
+        await Promise.all(
+          languages.map(async (lang) => {
+            const translatedText = (await this.translator.translateText(
+              initialText,
+              null,
+              lang,
+            )) as deepl.TextResult;
+
+            const languageKey = lang.split('-')[0];
+            property[languageKey] = translatedText.text;
+          }),
+        );
+      }),
+    );
+
     return this.pwaContentService.create(createPWAContentDto, userId);
   }
 
@@ -46,6 +77,7 @@ export class PWAContentController {
   @Get()
   async findAll(@Request() req): Promise<PWAContent[]> {
     const userId = req.user._id;
+
     return this.pwaContentService.findAll(userId);
   }
 
@@ -71,9 +103,9 @@ export class PWAContentController {
   @UseGuards(AuthGuard('jwt'))
   @Patch(':id')
   async update(
-      @Param('id') id: string,
-      @Body() updatePWAContentDto: UpdatePWAContentDto,
-      @Request() req,
+    @Param('id') id: string,
+    @Body() updatePWAContentDto: UpdatePWAContentDto,
+    @Request() req,
   ) {
     const userId = req.user._id;
     return this.pwaContentService.update(id, updatePWAContentDto, userId);
