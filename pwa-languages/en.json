@@ -1,6 +1,6 @@
 {
   "details": "Details",
-  "reviews": "reviews",
+  "reviews": "Reviews",
   "downloads": "Downloads",
   "age": "Age",
   "install": "Install",
@@ -52,7 +52,7 @@
   "dataStoringText": "The developer provides a way for you to request that your data be deleted",
   "seeDetails": "See details",
   "dataSafety": "Data safety",
-  "dataSafetyText": "Here's more information the developer has provided about the kinds of data this app may collect and share, and security practices the app may follow. Data practices may vary based on your app version, use, region, and age. ",
+  "dataSafetyText": "Here's more information the developer has provided about the kinds of data this app may collect and share, and security practices the app may follow. Data practices may vary based on your app version, use, region, and age.",
   "securityPractices": "Security practices",
   "moreBy": "More by",
   "ratesAndReviewsAreVerified": "Ratings and reviews are verified. They were left by users with the same type of device as yours.",
