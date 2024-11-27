@@ -53,6 +53,7 @@ const MainView: React.FC<Props> = ({ setView, pwaContent }) => {
               {pwaContent.appName}
             </div>
             <InstallationProgress
+              hasPaidContent={pwaContent.hasPaidContentTitle}
               developerName={pwaContent.developerName}
               isVerified={pwaContent.verified}
             />

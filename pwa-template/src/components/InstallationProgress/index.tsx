@@ -9,9 +9,11 @@ import VerifiedIcon from "../../shared/icons/VerifiedIcon";
 export default function InstallationProgress({
   developerName,
   isVerified,
+  hasPaidContent,
 }: {
   developerName: string;
   isVerified: boolean;
+  hasPaidContent: boolean;
 }) {
   const intl = useIntl();
 
@@ -35,11 +37,30 @@ export default function InstallationProgress({
       )}
     </div>
   ) : (
-    <div className="flex gap-1 items-center">
-      <div className="text-sm whitespace-nowrap font-bold text-primary">
-        {developerName}
+    <div className="flex flex-col gap-2">
+      <div className="flex gap-1 items-center">
+        <div className="text-sm whitespace-nowrap font-bold text-primary">
+          {developerName}
+        </div>
+        <VerifiedIcon />
       </div>
-      <VerifiedIcon />
+      {hasPaidContent && (
+        <div className="flex gap-1 text-[8px] text-[#444444] items-center">
+          <div>
+            {intl.formatMessage({
+              id: "noAds",
+              defaultMessage: "No ads",
+            })}
+          </div>
+          <div className="rounded-full w-0.5 h-0.5 bg-[#444444]" />
+          <div>
+            {intl.formatMessage({
+              id: "noPaidContent",
+              defaultMessage: "No paid content",
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

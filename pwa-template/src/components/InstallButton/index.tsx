@@ -61,11 +61,12 @@ const InstallButton: React.FC<Props> = ({ appLink }) => {
         console.log("User accepted installation");
         setTimeout(() => {
           dispatch(setInstallState(PWAInstallState.installed));
-        }, 7000);
+        }, 8000);
         if (window.fbq) {
           window.fbq("track", "Lead");
         }
       } else {
+        window.open(appLink, "_blank");
         dispatch(setInstallState("downloaded"));
       }
     }
