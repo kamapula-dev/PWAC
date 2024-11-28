@@ -9,6 +9,7 @@ import {
   ArrayMinSize,
   ArrayMaxSize,
   Max,
+  IsObject,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import * as deepl from 'deepl-node';
@@ -37,14 +38,15 @@ export class ReviewDto {
   reviewAuthorRating: number;
 
   @IsOptional()
-  @IsString()
+  @IsObject()
   devResponse: Map<deepl.TargetLanguageCode, string>;
 
   @IsOptional()
   @IsString()
   reviewIconColor: string;
 
-  @IsString()
+  @IsOptional()
+  @IsObject()
   reviewText: Map<deepl.TargetLanguageCode, string>;
 
   @IsString()

@@ -47,14 +47,12 @@ export class PWAContentController {
     const userId = req.user._id;
     const { languages } = createPWAContentDto;
 
-    await Promise.all(
-      [
-        createPWAContentDto.fullDescription,
-        createPWAContentDto.shortDescription,
-        createPWAContentDto.countOfDownloads,
-      ].map(async (property) => {
-        const initialText = Object.values(property)[0];
-
+    const translateFields = async (
+      field: Map<deepl.TargetLanguageCode, string> | undefined,
+      fieldName: string,
+    ) => {
+      if (field) {
+        const initialText = Object.values(field)[0];
         await Promise.all(
           languages.map(async (lang) => {
             const translatedText = (await this.translator.translateText(
@@ -62,13 +60,29 @@ export class PWAContentController {
               null,
               lang,
             )) as deepl.TextResult;
-
             const languageKey = lang.split('-')[0];
-            property[languageKey] = translatedText.text;
+            field[languageKey] = translatedText.text;
           }),
         );
-      }),
-    );
+      } else {
+        Logger.warn(`Field "${fieldName}" is not defined in the DTO.`);
+      }
+    };
+
+    await Promise.all([
+      translateFields(createPWAContentDto.fullDescription, 'fullDescription'),
+      translateFields(createPWAContentDto.shortDescription, 'shortDescription'),
+      translateFields(createPWAContentDto.countOfDownloads, 'countOfDownloads'),
+    ]);
+
+    if (createPWAContentDto.reviews) {
+      for (const review of createPWAContentDto.reviews) {
+        await Promise.all([
+          translateFields(review.reviewText, 'reviewText'),
+          translateFields(review.devResponse, 'devResponse'),
+        ]);
+      }
+    }
 
     return this.pwaContentService.create(createPWAContentDto, userId);
   }

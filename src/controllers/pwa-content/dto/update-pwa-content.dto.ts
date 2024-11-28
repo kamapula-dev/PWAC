@@ -7,6 +7,7 @@ import {
   ValidateNested,
   ArrayMinSize,
   ArrayMaxSize,
+  IsObject,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { MediaDto, ReviewDto } from './create-pwa-content.dto';
@@ -63,6 +64,7 @@ export class UpdatePWAContentDto {
   rating?: string;
 
   @IsOptional()
+  @IsObject()
   shortDescription?: Map<deepl.TargetLanguageCode, string>;
 
   @IsOptional()
