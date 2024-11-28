@@ -8,6 +8,7 @@ import { AuthModule } from './controllers/auth/auth.module';
 import { MediaModule } from './controllers/media/media.module';
 import { PWAContentModule } from './controllers/pwa-content/pwa-content.module';
 import { BullModule } from '@nestjs/bull';
+import { LanguagesModule } from './controllers/languages/languages.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { BullModule } from '@nestjs/bull';
     AuthModule,
     MediaModule,
     PWAContentModule,
+    LanguagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
