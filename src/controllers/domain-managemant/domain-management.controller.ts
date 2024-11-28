@@ -13,9 +13,15 @@ export class DomainManagementController {
 
   @Post('add')
   async addDomain(
-    @Body() body: { email: string; apiToken: string; domain: string },
+    @Body()
+    body: {
+      email: string;
+      apiToken: string;
+      domain: string;
+      accountId: string;
+    },
   ) {
-    const { email, apiToken, domain } = body;
+    const { email, apiToken, domain, accountId } = body;
 
     if (!email || !apiToken || !domain) {
       throw new HttpException(
@@ -24,6 +30,11 @@ export class DomainManagementController {
       );
     }
 
-    return await this.domainService.addDomain(email, apiToken, domain);
+    return await this.domainService.addDomain(
+      email,
+      apiToken,
+      domain,
+      accountId,
+    );
   }
 }
