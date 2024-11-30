@@ -16,25 +16,19 @@ export class DomainManagementController {
     @Body()
     body: {
       email: string;
-      apiToken: string;
+      gApiKey: string;
       domain: string;
-      accountId: string;
     },
   ) {
-    const { email, apiToken, domain, accountId } = body;
+    const { email, gApiKey, domain } = body;
 
-    if (!email || !apiToken || !domain) {
+    if (!email || !gApiKey || !domain) {
       throw new HttpException(
         'Missing required parameters',
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    return await this.domainService.addDomain(
-      email,
-      apiToken,
-      domain,
-      accountId,
-    );
+    return await this.domainService.addDomain(email, gApiKey, domain);
   }
 }
