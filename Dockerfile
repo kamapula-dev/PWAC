@@ -32,6 +32,7 @@ COPY --from=build /usr/src/app/dist ./dist
 COPY --from=build /usr/src/app/package*.json ./
 
 COPY --from=build /usr/src/app/pwa-template ./pwa-template
+COPY --from=build /usr/src/app/pwa-languages ./pwa-languages
 
 WORKDIR /usr/src/app
 
