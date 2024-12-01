@@ -28,10 +28,7 @@ export class BuildPWAProcessor {
 
       const projectRoot = path.resolve(__dirname, '../../..');
       const templatePath = path.join(projectRoot, 'pwa-template');
-      const tempBuildFolder = path.join(
-        projectRoot,
-          pwaContentId
-      );
+      const tempBuildFolder = path.join(projectRoot, pwaContentId);
 
       try {
         fs.mkdirSync(tempBuildFolder, { recursive: true });
@@ -122,7 +119,10 @@ export class BuildPWAProcessor {
 
       Logger.log('Uploading dist folder to S3...');
       try {
-        archiveKey = await this.mediaService.uploadDistFolder(distFolderPath);
+        archiveKey = await this.mediaService.uploadDistFolder(
+          distFolderPath,
+          pwaContentId,
+        );
         signedUrl = await this.mediaService.getSignedUrl(archiveKey);
         Logger.log('Signed URL generated:', signedUrl);
       } catch (error) {

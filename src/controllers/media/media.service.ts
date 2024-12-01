@@ -58,8 +58,11 @@ export class MediaService {
     return Promise.all(uploadPromises);
   }
 
-  async uploadDistFolder(distFolderPath: string): Promise<string> {
-    const archiveKey = `${uuidv4()}-dist.zip`;
+  async uploadDistFolder(
+    distFolderPath: string,
+    pwaContentId: string,
+  ): Promise<string> {
+    const archiveKey = `${pwaContentId}.zip`;
     const archivePath = path.join('/tmp', archiveKey);
 
     const output = fs.createWriteStream(archivePath);
