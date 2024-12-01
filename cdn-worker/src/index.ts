@@ -1,6 +1,7 @@
 import JSZip from 'jszip';
 
 const BUCKET_URL = 'https://pwac-media.s3.eu-north-1.amazonaws.com';
+const DOMAIN_MAPPING_API_URL = 'https://pwac.world/domain-mapping';
 
 addEventListener('fetch', (event) => {
   // @ts-ignore
@@ -10,16 +11,22 @@ addEventListener('fetch', (event) => {
 async function handleRequest(request: Request): Promise<Response> {
   try {
     const url = new URL(request.url);
-    const pathParts = url.pathname.split('/').filter(Boolean);
+    const domainName = url.hostname;
+    const requestedFile = url.pathname.slice(1) || 'index.html';
 
-    if (pathParts.length < 1) {
-      return new Response('Invalid request. Missing PWA ID.', { status: 400 });
+    const mappingResponse = await fetch(
+      `${DOMAIN_MAPPING_API_URL}/${domainName}`,
+    );
+    if (!mappingResponse.ok) {
+      return new Response('Domain mapping not found', { status: 404 });
     }
 
-    const pwaId = pathParts[0];
-    const requestedFile = pathParts.slice(1).join('/') || 'index.html';
-    const archiveUrl = `${BUCKET_URL}/${pwaId}.zip`;
+    const { pwaId } = await mappingResponse.json();
+    if (!pwaId) {
+      return new Response('PWA ID not found for the domain', { status: 404 });
+    }
 
+    const archiveUrl = `${BUCKET_URL}/${pwaId}.zip`;
     const archiveResponse = await fetch(archiveUrl);
     if (!archiveResponse.ok) {
       return new Response('Archive not found', { status: 404 });
