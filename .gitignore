@@ -396,5 +396,7 @@ Temporary Items
 # Local
 .env
 dist
+!cdn-worker/dist/
+!cdn-worker/dist/**
 .webpack
 .serverless/**/*.zip

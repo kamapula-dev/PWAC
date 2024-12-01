@@ -2,12 +2,11 @@ import { Injectable } from '@nestjs/common';
 import * as path from 'path';
 import { promises as fs } from 'fs';
 import * as deepl from 'deepl-node';
-import * as appRoot from 'app-root-path';
 import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class LanguagesService {
-  private readonly languagesPath = path.join(appRoot.path, 'pwa-languages');
+  private readonly languagesPath = path.join(process.cwd(), 'pwa-languages');
 
   constructor() {}
 

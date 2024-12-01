@@ -1,0 +1,20 @@
+{
+  "name": "cdn-worker",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "esbuild src/index.ts --bundle --outdir=dist --format=iife --sourcemap"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/jszip": "^3.4.1",
+    "wrangler": "^3.87.0"
+  },
+  "dependencies": {
+    "jszip": "^3.10.1"
+  }
+}
