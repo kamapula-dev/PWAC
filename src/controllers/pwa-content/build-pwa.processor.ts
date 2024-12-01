@@ -98,7 +98,7 @@ export class BuildPWAProcessor {
       }
 
       const distFolderPath = path.join(tempBuildFolder, 'dist');
-      let archiveKey: string;
+      let fileKey: string;
       let signedUrl: string;
 
       Logger.log('Checking for existing PWA...');
@@ -109,30 +109,47 @@ export class BuildPWAProcessor {
 
       if (existingPwa) {
         try {
-          await this.mediaService.deleteArchive(existingPwa.archiveKey);
-          Logger.log(`Old archive deleted for PWA-content ID: ${pwaContentId}`);
+          await this.mediaService.deleteFile(existingPwa.archiveKey);
+          Logger.log(`Old file deleted for PWA-content ID: ${pwaContentId}`);
         } catch (error) {
-          Logger.error('Error deleting old archive from S3:', error);
-          throw new Error('Error deleting old archive from S3');
+          Logger.error('Error deleting old file from S3:', error);
+          throw new Error('Error deleting old file from S3');
         }
       }
 
-      Logger.log('Uploading dist folder to S3...');
+      //
+      const inlineHtmlPath = `/tmp/${pwaContentId}.html`;
+      const inlineCommand = `html-inline ${distFolderPath}/index.html -o ${inlineHtmlPath}`;
+
       try {
-        archiveKey = await this.mediaService.uploadDistFolder(
-          distFolderPath,
-          pwaContentId,
+        await this.executeCommand(inlineCommand, distFolderPath);
+        Logger.log(`Inline HTML generated for ${pwaContentId}`);
+      } catch (error) {
+        Logger.error('Error generating inline HTML:', error);
+        throw new Error('Error generating inline HTML');
+      }
+
+      // Загружаем файл в S3
+      try {
+        fileKey = await this.mediaService.uploadHtmlFile(
+          inlineHtmlPath,
+          `${pwaContentId}.html`,
         );
-        signedUrl = await this.mediaService.getSignedUrl(archiveKey);
+        signedUrl = await this.mediaService.getSignedUrl(fileKey);
         Logger.log('Signed URL generated:', signedUrl);
       } catch (error) {
-        Logger.error('Error during upload to S3:', error);
-        throw new Error('Error during upload to S3');
+        Logger.error('Error uploading inline HTML to S3:', error);
+        throw new Error('Error uploading inline HTML to S3');
       }
+      //
 
       await this.userService.updateUserPwas(
         userId,
-        existingPwa || { pwaContentId, createdAt: new Date(), archiveKey },
+        existingPwa || {
+          pwaContentId,
+          createdAt: new Date(),
+          archiveKey: fileKey,
+        },
       );
 
       try {

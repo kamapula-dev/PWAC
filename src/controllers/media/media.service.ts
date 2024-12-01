@@ -96,7 +96,7 @@ export class MediaService {
     });
   }
 
-  async deleteArchive(fileKey: string): Promise<void> {
+  async deleteFile(fileKey: string): Promise<void> {
     try {
       const command = new DeleteObjectCommand({
         Bucket: this.bucketName,
@@ -107,6 +107,27 @@ export class MediaService {
       Logger.log(`File with key ${fileKey} deleted successfully from S3.`);
     } catch (error) {
       throw new Error(`Error deleting file from S3`);
+    }
+  }
+
+  async uploadHtmlFile(filePath: string, fileKey: string): Promise<string> {
+    const fileStream = fs.createReadStream(filePath);
+
+    const params = {
+      Bucket: this.bucketName,
+      Key: fileKey,
+      Body: fileStream,
+      ContentType: 'text/html',
+    };
+
+    const command = new PutObjectCommand(params);
+
+    try {
+      await this.s3Client.send(command);
+      Logger.log(`File ${fileKey} uploaded successfully.`);
+      return fileKey;
+    } finally {
+      fs.unlinkSync(filePath);
     }
   }
 }
