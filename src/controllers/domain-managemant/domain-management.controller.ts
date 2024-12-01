@@ -4,13 +4,16 @@ import {
   Body,
   HttpException,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { DomainManagementService } from './domain-management.service';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('domains')
 export class DomainManagementController {
   constructor(private readonly domainService: DomainManagementService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Post('add')
   async addDomain(
     @Body()
