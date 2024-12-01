@@ -8,6 +8,8 @@ import { AuthModule } from './controllers/auth/auth.module';
 import { MediaModule } from './controllers/media/media.module';
 import { PWAContentModule } from './controllers/pwa-content/pwa-content.module';
 import { BullModule } from '@nestjs/bull';
+import { DomainMappingModule } from './controllers/domain-mapping/domain-mapping.module';
+import { DomainManagementModule } from './controllers/domain-managemant/domain-management.module';
 import { LanguagesModule } from './controllers/languages/languages.module';
 
 @Module({
@@ -35,6 +37,8 @@ import { LanguagesModule } from './controllers/languages/languages.module';
     }),
     UserModule,
     AuthModule,
+    DomainManagementModule,
+    DomainMappingModule,
     MediaModule,
     PWAContentModule,
     LanguagesModule,

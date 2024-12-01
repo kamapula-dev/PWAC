@@ -30,7 +30,7 @@ export class BuildPWAProcessor {
       const templatePath = path.join(projectRoot, 'pwa-template');
       const tempBuildFolder = path.join(
         projectRoot,
-        `temp-build-${pwaContentId}-${Date.now()}`,
+          pwaContentId
       );
 
       try {

@@ -1,5 +1,7 @@
 node_modules
 dist
+cdn-worker/*
+!cdn-worker/dist/index.js
 npm-debug.log
 Dockerfile
 .dockerignore

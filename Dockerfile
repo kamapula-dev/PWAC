@@ -32,6 +32,9 @@ COPY --from=build /usr/src/app/dist ./dist
 COPY --from=build /usr/src/app/package*.json ./
 
 COPY --from=build /usr/src/app/pwa-template ./pwa-template
+
+COPY cdn-worker/dist/index.js ./cdn-worker/dist/index.js
+
 COPY --from=build /usr/src/app/pwa-languages ./pwa-languages
 
 WORKDIR /usr/src/app
