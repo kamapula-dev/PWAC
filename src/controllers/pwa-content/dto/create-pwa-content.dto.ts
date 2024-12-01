@@ -9,8 +9,10 @@ import {
   ArrayMinSize,
   ArrayMaxSize,
   Max,
+  IsObject,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import * as deepl from 'deepl-node';
 
 export class MediaDto {
   @IsOptional()
@@ -36,15 +38,16 @@ export class ReviewDto {
   reviewAuthorRating: number;
 
   @IsOptional()
-  @IsString()
-  devResponse: string;
+  @IsObject()
+  devResponse: Map<deepl.TargetLanguageCode, string>;
 
   @IsOptional()
   @IsString()
   reviewIconColor: string;
 
-  @IsString()
-  reviewText: string;
+  @IsOptional()
+  @IsObject()
+  reviewText: Map<deepl.TargetLanguageCode, string>;
 
   @IsString()
   reviewDate: string;
@@ -65,8 +68,8 @@ export class CreatePWAContentDto {
   @IsString()
   developerName: string;
 
-  @IsString()
-  countOfDownloads: string;
+  @IsOptional()
+  countOfDownloads: Map<deepl.TargetLanguageCode, string>;
 
   @IsString()
   countOfReviews: string;
@@ -93,11 +96,11 @@ export class CreatePWAContentDto {
   @IsString()
   rating: string;
 
-  @IsString()
-  shortDescription: string;
+  @IsOptional()
+  shortDescription: Map<deepl.TargetLanguageCode, string>;
 
-  @IsString()
-  fullDescription: string;
+  @IsOptional()
+  fullDescription: Map<deepl.TargetLanguageCode, string>;
 
   @IsString()
   countOfReviewsFull: string;
@@ -111,7 +114,7 @@ export class CreatePWAContentDto {
   @IsOptional()
   @IsArray()
   @Type(() => String)
-  languages: string[];
+  languages?: deepl.TargetLanguageCode[];
 
   @IsArray()
   @ValidateNested({ each: true })

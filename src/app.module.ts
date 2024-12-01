@@ -10,6 +10,7 @@ import { PWAContentModule } from './controllers/pwa-content/pwa-content.module';
 import { BullModule } from '@nestjs/bull';
 import { DomainMappingModule } from './controllers/domain-mapping/domain-mapping.module';
 import { DomainManagementModule } from './controllers/domain-managemant/domain-management.module';
+import { LanguagesModule } from './controllers/languages/languages.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { DomainManagementModule } from './controllers/domain-managemant/domain-m
     DomainMappingModule,
     MediaModule,
     PWAContentModule,
+    LanguagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -9,6 +9,7 @@ export enum PWAInstallState {
 export interface PwaContent {
   appName: string;
   developerName: string;
+  hasPaidContentTitle: boolean;
   countOfDownloads: number;
   countOfReviews: number;
   size: string;
