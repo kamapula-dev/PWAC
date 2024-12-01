@@ -25,7 +25,20 @@ export default function App() {
       const response = await axios.get(
         `api/pwa-content/${import.meta.env.VITE_PWA_CONTENT_ID}/trusted`
       );
-      setPwaContent(response.data);
+      const language = navigator.language.split("-")[0];
+      const pwaContent = {
+        ...response.data,
+        shortDescription:
+          response.data.shortDescription[language] ??
+          Object.values(response.data.shortDescription)[0],
+        fullDescription:
+          response.data.fullDescription[language] ??
+          Object.values(response.data.fullDescription)[0],
+        countOfDownloads:
+          response.data.countOfDownloads[language] ??
+          Object.values(response.data.countOfDownloads)[0],
+      };
+      setPwaContent(pwaContent);
     };
     getPwaContent();
   }, []);

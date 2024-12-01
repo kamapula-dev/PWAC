@@ -64,5 +64,7 @@
   "learnMore": "Узнать больше о",
   "developerDataCollection": "том, как разработчики раскрывают сбор данных...",
   "dataNotEncrypted": "Данные не зашифрованы.",
-  "dataCanNotBeDeleted": "Данные нельзя удалить."
+  "dataCanNotBeDeleted": "Данные нельзя удалить.",
+  "noPaidContent": "Платного контента нет.",
+  "noAds": "Без рекламы"
 }

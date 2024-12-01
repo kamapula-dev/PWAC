@@ -64,5 +64,7 @@
   "learnMore": "Saiba mais sobre",
   "developerDataCollection": "como os desenvolvedores divulgam a coleta de dados...",
   "dataNotEncrypted": "Os dados não estão criptografados.",
-  "dataCanNotBeDeleted": "Os dados não podem ser excluídos."
+  "dataCanNotBeDeleted": "Os dados não podem ser excluídos.",
+  "noPaidContent": "Sem conteúdo pago.",
+  "noAds": "Sem anúncios."
 }
