@@ -5,6 +5,7 @@ import {
   HttpException,
   HttpStatus,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { DomainManagementService } from './domain-management.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -21,9 +22,12 @@ export class DomainManagementController {
       email: string;
       gApiKey: string;
       domain: string;
+      pwaId: string;
     },
+    @Request() req,
   ) {
-    const { email, gApiKey, domain } = body;
+    const userId = req.user._id;
+    const { email, gApiKey, domain, pwaId } = body;
 
     if (!email || !gApiKey || !domain) {
       throw new HttpException(
@@ -32,6 +36,12 @@ export class DomainManagementController {
       );
     }
 
-    return await this.domainService.addDomain(email, gApiKey, domain);
+    return await this.domainService.addDomain(
+      email,
+      gApiKey,
+      domain,
+      pwaId,
+      userId,
+    );
   }
 }

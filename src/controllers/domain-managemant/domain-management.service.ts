@@ -3,10 +3,13 @@ import axios from 'axios';
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { DomainMappingService } from '../domain-mapping/domain-mapping.service';
 
 @Injectable()
 export class DomainManagementService {
   private CLOUDFLARE_API_BASE = 'https://api.cloudflare.com/client/v4';
+
+  constructor(private readonly domainMappingService: DomainMappingService) {}
 
   private loadWorkerScript(): string {
     const scriptPath = path.resolve(process.cwd(), 'cdn-worker/dist/index.js');
@@ -22,6 +25,8 @@ export class DomainManagementService {
     email: string,
     gApiKey: string,
     domain: string,
+    pwaId: string,
+    userId: string,
   ): Promise<any> {
     const script = this.loadWorkerScript();
     const response = await axios.get(
@@ -38,7 +43,14 @@ export class DomainManagementService {
       );
     }
 
-    const zoneId = await this.addZone(email, gApiKey, domain, accountId);
+    const zoneId = await this.addZone(
+      email,
+      gApiKey,
+      domain,
+      accountId,
+      pwaId,
+      userId,
+    );
 
     await this.deployWorker(email, gApiKey, accountId, domain, script, zoneId);
 
@@ -58,6 +70,8 @@ export class DomainManagementService {
     gApiKey: string,
     domain: string,
     accountId: string,
+    pwaId: string,
+    userId: string,
   ): Promise<string> {
     try {
       const body = {
@@ -75,6 +89,7 @@ export class DomainManagementService {
       Logger.log(JSON.stringify(response.data, null, 2));
 
       if (response.data.success) {
+        this.domainMappingService.addDomainMapping(domain, pwaId, userId);
         return response.data.result.id;
       } else {
         throw new Error(
