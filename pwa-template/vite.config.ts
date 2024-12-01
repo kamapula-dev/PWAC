@@ -2,10 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
-const PWA_ID = import.meta.env.PWA_ID || '';
-
 export default defineConfig({
-  base: `/${PWA_ID}/`,
   plugins: [
     react(),
     VitePWA({
@@ -16,8 +13,8 @@ export default defineConfig({
         display: 'standalone',
         short_name: 'Plinko casino',
         theme_color: '#ffffff',
-        start_url: `/${PWA_ID}/`,
-        scope: `/${PWA_ID}/`,
+        start_url: `/`,
+        scope: `/`,
         prefer_related_applications: true,
         icons: [
           {
