@@ -162,7 +162,7 @@ export class DomainManagementService {
       headers: {
         'X-Auth-Email': email,
         'X-Auth-Key': gApiKey,
-        'Content-Type': js ? 'application/jacascript' : 'application/json',
+        'Content-Type': js ? 'application/javascript' : 'application/json',
       },
     };
   }
