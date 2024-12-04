@@ -3,6 +3,8 @@ import JSZip from 'jszip';
 const BUCKET_URL = 'https://pwac-media.s3.eu-north-1.amazonaws.com';
 const DOMAIN_MAPPING_API_URL = 'https://pwac.world/domain-mapping';
 
+const CACHE_TTL_SECONDS = 60;
+
 addEventListener('fetch', (event) => {
   // @ts-ignore
   event.respondWith(handleRequest(event.request));
@@ -13,6 +15,14 @@ async function handleRequest(request: Request): Promise<Response> {
     const url = new URL(request.url);
     const domainName = url.hostname;
     const requestedFile = url.pathname.slice(1) || 'index.html';
+
+    // @ts-ignore
+    const cache = caches.default;
+    const cacheKey = new Request(`${domainName}/${requestedFile}`, request);
+    const cachedResponse = await cache.match(cacheKey);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
 
     const mappingResponse = await fetch(
       `${DOMAIN_MAPPING_API_URL}/${domainName}`,
@@ -43,12 +53,17 @@ async function handleRequest(request: Request): Promise<Response> {
     const fileContent = await file.async('uint8array');
     const contentType = getContentType(requestedFile);
 
-    return new Response(fileContent, {
+    const response = new Response(fileContent, {
       headers: {
         'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=3600',
+        'Cache-Control': `public, max-age=${CACHE_TTL_SECONDS}`,
       },
     });
+
+    // @ts-ignore
+    event.waitUntil(cache.put(cacheKey, response.clone()));
+
+    return response;
   } catch (error) {
     console.error('Error processing request:', error);
     return new Response('Internal server error', { status: 500 });
