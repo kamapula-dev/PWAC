@@ -144,13 +144,14 @@ export class BuildPWAProcessor {
           await Promise.all([
             this.domainMappingService.updateDomainMappingPwaId(
               userId,
-              existingPwa.domainName,
+              existingUserPwaForDomain.domainName,
               pwaContentId,
             ),
             this.userService.setUserPwaId(
               userId,
-              existingPwa.domainName,
+              existingUserPwaForDomain.domainName,
               pwaContentId,
+              archiveKey,
             ),
           ]);
         }

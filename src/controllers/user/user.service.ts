@@ -63,10 +63,16 @@ export class UserService {
     userId: string,
     domain: string,
     newPwaContentId: string | null,
+    newArchiveKey?: string,
   ): Promise<void> {
     const result = await this.userModel.updateOne(
       { _id: userId, 'pwas.domainName': domain },
-      { $set: { 'pwas.$.pwaContentId': newPwaContentId } },
+      {
+        $set: {
+          'pwas.$.pwaContentId': newPwaContentId,
+          ...(newArchiveKey ? { 'pwas.$.archiveKey': newArchiveKey } : {}),
+        },
+      },
     );
 
     if (result.matchedCount === 0) {
@@ -97,6 +103,8 @@ export class UserService {
         },
       },
     );
+
+    console.log(result, 'user pwa enrich result');
 
     if (result.matchedCount === 0) {
       throw new Error(

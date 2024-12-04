@@ -47,7 +47,7 @@ export class DomainManagementService {
       );
     }
 
-    const zoneId = await this.addZone(
+    const { zoneId, nsRecords } = await this.addZone(
       email,
       gApiKey,
       domain,
@@ -61,10 +61,7 @@ export class DomainManagementService {
     return {
       message:
         'Domain successfully added and worker deployed. Update NS records as follows:',
-      nsRecords: [
-        { name: 'ns1.cloudflare.com' },
-        { name: 'ns2.cloudflare.com' },
-      ],
+      nsRecords,
       domain,
     };
   }
@@ -76,7 +73,7 @@ export class DomainManagementService {
     accountId: string,
     pwaId: string,
     userId: string,
-  ): Promise<string> {
+  ): Promise<{ zoneId: string; nsRecords: { name: string }[] }> {
     try {
       const body = {
         account: { id: accountId },
@@ -93,12 +90,19 @@ export class DomainManagementService {
       Logger.log(JSON.stringify(response.data, null, 2));
 
       if (response.data.success) {
+        const zoneId = response.data.result.id;
+        const nsRecords = response.data.result.name_servers.map(
+          (ns: string) => ({
+            name: ns,
+          }),
+        );
+
         await Promise.all([
           this.domainMappingService.addDomainMapping(
             domain,
             pwaId,
             userId,
-            response.data.result.id,
+            zoneId,
           ),
           this.userService.enrichPwa(userId, pwaId, {
             email,
@@ -107,7 +111,7 @@ export class DomainManagementService {
           }),
         ]);
 
-        return response.data.result.id;
+        return { zoneId, nsRecords };
       } else {
         throw new Error(
           response.data.errors?.[0]?.message ||

@@ -198,18 +198,17 @@ export class PWAContentController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Post('/build')
+  @Post(':id/build')
   async buildPWA(
     @Body()
     body: {
-      id: string;
       domain?: string;
     },
+    @Param('id') id: string,
     @Request() req,
     @Res() res,
   ): Promise<void> {
     try {
-      const { id, domain } = body;
       const userId = req.user._id;
       const pwaContent = await this.pwaContentService.findOne(id, userId);
 
@@ -223,7 +222,7 @@ export class PWAContentController {
         appIcon: pwaContent.appIcon,
         pwaContentId: id,
         userId,
-        domain,
+        domain: body?.domain,
       });
 
       Logger.log(`Job ${job.id} added to the queue`);

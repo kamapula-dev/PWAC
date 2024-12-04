@@ -8,5 +8,6 @@ import { UserModule } from '../user/user.module';
   imports: [DomainMappingModule, UserModule],
   controllers: [DomainManagementController],
   providers: [DomainManagementService],
+  exports: [DomainManagementService],
 })
 export class DomainManagementModule {}
