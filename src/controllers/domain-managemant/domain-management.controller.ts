@@ -9,10 +9,14 @@ import {
 } from '@nestjs/common';
 import { DomainManagementService } from './domain-management.service';
 import { AuthGuard } from '@nestjs/passport';
+import { UserService } from '../user/user.service';
 
 @Controller('domains')
 export class DomainManagementController {
-  constructor(private readonly domainService: DomainManagementService) {}
+  constructor(
+    private readonly domainService: DomainManagementService,
+    private readonly userService: UserService,
+  ) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Post('add')
@@ -29,7 +33,7 @@ export class DomainManagementController {
     const userId = req.user._id;
     const { email, gApiKey, domain, pwaId } = body;
 
-    if (!email || !gApiKey || !domain) {
+    if (!(email && gApiKey && domain)) {
       throw new HttpException(
         'Missing required parameters',
         HttpStatus.BAD_REQUEST,

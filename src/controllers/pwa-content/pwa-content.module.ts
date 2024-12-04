@@ -7,6 +7,7 @@ import { MediaModule } from '../media/media.module';
 import { BullModule } from '@nestjs/bull';
 import { BuildPWAProcessor } from './build-pwa.processor';
 import { UserModule } from '../user/user.module';
+import { DomainManagementModule } from '../domain-managemant/domain-management.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UserModule } from '../user/user.module';
     }),
     UserModule,
     MediaModule,
+    DomainManagementModule,
   ],
   controllers: [PWAContentController],
   providers: [PWAContentService, BuildPWAProcessor],

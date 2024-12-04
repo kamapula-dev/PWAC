@@ -4,12 +4,16 @@ import axios from 'axios';
 import * as fs from 'fs';
 import * as path from 'path';
 import { DomainMappingService } from '../domain-mapping/domain-mapping.service';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class DomainManagementService {
   private CLOUDFLARE_API_BASE = 'https://api.cloudflare.com/client/v4';
 
-  constructor(private readonly domainMappingService: DomainMappingService) {}
+  constructor(
+    private readonly domainMappingService: DomainMappingService,
+    private readonly userService: UserService,
+  ) {}
 
   private loadWorkerScript(): string {
     const scriptPath = path.resolve(process.cwd(), 'cdn-worker/dist/index.js');
@@ -66,7 +70,7 @@ export class DomainManagementService {
   }
 
   private async addZone(
-    email,
+    email: string,
     gApiKey: string,
     domain: string,
     accountId: string,
@@ -89,7 +93,20 @@ export class DomainManagementService {
       Logger.log(JSON.stringify(response.data, null, 2));
 
       if (response.data.success) {
-        this.domainMappingService.addDomainMapping(domain, pwaId, userId);
+        await Promise.all([
+          this.domainMappingService.addDomainMapping(
+            domain,
+            pwaId,
+            userId,
+            response.data.result.id,
+          ),
+          this.userService.enrichPwa(userId, pwaId, {
+            email,
+            domain,
+            gApiKey,
+          }),
+        ]);
+
         return response.data.result.id;
       } else {
         throw new Error(
@@ -170,6 +187,125 @@ export class DomainManagementService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  async removeDomain(
+    email: string,
+    gApiKey: string,
+    domain: string,
+    pwaId: string,
+    userId: string,
+  ): Promise<any> {
+    const accountId = await this.getAccountId(email, gApiKey);
+
+    if (!accountId) {
+      throw new HttpException(
+        'Failed to retrieve accountId',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    const data = await this.domainMappingService.getMappingByDomain(domain);
+
+    if (!data.zoneId) {
+      throw new HttpException(
+        `Zone ID for domain ${domain} not found.`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    await this.deleteWorker(email, gApiKey, accountId, domain);
+    await this.deleteZone(email, gApiKey, data.zoneId);
+
+    await this.domainMappingService.removeDomainMapping(domain, pwaId, userId);
+
+    return {
+      message: `Domain ${domain} and associated worker have been successfully removed.`,
+    };
+  }
+
+  private async deleteZone(
+    email: string,
+    gApiKey: string,
+    zoneId: string,
+  ): Promise<void> {
+    try {
+      const response = await axios.delete(
+        `${this.CLOUDFLARE_API_BASE}/zones/${zoneId}`,
+        this.getHeaders(email, gApiKey),
+      );
+
+      if (response.status !== 200) {
+        throw new Error(
+          response.data.errors?.[0]?.message ||
+            'Failed to delete zone from Cloudflare',
+        );
+      }
+
+      Logger.log(`Zone ${zoneId} deleted successfully.`);
+    } catch (error) {
+      Logger.error('Error deleting zone:', error.message);
+
+      if (error.response) {
+        Logger.error(
+          'Response data:',
+          JSON.stringify(error.response.data, null, 2),
+        );
+      }
+
+      throw new HttpException(
+        'Failed to delete zone from Cloudflare',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  private async deleteWorker(
+    email: string,
+    gApiKey: string,
+    accountId: string,
+    domain: string,
+  ): Promise<void> {
+    try {
+      const workerName = domain.replace(/\./g, '-');
+
+      const response = await axios.delete(
+        `${this.CLOUDFLARE_API_BASE}/accounts/${accountId}/workers/scripts/${workerName}`,
+        this.getHeaders(email, gApiKey),
+      );
+
+      if (response.status !== 200) {
+        throw new Error(
+          response.data.errors?.[0]?.message ||
+            `Failed to delete worker ${workerName}`,
+        );
+      }
+
+      Logger.log(`Worker ${workerName} deleted successfully.`);
+    } catch (error) {
+      Logger.error('Error deleting worker:', error.message);
+
+      if (error.response) {
+        Logger.error(
+          'Response data:',
+          JSON.stringify(error.response.data, null, 2),
+        );
+      }
+
+      throw new HttpException(
+        'Failed to delete worker from Cloudflare',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  private async getAccountId(email: string, gApiKey: string): Promise<string> {
+    const response = await axios.get(
+      `${this.CLOUDFLARE_API_BASE}/accounts`,
+      this.getHeaders(email, gApiKey),
+    );
+
+    return response.data?.result?.[0]?.id || null;
   }
 
   private getHeaders(email: string, gApiKey: string, js?: true) {

@@ -7,20 +7,20 @@ import axios from 'axios';
 import { MediaService } from '../media/media.service';
 import { UserService } from '../user/user.service';
 import { Logger } from '@nestjs/common';
-import { PWAContentService } from './pwa-content.service';
+import { DomainMappingService } from '../domain-mapping/domain-mapping.service';
 
 @Processor('buildPWA')
 export class BuildPWAProcessor {
   constructor(
     private readonly mediaService: MediaService,
     private readonly userService: UserService,
-    private readonly pwaContentService: PWAContentService,
+    private readonly domainMappingService: DomainMappingService,
   ) {}
 
   @Process()
   async handleBuildPWAJob(job: Job) {
     try {
-      const { pwaContentId, appIcon, userId } = job.data;
+      const { pwaContentId, appIcon, userId, domain } = job.data;
 
       Logger.log(
         `Job started for PWA-content ID: ${pwaContentId}, User ID: ${userId}, Job ID: ${job.id}`,
@@ -99,7 +99,6 @@ export class BuildPWAProcessor {
 
       const distFolderPath = path.join(tempBuildFolder, 'dist');
       let archiveKey: string;
-      let signedUrl: string;
 
       Logger.log('Checking for existing PWA...');
       const user = await this.userService.findById(userId);
@@ -107,9 +106,14 @@ export class BuildPWAProcessor {
         (p) => p.pwaContentId === pwaContentId,
       );
 
+      // only for test mode, not reproducible in the live application
       if (existingPwa) {
         try {
           await this.mediaService.deleteArchive(existingPwa.archiveKey);
+          await this.userService.deleteUserPwaByContentId(
+            userId,
+            existingPwa.pwaContentId,
+          );
           Logger.log(`Old archive deleted for PWA-content ID: ${pwaContentId}`);
         } catch (error) {
           Logger.error('Error deleting old archive from S3:', error);
@@ -118,22 +122,45 @@ export class BuildPWAProcessor {
       }
 
       Logger.log('Uploading dist folder to S3...');
+
       try {
         archiveKey = await this.mediaService.uploadDistFolder(
           distFolderPath,
           pwaContentId,
         );
-        signedUrl = await this.mediaService.getSignedUrl(archiveKey);
-        Logger.log('Signed URL generated:', signedUrl);
       } catch (error) {
         Logger.error('Error during upload to S3:', error);
         throw new Error('Error during upload to S3');
       }
 
-      await this.userService.updateUserPwas(
-        userId,
-        existingPwa || { pwaContentId, createdAt: new Date(), archiveKey },
-      );
+      if (domain) {
+        const existingUserPwaForDomain = user.pwas.find(
+          (p) => p.domainName === domain,
+        );
+        const existingDomainMapping =
+          await this.domainMappingService.getMappingByDomain(domain);
+
+        if (existingDomainMapping && existingUserPwaForDomain) {
+          await Promise.all([
+            this.domainMappingService.updateDomainMappingPwaId(
+              userId,
+              existingPwa.domainName,
+              pwaContentId,
+            ),
+            this.userService.setUserPwaId(
+              userId,
+              existingPwa.domainName,
+              pwaContentId,
+            ),
+          ]);
+        }
+      } else {
+        await this.userService.addPwa(userId, {
+          createdAt: new Date(),
+          pwaContentId,
+          archiveKey,
+        });
+      }
 
       try {
         fs.rmSync(tempBuildFolder, { recursive: true, force: true });
@@ -145,7 +172,7 @@ export class BuildPWAProcessor {
       Logger.log(
         `Job completed for PWA-content ID: ${pwaContentId}, User ID: ${userId}, Job ID: ${job.id}`,
       );
-      return signedUrl;
+      return true;
     } catch (e) {
       await job.moveToFailed(new Error(e), true);
       throw e;

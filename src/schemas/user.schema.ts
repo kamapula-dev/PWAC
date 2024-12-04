@@ -25,6 +25,10 @@ export class User extends Document {
   pwas: {
     pwaContentId: string;
     archiveKey: string;
+    email?: string;
+    gApiKey?: string;
+    zoneId?: string;
+    domainName?: string;
     createdAt: Date;
   }[];
 }

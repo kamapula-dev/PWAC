@@ -23,6 +23,8 @@ import { ConfigService } from '@nestjs/config';
 import { UserService } from '../user/user.service';
 import { Queue } from 'bull';
 import * as deepl from 'deepl-node';
+import { DomainManagementService } from '../domain-managemant/domain-management.service';
+import { DomainMappingService } from '../domain-mapping/domain-mapping.service';
 
 @Controller('pwa-content')
 export class PWAContentController {
@@ -32,6 +34,8 @@ export class PWAContentController {
     private readonly mediaService: MediaService,
     private readonly configService: ConfigService,
     private readonly userService: UserService,
+    private readonly domainManagementService: DomainManagementService,
+    private readonly domainMappingService: DomainMappingService,
     @InjectQueue('buildPWA') private readonly buildQueue: Queue,
   ) {
     const deeplApiKey = this.configService.get<string>('DEEPL_API_KEY');
@@ -109,9 +113,51 @@ export class PWAContentController {
 
   @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
-  async remove(@Param('id') id: string, @Request() req): Promise<void> {
+  async delete(@Param('id') id: string, @Request() req): Promise<boolean> {
     const userId = req.user._id;
-    return this.pwaContentService.remove(id, userId);
+
+    const user = await this.userService.findById(userId);
+    const existingPwa = user.pwas.find((p) => p.pwaContentId === id);
+
+    await Promise.all([
+      this.pwaContentService.remove(id, userId),
+      this.mediaService.deleteArchive(existingPwa.archiveKey),
+      this.domainMappingService.updateDomainMappingPwaId(
+        userId,
+        existingPwa.domainName,
+        null,
+      ),
+      this.userService.setUserPwaId(userId, existingPwa.domainName, null),
+    ]);
+
+    return true;
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Delete(':id/force')
+  async forceDelete(@Param('id') id: string, @Request() req): Promise<boolean> {
+    const userId = req.user._id;
+
+    const user = await this.userService.findById(userId);
+    const existingPwa = user.pwas.find((p) => p.pwaContentId === id);
+
+    await Promise.all([
+      this.pwaContentService.remove(id, userId),
+      this.domainManagementService.removeDomain(
+        existingPwa.email,
+        existingPwa.gApiKey,
+        existingPwa.domainName,
+        id,
+        userId,
+      ),
+      this.userService.deleteUserPwaByContentId(
+        userId,
+        existingPwa.pwaContentId,
+      ),
+      this.mediaService.deleteArchive(existingPwa.archiveKey),
+    ]);
+
+    return true;
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -152,13 +198,18 @@ export class PWAContentController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Get(':id/build')
+  @Post('/build')
   async buildPWA(
-    @Param('id') id: string,
+    @Body()
+    body: {
+      id: string;
+      domain?: string;
+    },
     @Request() req,
     @Res() res,
   ): Promise<void> {
     try {
+      const { id, domain } = body;
       const userId = req.user._id;
       const pwaContent = await this.pwaContentService.findOne(id, userId);
 
@@ -169,9 +220,10 @@ export class PWAContentController {
       Logger.log('Adding job to the queue job');
 
       const job = await this.buildQueue.add({
-        pwaContentId: id,
         appIcon: pwaContent.appIcon,
+        pwaContentId: id,
         userId,
+        domain,
       });
 
       Logger.log(`Job ${job.id} added to the queue`);
@@ -218,7 +270,7 @@ export class PWAContentController {
     const state = await job.getState();
 
     if (state === 'completed') {
-      return { status: 'completed', url: job.returnvalue };
+      return { status: 'completed' };
     } else if (state === 'failed') {
       return {
         status: 'failed',

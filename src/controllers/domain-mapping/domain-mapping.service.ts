@@ -21,26 +21,52 @@ export class DomainMappingService {
     domainName: string,
     pwaId: string,
     userId: string,
+    zoneId: string,
   ): Promise<DomainMapping> {
     try {
       const mapping = new this.domainMappingModel({
         domainName,
         pwaId,
         userId,
+        zoneId,
       });
-      return await mapping.save();
+
+      return mapping.save();
     } catch (error) {
       if (error.code === 11000) {
         throw new BadRequestException('Domain name is already mapped.');
       }
+
       throw error;
     }
   }
 
-  async removeDomainMapping(domainName: string): Promise<void> {
+  async updateDomainMappingPwaId(
+    userId: string,
+    domainName: string,
+    newPwaId: string | null,
+  ): Promise<void> {
+    const result = await this.domainMappingModel.updateOne(
+      { domainName, userId },
+      { $set: { pwaId: newPwaId } },
+    );
+
+    if (result.matchedCount === 0) {
+      throw new Error(
+        `Domain mapping with domain name ${domainName} not found for user with ID ${userId}`,
+      );
+    }
+  }
+
+  async removeDomainMapping(
+    domainName: string,
+    pwaId: string,
+    userId: string,
+  ): Promise<void> {
     const result = await this.domainMappingModel
-      .deleteOne({ domainName })
+      .deleteOne({ domainName, pwaId, userId })
       .exec();
+
     if (result.deletedCount === 0) {
       throw new NotFoundException(`Domain ${domainName} not found.`);
     }
@@ -50,11 +76,13 @@ export class DomainMappingService {
     const mapping = await this.domainMappingModel
       .findOne({ domainName })
       .exec();
+
     if (!mapping) {
       throw new NotFoundException(
         `Mapping for domain ${domainName} not found.`,
       );
     }
+
     return mapping;
   }
 }
