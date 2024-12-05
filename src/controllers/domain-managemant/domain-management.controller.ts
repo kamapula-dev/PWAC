@@ -48,4 +48,25 @@ export class DomainManagementController {
       userId,
     );
   }
+
+  @Post('check-addition')
+  async checkDomainAddition(
+    @Body()
+    body: {
+      email: string;
+      gApiKey: string;
+      domain: string;
+    },
+  ): Promise<{ canBeAdded: boolean; message: string }> {
+    const { email, gApiKey, domain } = body;
+
+    if (!(email && gApiKey && domain)) {
+      throw new HttpException(
+        'Missing required parameters',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return this.domainService.checkDomainAddition(email, gApiKey, domain);
+  }
 }

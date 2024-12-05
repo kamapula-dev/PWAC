@@ -303,6 +303,97 @@ export class DomainManagementService {
     }
   }
 
+  async checkDomainAddition(
+    email: string,
+    gApiKey: string,
+    domain: string,
+  ): Promise<{ canBeAdded: boolean; message: string }> {
+    try {
+      const accountResponse = await axios.get(
+        `${this.CLOUDFLARE_API_BASE}/accounts`,
+        this.getHeaders(email, gApiKey),
+      );
+
+      const accountId = accountResponse.data?.result?.[0]?.id;
+
+      if (!accountId) {
+        throw new HttpException(
+          'Failed to retrieve accountId',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+
+      const zonesResponse = await axios.get(
+        `${this.CLOUDFLARE_API_BASE}/zones`,
+        this.getHeaders(email, gApiKey),
+      );
+
+      const existingZone = zonesResponse.data.result.find(
+        (z: { name: string }) => z.name === domain,
+      );
+
+      if (existingZone) {
+        return {
+          canBeAdded: false,
+          message: 'Domain already exists in your Cloudflare account.',
+        };
+      }
+
+      const testBody = {
+        account: { id: accountId },
+        name: domain,
+        type: 'full',
+      };
+
+      let addedZone;
+
+      try {
+        addedZone = await axios.post(
+          `${this.CLOUDFLARE_API_BASE}/zones`,
+          testBody,
+          this.getHeaders(email, gApiKey),
+        );
+      } catch (error) {
+        const cfError = error.response?.data?.errors?.[0]?.message;
+        return {
+          canBeAdded: false,
+          message: cfError || 'Failed to verify domain addition to Cloudflare.',
+        };
+      }
+
+      try {
+        await axios.delete(
+          `${this.CLOUDFLARE_API_BASE}/zones/${addedZone.data.result.id}`,
+          this.getHeaders(email, gApiKey),
+        );
+      } catch (deleteError) {
+        Logger.warn(
+          'Failed to delete test-added domain. Please remove manually.',
+          deleteError.message,
+        );
+      }
+
+      return {
+        canBeAdded: true,
+        message: 'Domain can be added to Cloudflare without issues.',
+      };
+    } catch (error) {
+      Logger.error('Error checking domain addition:', error.message);
+
+      if (error.response) {
+        Logger.error(
+          'Response data:',
+          JSON.stringify(error.response.data, null, 2),
+        );
+      }
+
+      throw new HttpException(
+        'Failed to validate domain addition to Cloudflare',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   private async getAccountId(email: string, gApiKey: string): Promise<string> {
     const response = await axios.get(
       `${this.CLOUDFLARE_API_BASE}/accounts`,
