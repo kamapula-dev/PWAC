@@ -339,40 +339,6 @@ export class DomainManagementService {
         };
       }
 
-      const testBody = {
-        account: { id: accountId },
-        name: domain,
-        type: 'full',
-      };
-
-      let addedZone;
-
-      try {
-        addedZone = await axios.post(
-          `${this.CLOUDFLARE_API_BASE}/zones`,
-          testBody,
-          this.getHeaders(email, gApiKey),
-        );
-      } catch (error) {
-        const cfError = error.response?.data?.errors?.[0]?.message;
-        return {
-          canBeAdded: false,
-          message: cfError || 'Failed to verify domain addition to Cloudflare.',
-        };
-      }
-
-      try {
-        await axios.delete(
-          `${this.CLOUDFLARE_API_BASE}/zones/${addedZone.data.result.id}`,
-          this.getHeaders(email, gApiKey),
-        );
-      } catch (deleteError) {
-        Logger.warn(
-          'Failed to delete test-added domain. Please remove manually.',
-          deleteError.message,
-        );
-      }
-
       return {
         canBeAdded: true,
         message: 'Domain can be added to Cloudflare without issues.',
@@ -387,10 +353,10 @@ export class DomainManagementService {
         );
       }
 
-      throw new HttpException(
-        'Failed to validate domain addition to Cloudflare',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      return {
+        canBeAdded: false,
+        message: error.message,
+      };
     }
   }
 
