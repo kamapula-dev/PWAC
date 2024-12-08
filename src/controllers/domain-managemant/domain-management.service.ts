@@ -105,13 +105,35 @@ export class DomainManagementService {
           proxied: true,
         };
 
-        const dnsRecordResponse = await axios.post(
-          `${this.CLOUDFLARE_API_BASE}/zones/${zoneId}/dns_records`,
-          dnsRecordBody,
-          this.getHeaders(email, gApiKey),
-        );
+        try {
+          const dnsRecordResponse = await axios.post(
+            `${this.CLOUDFLARE_API_BASE}/zones/${zoneId}/dns_records`,
+            dnsRecordBody,
+            this.getHeaders(email, gApiKey),
+          );
 
-        Logger.log(JSON.stringify(dnsRecordResponse.data, null, 2));
+          Logger.log(JSON.stringify(dnsRecordResponse.data, null, 2));
+        } catch (dnsError) {
+          if (
+            dnsError.response?.data?.errors &&
+            dnsError.response.data.errors.some(
+              (error: any) => error.code === 81058,
+            )
+          ) {
+            Logger.log('DNS record already exists, skipping creation.');
+          } else {
+            Logger.error('Error creating DNS record:', dnsError.message);
+
+            if (dnsError.response) {
+              Logger.error(
+                'DNS Error response data:',
+                JSON.stringify(dnsError.response.data, null, 2),
+              );
+            }
+
+            throw dnsError;
+          }
+        }
 
         await Promise.all([
           this.domainMappingService.addDomainMapping(
@@ -234,10 +256,11 @@ export class DomainManagementService {
       );
     }
 
-    await this.deleteWorker(email, gApiKey, accountId, domain);
-    await this.deleteZone(email, gApiKey, data.zoneId);
-
-    await this.domainMappingService.removeDomainMapping(domain, pwaId, userId);
+    await Promise.all([
+      this.deleteWorker(email, gApiKey, accountId, domain),
+      this.deleteZone(email, gApiKey, data.zoneId),
+      this.domainMappingService.removeDomainMapping(domain, pwaId, userId),
+    ]);
 
     return {
       message: `Domain ${domain} and associated worker have been successfully removed.`,
@@ -250,6 +273,24 @@ export class DomainManagementService {
     zoneId: string,
   ): Promise<void> {
     try {
+      const recordsResponse = await axios.get(
+        `${this.CLOUDFLARE_API_BASE}/zones/${zoneId}/dns_records`,
+        this.getHeaders(email, gApiKey),
+      );
+
+      const dnsRecords = recordsResponse.data.result;
+
+      const deletePromises = dnsRecords.map((record: any) => {
+        return axios.delete(
+          `${this.CLOUDFLARE_API_BASE}/zones/${zoneId}/dns_records/${record.id}`,
+          this.getHeaders(email, gApiKey),
+        );
+      });
+
+      await Promise.all(deletePromises);
+
+      Logger.log(`All DNS records for zone ${zoneId} deleted successfully.`);
+
       const response = await axios.delete(
         `${this.CLOUDFLARE_API_BASE}/zones/${zoneId}`,
         this.getHeaders(email, gApiKey),
@@ -264,7 +305,7 @@ export class DomainManagementService {
 
       Logger.log(`Zone ${zoneId} deleted successfully.`);
     } catch (error) {
-      Logger.error('Error deleting zone:', error.message);
+      Logger.error('Error deleting zone or DNS records:', error.message);
 
       if (error.response) {
         Logger.error(
@@ -274,7 +315,7 @@ export class DomainManagementService {
       }
 
       throw new HttpException(
-        'Failed to delete zone from Cloudflare',
+        'Failed to delete zone and DNS records from Cloudflare',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
