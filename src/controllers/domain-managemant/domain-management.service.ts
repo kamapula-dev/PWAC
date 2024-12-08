@@ -97,6 +97,22 @@ export class DomainManagementService {
           }),
         );
 
+        const dnsRecordBody = {
+          type: 'A',
+          name: domain,
+          content: '127.0.0.1',
+          ttl: 3600,
+          proxied: false,
+        };
+
+        const dnsRecordResponse = await axios.post(
+          `${this.CLOUDFLARE_API_BASE}/zones/${zoneId}/dns_records`,
+          dnsRecordBody,
+          this.getHeaders(email, gApiKey),
+        );
+
+        Logger.log(JSON.stringify(dnsRecordResponse.data, null, 2));
+
         await Promise.all([
           this.domainMappingService.addDomainMapping(
             domain,

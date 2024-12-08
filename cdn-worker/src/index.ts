@@ -7,18 +7,23 @@ const CACHE_TTL_SECONDS = 60;
 
 addEventListener('fetch', (event) => {
   // @ts-ignore
-  event.respondWith(handleRequest(event.request));
+  event.respondWith(handleRequest(event));
 });
 
-async function handleRequest(request: Request): Promise<Response> {
+async function handleRequest(event): Promise<Response> {
   try {
+    const request = event.request;
     const url = new URL(request.url);
     const domainName = url.hostname;
     const requestedFile = url.pathname.slice(1) || 'index.html';
 
     // @ts-ignore
     const cache = caches.default;
-    const cacheKey = new Request(`${domainName}/${requestedFile}`, request);
+
+    const cacheKey = new Request(
+      `https://${domainName}/${requestedFile}`,
+      request,
+    );
     const cachedResponse = await cache.match(cacheKey);
     if (cachedResponse) {
       return cachedResponse;

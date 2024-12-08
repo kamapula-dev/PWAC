@@ -2733,16 +2733,20 @@
   var BUCKET_URL = "https://pwac-media.s3.eu-north-1.amazonaws.com";
   var DOMAIN_MAPPING_API_URL = "https://pwac.world/domain-mapping";
   var CACHE_TTL_SECONDS = 60;
-  addEventListener("fetch", (event2) => {
-    event2.respondWith(handleRequest(event2.request));
+  addEventListener("fetch", (event) => {
+    event.respondWith(handleRequest(event));
   });
-  async function handleRequest(request) {
+  async function handleRequest(event) {
     try {
+      const request = event.request;
       const url = new URL(request.url);
       const domainName = url.hostname;
       const requestedFile = url.pathname.slice(1) || "index.html";
       const cache = caches.default;
-      const cacheKey = new Request(`${domainName}/${requestedFile}`, request);
+      const cacheKey = new Request(
+        `https://${domainName}/${requestedFile}`,
+        request
+      );
       const cachedResponse = await cache.match(cacheKey);
       if (cachedResponse) {
         return cachedResponse;
