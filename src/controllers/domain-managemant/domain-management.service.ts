@@ -100,9 +100,9 @@ export class DomainManagementService {
         const dnsRecordBody = {
           type: 'A',
           name: domain,
-          content: '127.0.0.1',
+          content: '192.0.2.1',
           ttl: 3600,
-          proxied: false,
+          proxied: true,
         };
 
         const dnsRecordResponse = await axios.post(
