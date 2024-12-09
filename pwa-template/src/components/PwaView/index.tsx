@@ -16,8 +16,6 @@ const PwaView = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  if (pwaLink === "") return <></>;
-
   return view === "loading" ? (
     <PageLoader pwaLink={pwaLink} />
   ) : (
