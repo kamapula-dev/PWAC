@@ -47,7 +47,7 @@ export class UserService {
     pwaData: {
       pwaContentId: string;
       createdAt: Date;
-      archiveKey: string;
+      archiveKey?: string;
       email?: string;
       gApiKey?: string;
       domain?: string;

@@ -23,7 +23,7 @@ export class User extends Document {
     type: [
       {
         pwaContentId: { type: String, required: true },
-        archiveKey: { type: String, required: true },
+        archiveKey: { type: String, required: false },
         createdAt: { type: Date, default: Date.now },
         email: { type: String, required: false },
         gApiKey: { type: String, required: false },
@@ -49,7 +49,7 @@ export class User extends Document {
   })
   pwas: {
     pwaContentId: string;
-    archiveKey: string;
+    archiveKey?: string;
     email?: string;
     gApiKey?: string;
     zoneId?: string;

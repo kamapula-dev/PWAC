@@ -20,9 +20,9 @@ export class BuildPWAProcessor {
 
   @Process()
   async handleBuildPWAJob(job: Job) {
-    try {
-      const { pwaContentId, appIcon, userId, domain } = job.data;
+    const { pwaContentId, appIcon, userId, domain } = job.data;
 
+    try {
       Logger.log(
         `Job started for PWA-content ID: ${pwaContentId}, User ID: ${userId}, Job ID: ${job.id}`,
       );
@@ -177,6 +177,41 @@ export class BuildPWAProcessor {
       );
       return true;
     } catch (e) {
+      if (domain) {
+        const user = await this.userService.findById(userId);
+        const existingUserPwaForDomain = user.pwas.find(
+          (p) => p.domainName === domain,
+        );
+        const existingDomainMapping =
+          await this.domainMappingService.getMappingByDomain(domain);
+
+        if (existingDomainMapping && existingUserPwaForDomain) {
+          await Promise.all([
+            this.domainMappingService.updateDomainMappingPwaId(
+              userId,
+              existingUserPwaForDomain.domainName,
+              pwaContentId,
+            ),
+            this.userService.setUserPwaId(
+              userId,
+              existingUserPwaForDomain.domainName,
+              pwaContentId,
+            ),
+            this.userService.updateUserPwaStatus(
+              userId,
+              pwaContentId,
+              PwaStatus.BUILD_FAILED,
+            ),
+          ]);
+        }
+      }
+
+      await this.userService.addPwa(userId, {
+        createdAt: new Date(),
+        pwaContentId,
+        status: PwaStatus.BUILD_FAILED,
+      });
+
       await job.moveToFailed(new Error(e), true);
       throw e;
     }
