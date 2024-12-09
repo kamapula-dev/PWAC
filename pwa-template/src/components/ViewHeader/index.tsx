@@ -29,7 +29,7 @@ const ViewHeader: React.FC<Props> = ({
       />
       <div className="flex flex-col font-medium text-sm">
         <span className="text-[#020202]">{appName}</span>
-        <span className="text-primary">{developerName}</span>
+        <span className="text-[#1357CD]">{developerName}</span>
       </div>
     </div>
   );

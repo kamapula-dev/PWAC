@@ -39,7 +39,7 @@ export default function InstallationProgress({
   ) : (
     <div className="flex flex-col gap-2">
       <div className="flex gap-1 items-center">
-        <div className="text-sm whitespace-nowrap font-bold text-primary">
+        <div className="text-sm whitespace-nowrap font-bold text-[#1357CD]">
           {developerName}
         </div>
         <VerifiedIcon />

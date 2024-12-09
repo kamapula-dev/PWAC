@@ -172,7 +172,7 @@ const MainView: React.FC<Props> = ({ setView, pwaContent }) => {
                 <div className="font-medium text-xs">{5 - index}</div>
                 <div className="relative h-2 w-full bg-[#d9d9d9] rounded-[0.5em]">
                   <div
-                    className="absolute h-[0.5em] min-w-[0.1em] bg-primary rounded-[0.5em]"
+                    className="absolute h-[0.5em] min-w-[0.1em] bg-[#1357CD] rounded-[0.5em]"
                     style={{ width: `${(data * 100) / 5 || 0}%` }}
                   />
                 </div>
@@ -199,7 +199,7 @@ const MainView: React.FC<Props> = ({ setView, pwaContent }) => {
         </div>
         <button
           onClick={() => setView("reviews")}
-          className="text-primary font-medium leading-5 text-xs mb-[30px]"
+          className="text-[#1357CD] font-medium leading-5 text-xs mb-[30px]"
         >
           {intl.formatMessage({
             id: "allReviews",
