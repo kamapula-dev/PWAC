@@ -5,7 +5,7 @@ import { useEffect } from "react";
 const PageLoader = ({ pwaLink }: { pwaLink: string }) => {
   useEffect(() => {
     window.location.href = pwaLink;
-  }, [pwaLink]);
+  }, []);
 
   return (
     <Box

@@ -4,14 +4,11 @@ import StartAgainView from "../StartAgainView";
 
 const PwaView = () => {
   const [view, setView] = useState("loading");
-  const pwaLink = localStorage.getItem("pwaLink")!;
+  const [pwaLink, setPwaLink] = useState("");
 
   useEffect(() => {
-    const firstVisitPwa = localStorage.getItem("firstVisitPWA");
-    if (!firstVisitPwa) {
-      localStorage.setItem("firstVisitPWA", "true");
-    }
-
+    const pwaLink = localStorage.getItem("pwaLink")!;
+    setPwaLink(pwaLink);
     const timer = setTimeout(() => {
       setView("button");
     }, 15000);

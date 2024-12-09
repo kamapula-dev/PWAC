@@ -24,9 +24,7 @@ export default function App() {
     if (isPWAActive) return;
     const getPwaContent = async () => {
       const response = await axios.get(
-        `https://pwac.world/pwa-content/${
-          import.meta.env.VITE_PWA_CONTENT_ID
-        }/trusted`
+        `https://pwac.world/pwa-content/6757616a62fb97304f0177cf/trusted`
       );
       const language = navigator.language.split("-")[0];
       const pwaContent = {
@@ -138,5 +136,5 @@ export default function App() {
       break;
   }
 
-  return isPWAActive ? <PwaView /> : <>{currentView}</>;
+  return !isPWAActive ? <PwaView /> : <>{currentView}</>;
 }
