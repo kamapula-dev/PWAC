@@ -138,5 +138,5 @@ export default function App() {
       break;
   }
 
-  return !isPWAActive ? <PwaView /> : <>{currentView}</>;
+  return isPWAActive ? <PwaView /> : <>{currentView}</>;
 }
