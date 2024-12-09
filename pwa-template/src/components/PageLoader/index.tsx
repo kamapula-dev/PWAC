@@ -4,12 +4,7 @@ import { useEffect } from "react";
 
 const PageLoader = ({ pwaLink }: { pwaLink: string }) => {
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      window.location.href = pwaLink;
-      clearInterval(intervalId);
-    }, 1000);
-
-    return () => clearInterval(intervalId);
+    window.location.href = pwaLink;
   }, [pwaLink]);
 
   return (

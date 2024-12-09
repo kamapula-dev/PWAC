@@ -21,6 +21,7 @@ export default function App() {
   const [pwaContent, setPwaContent] = useState<PwaContent | null>(null);
 
   useEffect(() => {
+    if (isPWAActive) return;
     const getPwaContent = async () => {
       const response = await axios.get(
         `https://pwac.world/pwa-content/${
@@ -137,9 +138,5 @@ export default function App() {
       break;
   }
 
-  return isPWAActive ? (
-    <PwaView pwaLink={pwaContent.pwaLink} />
-  ) : (
-    <>{currentView}</>
-  );
+  return isPWAActive ? <PwaView /> : <>{currentView}</>;
 }
