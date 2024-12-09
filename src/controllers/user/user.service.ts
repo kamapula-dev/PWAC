@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User } from '../../schemas/user.schema';
+import { PwaStatus, User } from '../../schemas/user.schema';
 import { JobId } from 'bull';
 
 @Injectable()
@@ -51,6 +51,8 @@ export class UserService {
       email?: string;
       gApiKey?: string;
       domain?: string;
+      zoneId?: string;
+      status?: PwaStatus;
     },
   ): Promise<void> {
     await this.userModel.updateOne(
@@ -89,9 +91,12 @@ export class UserService {
       email: string;
       gApiKey: string;
       domain: string;
+      zoneId: string;
+      nsRecords: { name: string }[];
+      status: PwaStatus;
     },
   ): Promise<void> {
-    const { domain, email, gApiKey } = updateData;
+    const { domain, email, gApiKey, zoneId, nsRecords, status } = updateData;
 
     const result = await this.userModel.updateOne(
       { _id: userId, 'pwas.pwaContentId': pwaContentId },
@@ -100,11 +105,31 @@ export class UserService {
           'pwas.$.email': email,
           'pwas.$.gApiKey': gApiKey,
           'pwas.$.domainName': domain,
+          'pwas.$.zoneId': zoneId,
+          'pwas.$.nsRecords': nsRecords,
+          'pwas.$.status': status,
         },
       },
     );
 
-    console.log(result, 'user pwa enrich result');
+    if (result.matchedCount === 0) {
+      throw new Error(
+        `PWA with content ID ${pwaContentId} not found for user with ID ${userId}`,
+      );
+    }
+  }
+
+  async updateUserPwaStatus(
+    userId: string,
+    pwaContentId: string,
+    status: PwaStatus,
+  ): Promise<void> {
+    const result = await this.userModel.updateOne(
+      { _id: userId, 'pwas.pwaContentId': pwaContentId },
+      {
+        $set: { 'pwas.$.status': status },
+      },
+    );
 
     if (result.matchedCount === 0) {
       throw new Error(

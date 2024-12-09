@@ -6,6 +6,8 @@ import {
   HttpStatus,
   UseGuards,
   Request,
+  Get,
+  Param,
 } from '@nestjs/common';
 import { DomainManagementService } from './domain-management.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -68,5 +70,14 @@ export class DomainManagementController {
     }
 
     return this.domainService.checkDomainAddition(email, gApiKey, domain);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get(':id/check-status')
+  async checkDomainStatus(
+    @Param('id') pwaId: string,
+    @Request() req,
+  ): Promise<string> {
+    return this.domainService.checkDomainStatus(pwaId, req.user._id);
   }
 }

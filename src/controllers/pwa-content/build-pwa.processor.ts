@@ -8,6 +8,7 @@ import { MediaService } from '../media/media.service';
 import { UserService } from '../user/user.service';
 import { Logger } from '@nestjs/common';
 import { DomainMappingService } from '../domain-mapping/domain-mapping.service';
+import { PwaStatus } from '../../schemas/user.schema';
 
 @Processor('buildPWA')
 export class BuildPWAProcessor {
@@ -160,6 +161,7 @@ export class BuildPWAProcessor {
           createdAt: new Date(),
           pwaContentId,
           archiveKey,
+          status: PwaStatus.BUILDED,
         });
       }
 

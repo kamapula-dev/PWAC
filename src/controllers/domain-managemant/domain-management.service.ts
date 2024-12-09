@@ -1,10 +1,11 @@
-import { Injectable, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
 
 import * as fs from 'fs';
 import * as path from 'path';
 import { DomainMappingService } from '../domain-mapping/domain-mapping.service';
 import { UserService } from '../user/user.service';
+import { PwaStatus } from '../../schemas/user.schema';
 
 @Injectable()
 export class DomainManagementService {
@@ -146,6 +147,9 @@ export class DomainManagementService {
             email,
             domain,
             gApiKey,
+            zoneId,
+            nsRecords,
+            status: PwaStatus.WAITING_NS,
           }),
         ]);
 
@@ -414,6 +418,52 @@ export class DomainManagementService {
         canBeAdded: false,
         message: error.message,
       };
+    }
+  }
+
+  async checkDomainStatus(pwaId: string, userId: string): Promise<string> {
+    try {
+      const user = await this.userService.findById(userId);
+      const existingPwa = user.pwas.find((p) => p.pwaContentId === pwaId);
+
+      if (!existingPwa) {
+        throw new Error(
+          `PWA with content ID ${pwaId} not found for user with ID ${userId}`,
+        );
+      }
+
+      const response = await axios.get(
+        `${this.CLOUDFLARE_API_BASE}/zones/${existingPwa.zoneId}`,
+        this.getHeaders(existingPwa.email, existingPwa.gApiKey),
+      );
+
+      const zoneStatus = response.data.result.status;
+
+      Logger.log(`Zone status for ${existingPwa.zoneId}: ${zoneStatus}`);
+
+      if (zoneStatus === 'active') {
+        await this.userService.updateUserPwaStatus(
+          userId,
+          pwaId,
+          PwaStatus.ACTIVE,
+        );
+      }
+
+      return zoneStatus; // [active, pending, moved, deactivated]
+    } catch (error) {
+      Logger.error('Error fetching zone status:', error.message);
+
+      if (error.response) {
+        Logger.error(
+          'Response data:',
+          JSON.stringify(error.response.data, null, 2),
+        );
+      }
+
+      throw new HttpException(
+        'Failed to fetch domain status from Cloudflare',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
