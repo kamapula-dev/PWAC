@@ -25,6 +25,7 @@ import { Queue } from 'bull';
 import * as deepl from 'deepl-node';
 import { DomainManagementService } from '../domain-managemant/domain-management.service';
 import { DomainMappingService } from '../domain-mapping/domain-mapping.service';
+import { ReadyDomainService } from '../ready-domain/ready-domain.service';
 
 @Controller('pwa-content')
 export class PWAContentController {
@@ -36,6 +37,7 @@ export class PWAContentController {
     private readonly userService: UserService,
     private readonly domainManagementService: DomainManagementService,
     private readonly domainMappingService: DomainMappingService,
+    private readonly readyDomainService: ReadyDomainService,
     @InjectQueue('buildPWA') private readonly buildQueue: Queue,
   ) {
     const deeplApiKey = this.configService.get<string>('DEEPL_API_KEY');
@@ -120,14 +122,18 @@ export class PWAContentController {
     const existingPwa = user.pwas.find((p) => p.pwaContentId === id);
 
     await Promise.all([
-      this.pwaContentService.remove(id, userId),
-      this.mediaService.deleteArchive(existingPwa.archiveKey),
-      this.domainMappingService.updateDomainMappingPwaId(
-        userId,
-        existingPwa.domainName,
-        null,
-      ),
+      existingPwa.archiveKey
+        ? this.mediaService.deleteArchive(existingPwa.archiveKey)
+        : Promise.resolve(),
+      existingPwa.domainName
+        ? this.domainMappingService.updateDomainMappingPwaId(
+            userId,
+            existingPwa.domainName,
+            null,
+          )
+        : Promise.resolve(),
       this.userService.setUserPwaId(userId, existingPwa.domainName, null),
+      this.pwaContentService.remove(id, userId),
     ]);
 
     return true;
@@ -142,19 +148,30 @@ export class PWAContentController {
     const existingPwa = user.pwas.find((p) => p.pwaContentId === id);
 
     await Promise.all([
-      this.pwaContentService.remove(id, userId),
-      this.domainManagementService.removeDomain(
-        existingPwa.email,
-        existingPwa.gApiKey,
-        existingPwa.domainName,
-        id,
-        userId,
-      ),
+      existingPwa.domainName
+        ? this.domainManagementService.removeDomain(
+            existingPwa.email,
+            existingPwa.gApiKey,
+            existingPwa.domainName,
+            id,
+            userId,
+          )
+        : Promise.resolve(),
       this.userService.deleteUserPwaByContentId(
         userId,
         existingPwa.pwaContentId,
       ),
-      this.mediaService.deleteArchive(existingPwa.archiveKey),
+      existingPwa.readyDomainId
+        ? this.readyDomainService.detachFromPwa(
+            userId,
+            id,
+            existingPwa.readyDomainId,
+          )
+        : Promise.resolve(),
+      existingPwa.archiveKey
+        ? this.mediaService.deleteArchive(existingPwa.archiveKey)
+        : Promise.resolve(),
+      this.pwaContentService.remove(id, userId),
     ]);
 
     return true;

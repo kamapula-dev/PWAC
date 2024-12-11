@@ -28,6 +28,7 @@ export class User extends Document {
         email: { type: String, required: false },
         gApiKey: { type: String, required: false },
         zoneId: { type: String, required: false },
+        readyDomainId: { type: String, required: false },
         domainName: { type: String, required: false },
         nsRecords: {
           type: [
@@ -56,6 +57,7 @@ export class User extends Document {
     domainName?: string;
     nsRecords?: { name: string }[];
     status?: PwaStatus;
+    readyDomainId?: string;
     createdAt: Date;
   }[];
 }

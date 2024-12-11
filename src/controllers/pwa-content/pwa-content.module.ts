@@ -9,6 +9,7 @@ import { BuildPWAProcessor } from './build-pwa.processor';
 import { UserModule } from '../user/user.module';
 import { DomainManagementModule } from '../domain-managemant/domain-management.module';
 import { DomainMappingModule } from '../domain-mapping/domain-mapping.module';
+import { ReadyDomainModule } from '../ready-domain/ready-domain.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { DomainMappingModule } from '../domain-mapping/domain-mapping.module';
     MediaModule,
     DomainManagementModule,
     DomainMappingModule,
+    ReadyDomainModule,
   ],
   controllers: [PWAContentController],
   providers: [PWAContentService, BuildPWAProcessor],

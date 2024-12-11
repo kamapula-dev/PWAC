@@ -138,6 +138,25 @@ export class UserService {
     }
   }
 
+  async updateUserPwaReadyDomain(
+    userId: string,
+    pwaContentId: string,
+    readyDomainId: string | null,
+  ): Promise<void> {
+    const result = await this.userModel.updateOne(
+      { _id: userId, 'pwas.pwaContentId': pwaContentId },
+      {
+        $set: { 'pwas.$.readyDomainID': readyDomainId },
+      },
+    );
+
+    if (result.matchedCount === 0) {
+      throw new Error(
+        `PWA with content ID ${pwaContentId} not found for user with ID ${userId}`,
+      );
+    }
+  }
+
   async deleteUserPwaByContentId(
     userId: string,
     pwaContentId: string,

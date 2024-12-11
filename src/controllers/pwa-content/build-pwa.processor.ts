@@ -49,6 +49,7 @@ export class BuildPWAProcessor {
 
       // Create the 'public' directory before downloading the icon
       const publicFolderPath = path.join(tempBuildFolder, 'public');
+
       try {
         fs.mkdirSync(publicFolderPath, { recursive: true });
         Logger.log(`Public folder created at ${publicFolderPath}`);
@@ -81,6 +82,7 @@ export class BuildPWAProcessor {
       }
 
       const generateAssetsCommand = `npm run generate-pwa-assets`;
+
       try {
         await this.executeCommand(generateAssetsCommand, tempBuildFolder);
         Logger.log('Assets generation completed');
@@ -90,6 +92,7 @@ export class BuildPWAProcessor {
       }
 
       const buildCommand = `npm run build`;
+
       try {
         await this.executeCommand(buildCommand, tempBuildFolder);
         Logger.log('Build completed successfully');
@@ -110,7 +113,10 @@ export class BuildPWAProcessor {
       // only for test mode, not reproducible in the live application
       if (existingPwa) {
         try {
-          await this.mediaService.deleteArchive(existingPwa.archiveKey);
+          if (existingPwa.archiveKey) {
+            await this.mediaService.deleteArchive(existingPwa.archiveKey);
+          }
+
           await this.userService.deleteUserPwaByContentId(
             userId,
             existingPwa.pwaContentId,
@@ -153,6 +159,11 @@ export class BuildPWAProcessor {
               existingUserPwaForDomain.domainName,
               pwaContentId,
               archiveKey,
+            ),
+            this.userService.updateUserPwaStatus(
+              userId,
+              pwaContentId,
+              PwaStatus.BUILDED,
             ),
           ]);
         }
