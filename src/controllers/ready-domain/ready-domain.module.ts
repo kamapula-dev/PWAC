@@ -19,5 +19,6 @@ import { UserModule } from '../user/user.module';
   ],
   controllers: [ReadyDomainController],
   providers: [ReadyDomainService],
+  exports: [ReadyDomainService],
 })
 export class ReadyDomainModule {}
