@@ -1,7 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ReadyDomain } from '../../schemas/ready-domain.scheme';
+import {
+  CreateReadyDomainDto,
+  ReadyDomain,
+} from '../../schemas/ready-domain.scheme';
 import { DomainMappingService } from '../domain-mapping/domain-mapping.service';
 import { UserService } from '../user/user.service';
 
@@ -40,6 +43,11 @@ export class ReadyDomainService {
     await this.userService.updateUserPwaReadyDomain(userId, pwaId, domain.id);
 
     return domain.save();
+  }
+
+  async createReadyDomain(createDomainDto: CreateReadyDomainDto) {
+    const newDomain = new this.readyDomainModel(createDomainDto);
+    return newDomain.save();
   }
 
   async detachFromPwa(userId: string, pwaId: string, id: string) {
