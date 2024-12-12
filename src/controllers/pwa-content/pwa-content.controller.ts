@@ -148,7 +148,7 @@ export class PWAContentController {
     const existingPwa = user.pwas.find((p) => p.pwaContentId === id);
 
     await Promise.all([
-      existingPwa.domainName
+      existingPwa.domainName && !existingPwa.readyDomainId
         ? this.domainManagementService.removeDomain(
             existingPwa.email,
             existingPwa.gApiKey,
