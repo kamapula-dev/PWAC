@@ -60,8 +60,6 @@ export class ReadyDomainService {
     domain.pwaId = null;
     domain.userId = null;
 
-    await this.userService.updateUserPwaReadyDomain(userId, pwaId, null);
-
     return domain.save();
   }
 }

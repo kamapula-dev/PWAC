@@ -147,6 +147,8 @@ export class PWAContentController {
     const user = await this.userService.findById(userId);
     const existingPwa = user.pwas.find((p) => p.pwaContentId === id);
 
+    console.log(existingPwa, 'existingPwa');
+
     await Promise.all([
       existingPwa.domainName && !existingPwa.readyDomainId
         ? this.domainManagementService.removeDomain(
@@ -157,10 +159,6 @@ export class PWAContentController {
             userId,
           )
         : Promise.resolve(),
-      this.userService.deleteUserPwaByContentId(
-        userId,
-        existingPwa.pwaContentId,
-      ),
       existingPwa.readyDomainId
         ? this.readyDomainService.detachFromPwa(
             userId,
@@ -171,6 +169,10 @@ export class PWAContentController {
       existingPwa.archiveKey
         ? this.mediaService.deleteArchive(existingPwa.archiveKey)
         : Promise.resolve(),
+      this.userService.deleteUserPwaByContentId(
+        userId,
+        existingPwa.pwaContentId,
+      ),
       this.pwaContentService.remove(id, userId),
     ]);
 
