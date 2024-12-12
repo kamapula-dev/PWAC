@@ -138,6 +138,27 @@ export class UserService {
     }
   }
 
+  async setUserPwaStatusByDomain(
+    userId: string,
+    domain: string,
+    status: PwaStatus,
+  ): Promise<void> {
+    const result = await this.userModel.updateOne(
+      { _id: userId, 'pwas.domainName': domain },
+      {
+        $set: {
+          'pwas.$.status': status,
+        },
+      },
+    );
+
+    if (result.matchedCount === 0) {
+      throw new Error(
+        `PWA with domain ${domain} not found for user with ID ${userId}`,
+      );
+    }
+  }
+
   async updateUserPwaReadyDomain(
     userId: string,
     pwaContentId: string,

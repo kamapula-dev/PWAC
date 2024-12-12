@@ -160,11 +160,6 @@ export class BuildPWAProcessor {
               pwaContentId,
               archiveKey,
             ),
-            this.userService.updateUserPwaStatus(
-              userId,
-              pwaContentId,
-              PwaStatus.BUILDED,
-            ),
           ]);
         }
       } else {
@@ -208,9 +203,9 @@ export class BuildPWAProcessor {
               existingUserPwaForDomain.domainName,
               pwaContentId,
             ),
-            this.userService.updateUserPwaStatus(
+            this.userService.setUserPwaStatusByDomain(
               userId,
-              pwaContentId,
+              existingUserPwaForDomain.domainName,
               PwaStatus.BUILD_FAILED,
             ),
           ]);
