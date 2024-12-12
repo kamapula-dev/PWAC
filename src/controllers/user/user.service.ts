@@ -167,7 +167,7 @@ export class UserService {
     const result = await this.userModel.updateOne(
       { _id: userId, 'pwas.pwaContentId': pwaContentId },
       {
-        $set: { 'pwas.$.readyDomainID': readyDomainId },
+        $set: { 'pwas.$.readyDomainId': readyDomainId },
       },
     );
 
