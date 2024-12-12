@@ -147,7 +147,9 @@ export class PWAContentController {
     const user = await this.userService.findById(userId);
     const existingPwa = user.pwas.find((p) => p.pwaContentId === id);
 
-    console.log(existingPwa, 'existingPwa');
+    if (!existingPwa) {
+      throw new NotFoundException('User PWA not found');
+    }
 
     await Promise.all([
       existingPwa.domainName && !existingPwa.readyDomainId

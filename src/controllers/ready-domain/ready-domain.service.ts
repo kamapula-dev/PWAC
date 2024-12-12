@@ -57,6 +57,12 @@ export class ReadyDomainService {
       throw new NotFoundException(`Domain with ID ${id} not found`);
     }
 
+    await this.domainMappingService.removeDomainMapping(
+      domain.domain,
+      pwaId,
+      userId,
+    );
+
     domain.pwaId = null;
     domain.userId = null;
 
