@@ -15,6 +15,9 @@ export class PWAContent extends Document {
   @Prop()
   hasPaidContentTitle?: boolean;
 
+  @Prop()
+  age?: string;
+
   @Prop({ required: true })
   developerName: string;
 

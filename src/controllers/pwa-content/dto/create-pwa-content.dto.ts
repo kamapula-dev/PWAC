@@ -80,6 +80,10 @@ export class CreatePWAContentDto {
   @IsBoolean()
   verified: boolean;
 
+  @IsOptional()
+  @IsString()
+  age?: string;
+
   @IsBoolean()
   @IsOptional()
   hasLoadingScreen?: boolean;

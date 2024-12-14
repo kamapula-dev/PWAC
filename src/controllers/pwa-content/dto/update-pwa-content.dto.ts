@@ -43,6 +43,10 @@ export class UpdatePWAContentDto {
   size?: string;
 
   @IsOptional()
+  @IsString()
+  age?: string;
+
+  @IsOptional()
   @IsBoolean()
   verified?: boolean;
 
