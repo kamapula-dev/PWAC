@@ -66,5 +66,9 @@
   "dataNotEncrypted": "Veriler şifrelenmemiş.",
   "dataCanNotBeDeleted": "Veriler silinemez.",
   "noPaidContent": "Ücretli içerik yok.",
-  "noAds": "Reklam yok."
+  "noAds": "Reklam yok.",
+  "games": "Oyunlar",
+  "apps": "Uygulamalar",
+  "search": "Arama",
+  "books": "Kitaplar"
 }

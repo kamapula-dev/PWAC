@@ -11,7 +11,8 @@ const ContentSlider: React.FC<Props> = ({ pwaContent }) => {
         {pwaContent.images.map((screen, index) => (
           <div
             key={index}
-            className="bg-gray-300 rounded-lg flex-shrink-0 w-[94px] h-[167px] snap-start scrollbar-hide"
+            style={{ width: pwaContent.wideScreens ? "294px" : "94px" }}
+            className="bg-gray-300 rounded-lg flex-shrink-0 h-[167px] snap-start scrollbar-hide"
           >
             {screen.url && (
               <img

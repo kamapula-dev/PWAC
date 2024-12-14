@@ -66,5 +66,9 @@
   "dataNotEncrypted": "Data tidak dienkripsi.",
   "dataCanNotBeDeleted": "Data tidak dapat dihapus.",
   "noPaidContent": "Tidak ada konten berbayar.",
-  "noAds": "Tanpa iklan."
+  "noAds": "Tanpa iklan.",
+  "games": "Permainan",
+  "apps": "Aplikasi",
+  "search": "Pencarian",
+  "books": "Buku"
 }

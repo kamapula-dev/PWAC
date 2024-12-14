@@ -66,5 +66,9 @@
   "dataNotEncrypted": "Les données ne sont pas cryptées.",
   "dataCanNotBeDeleted": "Les données ne peuvent pas être supprimées.",
   "noPaidContent": "Aucun contenu payant.",
-  "noAds": "Sans publicité."
+  "noAds": "Sans publicité.",
+  "games": "Jeux",
+  "apps": "Applications",
+  "search": "Recherche",
+  "books": "Livres"
 }

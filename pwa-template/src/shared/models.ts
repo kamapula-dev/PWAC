@@ -42,4 +42,8 @@ export interface PwaContent {
   version: string;
   sliders: number[];
   id?: string;
+  wideScreens: boolean;
+  hasLoadingScreen?: boolean;
+  hasMenu?: boolean;
+  videoUrl?: string;
 }

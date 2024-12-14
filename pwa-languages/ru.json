@@ -66,5 +66,9 @@
   "dataNotEncrypted": "Данные не зашифрованы.",
   "dataCanNotBeDeleted": "Данные нельзя удалить.",
   "noPaidContent": "Платного контента нет.",
-  "noAds": "Без рекламы"
+  "noAds": "Без рекламы",
+  "games": "Игры",
+  "apps": "Приложения",
+  "search": "Поиск",
+  "books": "Книги"
 }

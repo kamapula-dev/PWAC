@@ -66,5 +66,9 @@
   "dataNotEncrypted": "البيانات غير مشفرة.",
   "dataCanNotBeDeleted": "لا يمكن حذف البيانات.",
   "noPaidContent": "لا يوجد محتوى مدفوع.",
-  "noAds": "بدون إعلانات."
+  "noAds": "بدون إعلانات.",
+  "games": "الألعاب",
+  "apps": "التطبيقات",
+  "search": "بحث",
+  "books": "الكتب"
 }

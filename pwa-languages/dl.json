@@ -66,5 +66,9 @@
   "dataNotEncrypted": "Gegevens zijn niet versleuteld.",
   "dataCanNotBeDeleted": "Gegevens kunnen niet worden verwijderd.",
   "noPaidContent": "Geen betaalde inhoud.",
-  "noAds": "Geen advertenties."
+  "noAds": "Geen advertenties.",
+  "games": "Spellen",
+  "apps": "Apps",
+  "search": "Zoeken",
+  "books": "Boeken"
 }
