@@ -34,6 +34,9 @@ export class PWAContent extends Document {
   verified: boolean;
 
   @Prop({ required: true })
+  wideScreens: boolean;
+
+  @Prop({ required: true })
   hasLoadingScreen: boolean;
 
   @Prop({ required: true })

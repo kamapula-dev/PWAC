@@ -80,6 +80,9 @@ export class CreatePWAContentDto {
   @IsBoolean()
   verified: boolean;
 
+  @IsBoolean()
+  wideScreens: boolean;
+
   @IsOptional()
   @IsString()
   age?: string;

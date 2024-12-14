@@ -51,6 +51,9 @@ export class UpdatePWAContentDto {
   verified?: boolean;
 
   @IsBoolean()
+  wideScreens: boolean;
+
+  @IsBoolean()
   @IsOptional()
   hasLoadingScreen?: boolean;
 
