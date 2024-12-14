@@ -80,6 +80,14 @@ export class CreatePWAContentDto {
   @IsBoolean()
   verified: boolean;
 
+  @IsBoolean()
+  @IsOptional()
+  hasLoadingScreen?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  hasMenu?: boolean;
+
   @IsArray()
   @IsString({ each: true })
   tags: string[];

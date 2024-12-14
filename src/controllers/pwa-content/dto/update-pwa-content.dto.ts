@@ -46,6 +46,14 @@ export class UpdatePWAContentDto {
   @IsBoolean()
   verified?: boolean;
 
+  @IsBoolean()
+  @IsOptional()
+  hasLoadingScreen?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  hasMenu?: boolean;
+
   @IsOptional()
   @IsArray()
   @IsString({ each: true })

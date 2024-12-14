@@ -30,6 +30,12 @@ export class PWAContent extends Document {
   @Prop({ required: true })
   verified: boolean;
 
+  @Prop({ required: true })
+  hasLoadingScreen: boolean;
+
+  @Prop({ required: true })
+  hasMenu: boolean;
+
   @Prop({ type: [String], required: true })
   tags: string[];
 
