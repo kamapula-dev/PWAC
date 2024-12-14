@@ -53,6 +53,10 @@ export class UpdatePWAContentDto {
   @IsBoolean()
   wideScreens: boolean;
 
+  @IsOptional()
+  @IsString()
+  videoUrl?: string;
+
   @IsBoolean()
   @IsOptional()
   hasLoadingScreen?: boolean;

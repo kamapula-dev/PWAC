@@ -36,6 +36,9 @@ export class PWAContent extends Document {
   @Prop({ required: true })
   wideScreens: boolean;
 
+  @Prop()
+  videoUrl?: string;
+
   @Prop({ required: true })
   hasLoadingScreen: boolean;
 

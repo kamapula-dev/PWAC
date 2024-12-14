@@ -85,6 +85,10 @@ export class CreatePWAContentDto {
 
   @IsOptional()
   @IsString()
+  videoUrl?: string;
+
+  @IsOptional()
+  @IsString()
   age?: string;
 
   @IsBoolean()
