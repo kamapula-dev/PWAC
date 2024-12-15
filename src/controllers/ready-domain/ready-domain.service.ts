@@ -19,7 +19,12 @@ export class ReadyDomainService {
 
   async getAllAvailableDomains() {
     return this.readyDomainModel
-      .find({ pwaId: { $exists: false } }, '-email -gApiKey -zoneId')
+      .find(
+        {
+          $or: [{ pwaId: { $exists: false } }, { pwaId: null }],
+        },
+        '-email -gApiKey -zoneId',
+      )
       .exec();
   }
 
