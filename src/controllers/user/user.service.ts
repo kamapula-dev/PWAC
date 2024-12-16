@@ -159,10 +159,11 @@ export class UserService {
     }
   }
 
-  async updateUserPwaReadyDomain(
+  async setUserPwaReadyDomain(
     userId: string,
     pwaContentId: string,
-    readyDomainId: string | null,
+    readyDomainId: string,
+    domainName: string,
   ): Promise<void> {
     const result = await this.userModel.updateOne(
       { _id: userId, 'pwas.pwaContentId': pwaContentId },
@@ -170,6 +171,7 @@ export class UserService {
         $set: {
           'pwas.$.readyDomainId': readyDomainId,
           'pwas.$.status': PwaStatus.ACTIVE,
+          'pwas.$.domainName': domainName,
         },
       },
     );

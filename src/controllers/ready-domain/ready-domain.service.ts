@@ -45,7 +45,12 @@ export class ReadyDomainService {
     domain.pwaId = pwaId;
     domain.userId = userId;
 
-    await this.userService.updateUserPwaReadyDomain(userId, pwaId, domain.id);
+    await this.userService.setUserPwaReadyDomain(
+      userId,
+      pwaId,
+      domain.id,
+      domain.domain,
+    );
 
     return domain.save();
   }
