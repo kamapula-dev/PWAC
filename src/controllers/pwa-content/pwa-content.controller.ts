@@ -55,7 +55,7 @@ export class PWAContentController {
     const userId = req.user._id;
     const { languages, appIcon } = createPWAContentDto;
 
-    const allowedFormats = ['.png', '.jpeg', '.jpg', '.svg'];
+    const allowedFormats = ['.png', '.jpeg', '.jpg', '.svg', '.webp'];
 
     const processAppIcon = (icon: string): string => {
       if (!icon) {
