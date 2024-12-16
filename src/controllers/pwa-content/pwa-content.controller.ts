@@ -11,6 +11,7 @@ import {
   Logger,
   NotFoundException,
   Patch,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { PWAContentService } from './pwa-content.service';
@@ -26,6 +27,7 @@ import * as deepl from 'deepl-node';
 import { DomainManagementService } from '../domain-managemant/domain-management.service';
 import { DomainMappingService } from '../domain-mapping/domain-mapping.service';
 import { ReadyDomainService } from '../ready-domain/ready-domain.service';
+import * as path from 'path';
 
 @Controller('pwa-content')
 export class PWAContentController {
@@ -51,7 +53,31 @@ export class PWAContentController {
     @Request() req,
   ): Promise<PWAContent> {
     const userId = req.user._id;
-    const { languages } = createPWAContentDto;
+    const { languages, appIcon } = createPWAContentDto;
+
+    const allowedFormats = ['.png', '.jpeg', '.jpg', '.svg'];
+
+    const processAppIcon = (icon: string): string => {
+      if (!icon) {
+        throw new BadRequestException('AppIcon is required.');
+      }
+
+      const cleanIcon = icon.split('?')[0];
+      const ext = path.extname(cleanIcon).toLowerCase();
+
+      if (!allowedFormats.includes(ext)) {
+        throw new BadRequestException(
+          `Invalid appIcon format. Allowed formats are: ${allowedFormats.join(
+            ', ',
+          )}`,
+        );
+      }
+
+      return cleanIcon;
+    };
+
+    const validAppIcon = processAppIcon(appIcon);
+    createPWAContentDto.appIcon = validAppIcon;
 
     const translateFields = async (
       field: Map<deepl.TargetLanguageCode, string> | undefined,
