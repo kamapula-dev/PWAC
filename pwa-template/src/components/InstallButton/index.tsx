@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useIntl } from "react-intl";
 import {
@@ -13,6 +13,7 @@ declare const window: any;
 
 interface Props {
   appLink: string;
+  installPrompt: BeforeInstallPromptEvent | null;
 }
 
 interface BeforeInstallPromptEvent extends Event {
@@ -20,31 +21,12 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 }
 
-const InstallButton: React.FC<Props> = ({ appLink }) => {
-  const [installPrompt, setInstallPrompt] =
-    useState<BeforeInstallPromptEvent | null>(null);
+const InstallButton: React.FC<Props> = ({ appLink, installPrompt }) => {
   const installState = useSelector((state: RootState) =>
     getInstallState(state.install)
   );
 
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    window.addEventListener(
-      "beforeinstallprompt",
-      (e: BeforeInstallPromptEvent) => {
-        e.preventDefault();
-        console.log("beforeinstallprompt fired");
-        setInstallPrompt(e);
-      }
-    );
-
-    return () => {
-      window.removeEventListener("beforeinstallprompt", () => {
-        setInstallPrompt(null);
-      });
-    };
-  }, []);
 
   const intl = useIntl();
 

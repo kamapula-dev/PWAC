@@ -15,13 +15,15 @@ import thirdPartyIcon from "../../shared/images/thirdParties.png";
 import dataCollecting from "../../shared/images/dataCollecting.png";
 import stopIcon from "../../shared/images/stop.png";
 import { motion } from "framer-motion";
+import { BeforeInstallPromptEvent } from "../../App";
 
 interface Props {
   setView: Dispatch<SetStateAction<string>>;
   pwaContent: PwaContent;
+  installPrompt: BeforeInstallPromptEvent | null;
 }
 
-const MainView: React.FC<Props> = ({ setView, pwaContent }) => {
+const MainView: React.FC<Props> = ({ setView, pwaContent, installPrompt }) => {
   const intl = useIntl();
 
   const slideVariants = {
@@ -97,7 +99,7 @@ const MainView: React.FC<Props> = ({ setView, pwaContent }) => {
             </div>
           </div>
         </div>
-        <InstallButton appLink="/" />
+        <InstallButton appLink="/" installPrompt={installPrompt} />
         <ContentSlider pwaContent={pwaContent} />
         <div className="mb-4">
           <OpenSectionButton
