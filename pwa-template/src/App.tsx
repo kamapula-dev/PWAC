@@ -34,6 +34,7 @@ export default function App() {
         );
 
         const language = navigator.language.split('-')[0];
+
         const pwaContent = {
           ...response.data,
           shortDescription:
