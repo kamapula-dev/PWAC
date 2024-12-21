@@ -1,6 +1,6 @@
-import React, { Dispatch, SetStateAction } from "react";
-import { useIntl } from "react-intl";
-import ArrowRight from "../../shared/icons/ArrowRight";
+import React, { Dispatch, SetStateAction } from 'react';
+import { useIntl } from 'react-intl';
+import ArrowRight from '../../shared/icons/ArrowRight';
 
 interface Props {
   id: string;
@@ -26,10 +26,10 @@ const OpenSectionButton: React.FC<Props> = ({
       className="flex items-center w-full justify-between"
       onClick={handleSetView}
     >
-      <div className="text-base font-medium leading-5 text-[#605D64]">
+      <div className="text-base font-medium leading-5 text-[#1D1D1D]">
         {intl.formatMessage({ id, defaultMessage })}
       </div>
-      <ArrowRight />
+      <ArrowRight style={{ color: '#1D1D1D' }} />
     </button>
   );
 };
