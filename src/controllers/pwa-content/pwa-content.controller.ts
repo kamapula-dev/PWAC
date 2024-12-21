@@ -54,6 +54,33 @@ export class PWAContentController {
   ): Promise<PWAContent> {
     const userId = req.user._id;
     const { languages, appIcon } = createPWAContentDto;
+    const actualLanguages = languages.includes('all')
+      ? ([
+          'en-US',
+          'DE',
+          'FR',
+          'ES',
+          'IT',
+          'PT-BR',
+          'NL',
+          'SV',
+          'DA',
+          'FI',
+          'PL',
+          'ZH-HANS',
+          'JA',
+          'ET',
+          'LT',
+          'SL',
+          'BG',
+          'SK',
+          'RO',
+          'EL',
+          'HU',
+          'CS',
+          'AR',
+        ] as deepl.TargetLanguageCode[])
+      : (languages as deepl.TargetLanguageCode[]);
 
     const allowedFormats = ['.png', '.jpeg', '.jpg', '.svg', '.webp'];
 
@@ -86,7 +113,7 @@ export class PWAContentController {
       if (field) {
         const initialText = Object.values(field)[0];
         await Promise.all(
-          languages.map(async (lang) => {
+          actualLanguages.map(async (lang) => {
             const translatedText = (await this.translator.translateText(
               initialText,
               null,

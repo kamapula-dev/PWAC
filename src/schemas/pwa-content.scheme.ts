@@ -67,7 +67,7 @@ export class PWAContent extends Document {
   fullDescription: Map<string, string>;
 
   @Prop()
-  languages?: deepl.TargetLanguageCode[];
+  languages?: (deepl.TargetLanguageCode | 'all')[];
 
   @Prop({ required: true })
   countOfReviewsFull: string;

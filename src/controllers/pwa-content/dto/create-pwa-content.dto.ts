@@ -130,10 +130,9 @@ export class CreatePWAContentDto {
   @IsString()
   appIcon: string;
 
-  @IsOptional()
   @IsArray()
   @Type(() => String)
-  languages?: deepl.TargetLanguageCode[];
+  languages: (deepl.TargetLanguageCode | 'all')[];
 
   @IsArray()
   @ValidateNested({ each: true })
