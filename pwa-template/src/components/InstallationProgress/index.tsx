@@ -1,10 +1,10 @@
-import { useIntl } from "react-intl";
-import { useSelector } from "react-redux";
-import VerifiedUserOutlinedIcon from "@mui/icons-material/VerifiedUserOutlined";
-import { RootState } from "../../Redux/store/store";
-import { getInstallState } from "../../Redux/feat/InstallSlice";
-import { PWAInstallState } from "../../shared/models";
-import VerifiedIcon from "../../shared/icons/VerifiedIcon";
+import { useIntl } from 'react-intl';
+import { useSelector } from 'react-redux';
+import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
+import { RootState } from '../../Redux/store/store';
+import { getInstallState } from '../../Redux/feat/InstallSlice';
+import { PWAInstallState } from '../../shared/models';
+import VerifiedIcon from '../../shared/icons/VerifiedIcon';
 
 export default function InstallationProgress({
   developerName,
@@ -19,11 +19,11 @@ export default function InstallationProgress({
 
   const isDownloading = useSelector(
     (state: RootState) =>
-      getInstallState(state.install) === PWAInstallState.downloading
+      getInstallState(state.install) === PWAInstallState.downloading,
   );
 
   const fakeDownloadProgress = useSelector(
-    (state: RootState) => state.install.fakeDownloadProgress
+    (state: RootState) => state.install.fakeDownloadProgress,
   );
 
   return isDownloading ? (
@@ -31,8 +31,8 @@ export default function InstallationProgress({
       <div className="text-black">{fakeDownloadProgress}</div>
       {isVerified && (
         <div className="flex gap-0.5 items-center text-[11px] text-gray-500 justify-center">
-          <VerifiedUserOutlinedIcon sx={{ fontSize: 12, color: "#1357CD" }} />
-          {intl.formatMessage({ id: "verified" })}
+          <VerifiedUserOutlinedIcon sx={{ fontSize: 12, color: '#1357CD' }} />
+          {intl.formatMessage({ id: 'verified' })}
         </div>
       )}
     </div>
@@ -48,15 +48,15 @@ export default function InstallationProgress({
         <div className="flex gap-1 text-[8px] text-[#444444] items-center">
           <div>
             {intl.formatMessage({
-              id: "noAds",
-              defaultMessage: "No ads",
+              id: 'noAds',
+              defaultMessage: 'No ads',
             })}
           </div>
           <div className="rounded-full w-0.5 h-0.5 bg-[#444444]" />
-          <div>
+          <div className="text-[20px]">
             {intl.formatMessage({
-              id: "noPaidContent",
-              defaultMessage: "No paid content",
+              id: 'noPaidContent',
+              defaultMessage: 'No paid content',
             })}
           </div>
         </div>
