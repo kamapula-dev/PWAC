@@ -18,6 +18,7 @@ import { motion } from "framer-motion";
 import { BeforeInstallPromptEvent } from "../../App";
 import DotsIcon from "../../shared/icons/DotsIcon";
 import InfoIcon from "../../shared/icons/InfoIcon";
+import DownloadIcon from "../../shared/icons/DownloadIcon";
 
 interface Props {
   setView: Dispatch<SetStateAction<string>>;
@@ -94,11 +95,7 @@ const MainView: React.FC<Props> = ({ setView, pwaContent, installPrompt }) => {
             style={{ minWidth: "126px", paddingRight: "16px" }}
             className="flex-1 flex flex-col justify-center items-center h-[44px]"
           >
-            <img
-              style={{ width: "16px", marginBottom: "4px" }}
-              alt=""
-              src="/src/shared/icons/download-size.png"
-            />
+            <DownloadIcon />
             <div className="text-xs text-[#605D64] font-medium">
               {pwaContent.size.toUpperCase()}
             </div>
