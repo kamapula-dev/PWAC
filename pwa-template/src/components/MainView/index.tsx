@@ -70,14 +70,19 @@ const MainView: React.FC<Props> = ({ setView, pwaContent, installPrompt }) => {
           className="flex items-center mb-5 no-scrollbar"
         >
           <div
-            style={{ minWidth: '126px', paddingRight: '16px' }}
+            style={{
+              minWidth: '156px',
+            }}
             className="flex-1 flex flex-col justify-center items-center h-10"
           >
             <div className="font-medium text-sm text-[#020202] flex gap-0.5 items-center justify-center">
               {pwaContent.countOfStars}
               <StarIcon />
             </div>
-            <div className="text-xs text-[#605D64] flex items-center font-medium">
+            <div
+              style={{ width: 'max-content' }}
+              className="text-xs text-[#605D64] flex items-center font-medium"
+            >
               {pwaContent.countOfReviews}
               {intl.formatMessage({
                 id: 'reviews',
@@ -92,7 +97,7 @@ const MainView: React.FC<Props> = ({ setView, pwaContent, installPrompt }) => {
             className="h-[22px] bg-[#C4C4C4] w-px"
           />
           <div
-            style={{ minWidth: '126px', paddingRight: '16px' }}
+            style={{ minWidth: '126px' }}
             className="flex-1 flex flex-col justify-center items-center h-[44px]"
           >
             <DownloadIcon />
@@ -105,7 +110,7 @@ const MainView: React.FC<Props> = ({ setView, pwaContent, installPrompt }) => {
             className="h-[22px] bg-[#C4C4C4] w-px"
           />
           <div
-            style={{ minWidth: '126px', paddingRight: '16px' }}
+            style={{ minWidth: '126px' }}
             className="flex-1 flex flex-col justify-center items-center h-[44px]"
           >
             <div className="font-medium text-sm text-[#030303] items-center justify-center">
@@ -123,7 +128,7 @@ const MainView: React.FC<Props> = ({ setView, pwaContent, installPrompt }) => {
             className="h-[22px] bg-[#C4C4C4] w-px"
           />
           <div
-            style={{ minWidth: '126px', paddingRight: '16px' }}
+            style={{ minWidth: '126px' }}
             className="flex-1 flex flex-col justify-center items-center h-[44px]"
           >
             <div className="font-medium text-[13px] text-[#030303] flex gap-[2px] items-center justify-center mb-[5px]">
