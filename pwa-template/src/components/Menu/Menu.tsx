@@ -12,7 +12,10 @@ const Menu = () => {
         <div className="flex-1 flex flex-col items-center">
           <div></div>
           <GamesIcon />
-          <div className="font-medium text-xs">
+          <div
+            style={{ fontWeight: 600, color: "#605D64" }}
+            className="font-medium text-xs"
+          >
             {intl.formatMessage({
               id: "games",
               defaultMessage: "Games",
@@ -21,7 +24,10 @@ const Menu = () => {
         </div>
         <div className="flex-1 flex flex-col items-center">
           <AppsIcon />
-          <div className="font-medium text-xs">
+          <div
+            style={{ fontWeight: 600, color: "#056890" }}
+            className="font-medium text-xs"
+          >
             {intl.formatMessage({
               id: "apps",
               defaultMessage: "Apps",
@@ -30,7 +36,10 @@ const Menu = () => {
         </div>
         <div className="flex-1 flex flex-col items-center">
           <SearchIcon />
-          <div className="font-medium text-xs">
+          <div
+            style={{ fontWeight: 600, color: "#605D64" }}
+            className="font-medium text-xs"
+          >
             {intl.formatMessage({
               id: "search",
               defaultMessage: "Search",
@@ -39,7 +48,10 @@ const Menu = () => {
         </div>
         <div className="flex-1 flex flex-col items-center">
           <BooksIcon />
-          <div className="font-medium text-xs">
+          <div
+            style={{ fontWeight: 600, color: "#605D64" }}
+            className="font-medium text-xs"
+          >
             {intl.formatMessage({
               id: "books",
               defaultMessage: "Books",

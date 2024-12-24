@@ -46,14 +46,14 @@ export default function InstallationProgress({
       </div>
       {hasPaidContent && (
         <div className="flex gap-1 text-[8px] text-[#444444] items-center">
-          <div>
+          <div className="text-[10px]">
             {intl.formatMessage({
               id: 'noAds',
               defaultMessage: 'No ads',
             })}
           </div>
           <div className="rounded-full w-0.5 h-0.5 bg-[#444444]" />
-          <div className="text-[20px]">
+          <div className="text-[10px]">
             {intl.formatMessage({
               id: 'noPaidContent',
               defaultMessage: 'No paid content',

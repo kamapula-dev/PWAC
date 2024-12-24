@@ -16,6 +16,8 @@ import dataCollecting from "../../shared/images/dataCollecting.png";
 import stopIcon from "../../shared/images/stop.png";
 import { motion } from "framer-motion";
 import { BeforeInstallPromptEvent } from "../../App";
+import DotsIcon from "../../shared/icons/DotsIcon";
+import InfoIcon from "../../shared/icons/InfoIcon";
 
 interface Props {
   setView: Dispatch<SetStateAction<string>>;
@@ -44,8 +46,9 @@ const MainView: React.FC<Props> = ({ setView, pwaContent, installPrompt }) => {
       variants={slideVariants}
       transition={{ duration: 0.25, ease: "easeInOut" }}
     >
-      <div className="h-11 pl-[18px] flex items-center mb-2.5">
+      <div className="h-11 pl-[18px] flex items-center justify-between mb-2.5">
         <ArrowLeft />
+        <DotsIcon />
       </div>
       <div className="px-4 pb-[30px]">
         <div className="flex mb-4">
@@ -61,22 +64,53 @@ const MainView: React.FC<Props> = ({ setView, pwaContent, installPrompt }) => {
             />
           </div>
         </div>
-        <div className="flex items-center mb-5">
-          <div className="flex-1 flex flex-col justify-center items-center h-10">
+        <div
+          style={{ overflowX: "auto" }}
+          className="flex items-center mb-5 no-scrollbar"
+        >
+          <div
+            style={{ minWidth: "126px", paddingRight: "16px" }}
+            className="flex-1 flex flex-col justify-center items-center h-10"
+          >
             <div className="font-medium text-sm text-[#020202] flex gap-0.5 items-center justify-center">
               {pwaContent.countOfStars}
               <StarIcon />
             </div>
-            <div className="text-xs text-[#605D64] font-medium">
+            <div className="text-xs text-[#605D64] flex items-center font-medium">
               {pwaContent.countOfReviews}&nbsp;
               {intl.formatMessage({
                 id: "reviews",
                 defaultMessage: "reviews",
               })}
+              &nbsp;
+              <InfoIcon />
             </div>
           </div>
-          <div className="h-[22px] bg-[#C4C4C4] w-px" />
-          <div className="flex-1 flex flex-col justify-center items-center h-[44px]">
+          <div
+            style={{ minWidth: "1px" }}
+            className="h-[22px] bg-[#C4C4C4] w-px"
+          />
+          <div
+            style={{ minWidth: "126px", paddingRight: "16px" }}
+            className="flex-1 flex flex-col justify-center items-center h-[44px]"
+          >
+            <img
+              style={{ width: "16px", marginBottom: "4px" }}
+              alt=""
+              src="/src/shared/icons/download-size.png"
+            />
+            <div className="text-xs text-[#605D64] font-medium">
+              {pwaContent.size.toUpperCase()}
+            </div>
+          </div>
+          <div
+            style={{ minWidth: "1px" }}
+            className="h-[22px] bg-[#C4C4C4] w-px"
+          />
+          <div
+            style={{ minWidth: "126px", paddingRight: "16px" }}
+            className="flex-1 flex flex-col justify-center items-center h-[44px]"
+          >
             <div className="font-medium text-sm text-[#030303] items-center justify-center">
               {pwaContent.countOfDownloads}
             </div>
@@ -87,15 +121,22 @@ const MainView: React.FC<Props> = ({ setView, pwaContent, installPrompt }) => {
               })}
             </div>
           </div>
-          <div className="h-[22px] bg-[#C4C4C4] w-px" />
-          <div className="flex-1 flex flex-col justify-center items-center h-[44px]">
+          <div
+            style={{ minWidth: "1px" }}
+            className="h-[22px] bg-[#C4C4C4] w-px"
+          />
+          <div
+            style={{ minWidth: "126px", paddingRight: "16px" }}
+            className="flex-1 flex flex-col justify-center items-center h-[44px]"
+          >
             <div className="font-medium text-[13px] text-[#030303] flex gap-[2px] items-center justify-center mb-[5px]">
               <div className="h-4 mb-0. border border-solid border-black flex items-center justify-center text-xs font-bold">
                 18+
               </div>
             </div>
-            <div className="text-xs text-[#605D64] font-medium">
-              {intl.formatMessage({ id: "age", defaultMessage: "Age" })}
+            <div className="text-xs text-[#605D64] flex items-center font-medium">
+              {intl.formatMessage({ id: "age", defaultMessage: "Age" })}&nbsp;
+              <InfoIcon />
             </div>
           </div>
         </div>
