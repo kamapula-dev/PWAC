@@ -105,9 +105,10 @@ export class UpdatePWAContentDto {
   @IsString()
   appIcon?: string;
 
+  @IsOptional()
   @IsArray()
   @Type(() => String)
-  languages: (deepl.TargetLanguageCode | 'all')[];
+  languages?: (deepl.TargetLanguageCode | 'all')[];
 
   @IsOptional()
   @IsArray()
