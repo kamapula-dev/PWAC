@@ -39,6 +39,9 @@ export class PWAContent extends Document {
   @Prop()
   videoUrl?: string;
 
+  @Prop()
+  pwaTags: string[];
+
   @Prop({ required: true })
   hasLoadingScreen: boolean;
 

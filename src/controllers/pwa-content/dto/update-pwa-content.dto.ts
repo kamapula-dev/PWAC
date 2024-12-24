@@ -99,6 +99,9 @@ export class UpdatePWAContentDto {
   countOfStars?: number;
 
   @IsOptional()
+  pwaTags: string[];
+
+  @IsOptional()
   @IsString()
   appIcon?: string;
 

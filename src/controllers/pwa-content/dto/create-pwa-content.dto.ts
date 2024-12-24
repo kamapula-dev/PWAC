@@ -127,6 +127,9 @@ export class CreatePWAContentDto {
   @IsNumber()
   countOfStars: number;
 
+  @IsOptional()
+  pwaTags: string[];
+
   @IsString()
   appIcon: string;
 
