@@ -46,4 +46,5 @@ export interface PwaContent {
   hasLoadingScreen?: boolean;
   hasMenu?: boolean;
   videoUrl?: string;
+  age: string;
 }
