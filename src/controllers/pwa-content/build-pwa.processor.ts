@@ -20,7 +20,7 @@ export class BuildPWAProcessor {
 
   @Process()
   async handleBuildPWAJob(job: Job) {
-    const { pwaContentId, appIcon, userId, domain } = job.data;
+    const { pwaContentId, appIcon, userId, domain, pwaName } = job.data;
 
     try {
       Logger.log(
@@ -79,6 +79,27 @@ export class BuildPWAProcessor {
       } catch (error) {
         Logger.error('Error downloading app icon:', error);
         throw new Error('Failed to download app icon');
+      }
+
+      try {
+        const manifestPath = path.join(tempBuildFolder, 'manifest.json');
+        const rawManifest = fs.readFileSync(manifestPath, 'utf-8');
+        const manifestData = JSON.parse(rawManifest);
+
+        if (pwaName) {
+          manifestData.name = pwaName;
+          manifestData.short_name = pwaName;
+        }
+
+        fs.writeFileSync(
+          manifestPath,
+          JSON.stringify(manifestData, null, 2),
+          'utf-8',
+        );
+        Logger.log(`Manifest updated with new name: ${pwaName}`);
+      } catch (error) {
+        Logger.error('Error updating manifest.json:', error);
+        throw new Error('Failed to update manifest.json');
       }
 
       const generateAssetsCommand = `npm run generate-pwa-assets`;

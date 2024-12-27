@@ -297,6 +297,7 @@ export class PWAContentController {
         pwaContentId: id,
         userId,
         domain: body?.domain,
+        pwaName: pwaContent.appName,
       });
 
       Logger.log(`Job ${job.id} added to the queue`);
