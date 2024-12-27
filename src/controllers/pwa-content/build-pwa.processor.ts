@@ -102,6 +102,21 @@ export class BuildPWAProcessor {
         throw new Error('Failed to update manifest.json');
       }
 
+      const indexPath = path.join(tempBuildFolder, 'index.html');
+
+      try {
+        const indexHtml = fs.readFileSync(indexPath, 'utf-8');
+        const updatedIndexHtml = indexHtml.replace(
+          /<title>.*<\/title>/,
+          `<title>${pwaName}</title>`,
+        );
+        fs.writeFileSync(indexPath, updatedIndexHtml, 'utf-8');
+        Logger.log(`Title in index.html updated to: ${pwaName}`);
+      } catch (error) {
+        Logger.error('Error updating title in index.html:', error);
+        throw new Error('Failed to update title in index.html');
+      }
+
       const generateAssetsCommand = `npm run generate-pwa-assets`;
 
       try {
