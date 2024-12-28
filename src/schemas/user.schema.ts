@@ -22,6 +22,20 @@ export class User extends Document {
   @Prop({
     type: [
       {
+        email: { type: String, required: true },
+        gApiKey: { type: String, required: true },
+      },
+    ],
+    default: [],
+  })
+  cfAccounts: {
+    email: string;
+    gApiKey: string;
+  }[];
+
+  @Prop({
+    type: [
+      {
         pwaContentId: { type: String, required: true },
         archiveKey: { type: String, required: false },
         createdAt: { type: Date, default: Date.now },
