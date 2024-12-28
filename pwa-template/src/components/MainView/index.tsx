@@ -83,7 +83,7 @@ const MainView: React.FC<Props> = ({ setView, pwaContent, installPrompt }) => {
               style={{ width: 'max-content' }}
               className="text-xs text-[#605D64] flex items-center font-medium"
             >
-              {pwaContent.countOfReviews}
+              {pwaContent.countOfReviews}&nbsp;
               {intl.formatMessage({
                 id: 'reviews',
                 defaultMessage: 'reviews',
@@ -203,7 +203,7 @@ const MainView: React.FC<Props> = ({ setView, pwaContent, installPrompt }) => {
             className="font-medium text-xs leading-4 flex"
             style={{ gridArea: 'rating-count' }}
           >
-            {pwaContent.countOfReviews}
+            {pwaContent.countOfReviews}&nbsp;
             {intl.formatMessage({
               id: 'reviews',
               defaultMessage: 'reviews',
