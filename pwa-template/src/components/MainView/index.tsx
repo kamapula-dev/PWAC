@@ -258,7 +258,7 @@ const MainView: React.FC<Props> = ({ setView, pwaContent, installPrompt }) => {
         {pwaContent.securityUI && (
           <>
             <div className="flex justify-between items-center cursor-pointer mb-3">
-              <span className="text-[#605D64] leading-6 font-medium text-base">
+              <span className="text-[#1D1D1D] leading-6 font-medium text-base">
                 {intl.formatMessage({
                   id: 'dataSecurity',
                   defaultMessage: 'Data security',
