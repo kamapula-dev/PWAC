@@ -79,6 +79,7 @@ export class PWAContentController {
           'HU',
           'CS',
           'AR',
+          'ru',
         ] as deepl.TargetLanguageCode[])
       : (languages as deepl.TargetLanguageCode[]);
 
