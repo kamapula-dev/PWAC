@@ -299,6 +299,7 @@ export class PWAContentController {
         userId,
         domain: body?.domain,
         pwaName: pwaContent.appName,
+        ...(pwaContent?.pixel && { pixel: pwaContent.pixel }),
       });
 
       Logger.log(`Job ${job.id} added to the queue`);

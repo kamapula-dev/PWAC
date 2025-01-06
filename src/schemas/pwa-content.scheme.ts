@@ -102,6 +102,20 @@ export class PWAContent extends Document {
     },
   })
   sliders: number[];
+
+  @Prop({
+    type: {
+      token: { type: String, required: true },
+      pixelId: { type: String, required: true },
+      events: { type: [String], required: true },
+    },
+    required: false,
+  })
+  pixel?: {
+    token: string;
+    pixelId: string;
+    events: string[];
+  };
 }
 
 export const PWAContentSchema = SchemaFactory.createForClass(PWAContent);

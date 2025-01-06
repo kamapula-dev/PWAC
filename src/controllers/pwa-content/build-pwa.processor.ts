@@ -20,7 +20,7 @@ export class BuildPWAProcessor {
 
   @Process()
   async handleBuildPWAJob(job: Job) {
-    const { pwaContentId, appIcon, userId, domain, pwaName } = job.data;
+    const { pwaContentId, appIcon, userId, domain, pwaName, pixel } = job.data;
 
     try {
       Logger.log(
@@ -115,6 +115,56 @@ export class BuildPWAProcessor {
       } catch (error) {
         Logger.error('Error updating title in index.html:', error);
         throw new Error('Failed to update title in index.html');
+      }
+
+      if (pixel) {
+        try {
+          const indexHtml = fs.readFileSync(indexPath, 'utf-8');
+          const { pixelId } = pixel;
+
+          const pixelScript = `
+            <script>
+              !(function (f, b, e, v, n, t, s) {
+                if (f.fbq) return;
+                n = f.fbq = function () {
+                  n.callMethod
+                    ? n.callMethod.apply(n, arguments)
+                    : n.queue.push(arguments);
+                };
+                if (!f._fbq) f._fbq = n;
+                n.push = n;
+                n.loaded = !0;
+                n.version = "2.0";
+                n.queue = [];
+                t = b.createElement(e);
+                t.async = !0;
+                t.src = v;
+                s = b.getElementsByTagName(e)[0];
+                s.parentNode.insertBefore(t, s);
+              })(
+                window,
+                document,
+                "script",
+                "https://connect.facebook.net/en_US/fbevents.js"
+              );
+              
+              if ('${pixelId}') {
+                fbq("init", "${pixelId}");
+                fbq("track", "PageView");
+              }
+            </script>`;
+
+          const updatedIndexHtml = indexHtml.replace(
+            '</head>',
+            `${pixelScript}</head>`,
+          );
+
+          fs.writeFileSync(indexPath, updatedIndexHtml, 'utf-8');
+          Logger.log(`Pixel script added with ID: ${pixelId}`);
+        } catch (error) {
+          Logger.error('Error updating index.html with Pixel ID:', error);
+          throw new Error('Failed to update index.html with Pixel ID');
+        }
       }
 
       const generateAssetsCommand = `npm run generate-pwa-assets`;

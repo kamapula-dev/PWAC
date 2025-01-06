@@ -14,6 +14,18 @@ import {
 import { Type } from 'class-transformer';
 import * as deepl from 'deepl-node';
 
+export class PixelDto {
+  @IsString()
+  token: string;
+
+  @IsString()
+  pixelId: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  events: string[];
+}
+
 export class MediaDto {
   @IsOptional()
   @IsString()
@@ -149,6 +161,11 @@ export class CreatePWAContentDto {
 
   @IsString()
   version: string;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => PixelDto)
+  pixel?: PixelDto;
 
   @IsArray()
   @ArrayMinSize(5, { message: 'Array must contain exactly 5 values' })
