@@ -117,12 +117,10 @@ export class BuildPWAProcessor {
         throw new Error('Failed to update title in index.html');
       }
 
-      if (pixel) {
-        try {
-          const indexHtml = fs.readFileSync(indexPath, 'utf-8');
-          const { pixelId } = pixel;
-
-          const pixelScript = `
+      try {
+        const indexHtml = fs.readFileSync(indexPath, 'utf-8');
+        const pixelScript = pixel
+          ? `
             <script>
               !(function (f, b, e, v, n, t, s) {
                 if (f.fbq) return;
@@ -148,23 +146,63 @@ export class BuildPWAProcessor {
                 "https://connect.facebook.net/en_US/fbevents.js"
               );
               
-              if ('${pixelId}') {
-                fbq("init", "${pixelId}");
+              if ('${pixel.pixelId}') {
+                fbq("init", "${pixel.pixelId}");
                 fbq("track", "PageView");
               }
-            </script>`;
+            </script>`
+          : `<script>
+                function getQueryParam(param) {
+                  var searchParams = new URLSearchParams(window.location.search);
+                  return searchParams.get(param);
+                }
+                var pixelId = getQueryParam("idpixel");
+                !(function (f, b, e, v, n, t, s) {
+                  if (f.fbq) return;
+                  n = f.fbq = function () {
+                    n.callMethod
+                      ? n.callMethod.apply(n, arguments)
+                      : n.queue.push(arguments);
+                  };
+                  if (!f._fbq) f._fbq = n;
+                  n.push = n;
+                  n.loaded = !0;
+                  n.version = "2.0";
+                  n.queue = [];
+                  t = b.createElement(e);
+                  t.async = !0;
+                  t.src = v;
+                  s = b.getElementsByTagName(e)[0];
+                  s.parentNode.insertBefore(t, s);
+                })(
+                  window,
+                  document,
+                  "script",
+                  "https://connect.facebook.net/en_US/fbevents.js"
+                );
+            
+                if (pixelId) {
+                  fbq("init", pixelId);
+                }
+            
+                fbq("track", "PageView");
+              </script>
+            `;
 
-          const updatedIndexHtml = indexHtml.replace(
-            '</head>',
-            `${pixelScript}</head>`,
-          );
+        const updatedIndexHtml = indexHtml.replace(
+          '</head>',
+          `${pixelScript}</head>`,
+        );
 
-          fs.writeFileSync(indexPath, updatedIndexHtml, 'utf-8');
-          Logger.log(`Pixel script added with ID: ${pixelId}`);
-        } catch (error) {
-          Logger.error('Error updating index.html with Pixel ID:', error);
-          throw new Error('Failed to update index.html with Pixel ID');
+        fs.writeFileSync(indexPath, updatedIndexHtml, 'utf-8');
+        if (pixel) {
+          Logger.log(`Pixel script added with ID: ${pixel.pixelId}`);
+        } else {
+          Logger.log(`Pixel script added query params`);
         }
+      } catch (error) {
+        Logger.error('Error updating index.html with Pixel ID:', error);
+        throw new Error('Failed to update index.html with Pixel ID');
       }
 
       const generateAssetsCommand = `npm run generate-pwa-assets`;
