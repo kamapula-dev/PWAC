@@ -38,9 +38,10 @@ export class ContentGenerationService {
     }
   }
 
-  async generateReviewText(): Promise<{
+  async generateReview(): Promise<{
     reviewText: string;
     reviewAuthor: string;
+    reviewResponse: string;
   }> {
     const reviewText = await this.generateContent(
       'Напиши позитивный отзыв о приложении для казино на русском языке. Пиши, как обычный пользователь, используй простой язык, короткие слова и немного сленга. Не добавляй свои комментарии, только отзыв. Два предложения.',
@@ -50,9 +51,14 @@ export class ContentGenerationService {
       'Напиши имя пользователя, оно может быть как реальным, так и вымышленным. Имя должно быть на латинице. Не более 2 слов.',
       20,
     );
+    const reviewResponse = await this.generateContent(
+      'Напиши ответ на отзыв. Ответ должен быть позитивным и коротким. Не более 50 токенов. Одно предложение.',
+      50,
+    );
     return {
       reviewText,
       reviewAuthor,
+      reviewResponse,
     };
   }
 
@@ -61,5 +67,21 @@ export class ContentGenerationService {
       'Напиши описание приложения для казино на русском языке простыми словами. Это реклама. Описание должно подчеркнуть интерфейс и бонусы. Около 200 токенов. 3 предложения.',
       200,
     );
+  }
+
+  async generateReviewResponseText(review: string): Promise<string> {
+    return this.generateContent(
+      `Напиши ответ на отзыв "${review}". Ответ должен быть позитивным и коротким. Не более 50 токенов. Одно предложение.`,
+      50,
+    );
+  }
+
+  async generateAppReviewText(): Promise<{ text: string }> {
+    return {
+      text: await this.generateContent(
+        'Напиши позитивный отзыв о приложении для казино на русском языке. Пиши, как обычный пользователь, используй простой язык, короткие слова и немного сленга. Не добавляй свои комментарии, только отзыв. Два предложения.',
+        100,
+      ),
+    };
   }
 }

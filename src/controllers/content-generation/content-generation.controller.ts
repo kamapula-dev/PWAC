@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ContentGenerationService } from './content-generation.service';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -9,12 +9,13 @@ export class ContentGenerationController {
   ) {}
 
   @UseGuards(AuthGuard('jwt'))
-  @Get('generate-review-text')
+  @Get('generate-review')
   async generateHaiku(): Promise<{
     reviewText: string;
+    reviewResponse: string;
     reviewAuthor: string;
   }> {
-    return this.contentGenerationService.generateReviewText();
+    return this.contentGenerationService.generateReview();
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -25,5 +26,23 @@ export class ContentGenerationController {
     return {
       text: description,
     };
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('generate-review-response-text')
+  async generateReviewResponse(
+    @Body('review') review: { text: string },
+  ): Promise<{ text: string }> {
+    return {
+      text: await this.contentGenerationService.generateReviewResponseText(
+        review.text,
+      ),
+    };
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('generate-review-text')
+  async generateReviewText(): Promise<{ text: string }> {
+    return await this.contentGenerationService.generateAppReviewText();
   }
 }
