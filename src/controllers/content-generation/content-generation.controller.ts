@@ -10,7 +10,10 @@ export class ContentGenerationController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get('generate-review-text')
-  async generateHaiku(): Promise<string> {
+  async generateHaiku(): Promise<{
+    reviewText: string;
+    reviewAuthor: string;
+  }> {
     return this.contentGenerationService.generateReviewText();
   }
 

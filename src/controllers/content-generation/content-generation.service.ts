@@ -40,11 +40,22 @@ export class ContentGenerationService {
     }
   }
 
-  async generateReviewText(): Promise<string> {
-    return this.generateContent(
+  async generateReviewText(): Promise<{
+    reviewText: string;
+    reviewAuthor: string;
+  }> {
+    const reviewText = await this.generateContent(
       'Напиши позитивный отзыв о приложении для казино на русском языке. Пиши, как обычный пользователь, используй простой язык, короткие слова и немного сленга. Не добавляй свои комментарии, только отзыв. Два предложения.',
       100,
     );
+    const reviewAuthor = await this.generateContent(
+      'Напиши имя пользователя, оно может быть как реальным, так и вымышленным. Имя должно быть на латинице. Не более 2 слов.',
+      20,
+    );
+    return {
+      reviewText,
+      reviewAuthor,
+    };
   }
 
   async generateAppDescription(): Promise<string> {
