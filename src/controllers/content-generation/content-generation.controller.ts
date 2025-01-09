@@ -19,7 +19,11 @@ export class ContentGenerationController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get('generate-app-description')
-  async generateLimerick(): Promise<string> {
-    return this.contentGenerationService.generateAppDescription();
+  async generateAppDescription(): Promise<{ text: string }> {
+    const description =
+      await this.contentGenerationService.generateAppDescription();
+    return {
+      text: description,
+    };
   }
 }

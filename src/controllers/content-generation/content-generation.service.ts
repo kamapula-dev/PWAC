@@ -17,7 +17,6 @@ export class ContentGenerationService {
   private async generateContent(
     prompt: string,
     maxTokens: number,
-    temperature = 0.7,
   ): Promise<string> {
     try {
       const completion = await this.openai.chat.completions.create({
@@ -30,7 +29,6 @@ export class ContentGenerationService {
           },
         ],
         max_tokens: maxTokens,
-        temperature,
       });
       return completion.choices[0]?.message?.content?.trim();
     } catch (error) {
