@@ -31,8 +31,9 @@ export class ContentGenerationController {
   @UseGuards(AuthGuard('jwt'))
   @Post('generate-review-response-text')
   async generateReviewResponse(
-    @Body('review') review: { text: string },
+    @Body('text') review: { text: string },
   ): Promise<{ text: string }> {
+    console.log(review);
     return {
       text: await this.contentGenerationService.generateReviewResponseText(
         review.text,
