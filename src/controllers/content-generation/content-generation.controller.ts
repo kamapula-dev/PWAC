@@ -33,7 +33,6 @@ export class ContentGenerationController {
   async generateReviewResponse(
     @Body('text') review: { text: string },
   ): Promise<{ text: string }> {
-    console.log(review);
     return {
       text: await this.contentGenerationService.generateReviewResponseText(
         review.text,
