@@ -11,6 +11,7 @@ import { BullModule } from '@nestjs/bull';
 import { DomainMappingModule } from './controllers/domain-mapping/domain-mapping.module';
 import { DomainManagementModule } from './controllers/domain-managemant/domain-management.module';
 import { LanguagesModule } from './controllers/languages/languages.module';
+import { ContentGenerationModule } from './controllers/content-generation/content-generation.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { LanguagesModule } from './controllers/languages/languages.module';
     MediaModule,
     PWAContentModule,
     LanguagesModule,
+    ContentGenerationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
