@@ -36,7 +36,7 @@ export class ContentGenerationService {
           },
         ],
         max_tokens: maxTokens,
-        temperature: 1.5,
+        temperature: 1.2,
       });
       return completion.choices[0]?.message?.content?.trim();
     } catch (error) {
