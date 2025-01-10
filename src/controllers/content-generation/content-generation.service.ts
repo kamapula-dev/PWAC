@@ -17,15 +17,22 @@ export class ContentGenerationService {
   private async generateContent(
     prompt: string,
     maxTokens: number,
+    randomPhrases?: string[],
   ): Promise<string> {
     try {
+      const randomIndex = Math.floor(Math.random() * randomPhrases?.length);
       const completion = await this.openai.chat.completions.create({
         model: 'gpt-4-turbo',
         messages: [
-          { role: 'system', content: 'You are a helpful assistant.' },
           {
             role: 'user',
-            content: prompt,
+            content: 'You are user of application related with gambling',
+          },
+          {
+            role: 'user',
+            content: `${prompt} ${
+              randomPhrases ? randomPhrases[randomIndex] : ''
+            }`,
           },
         ],
         max_tokens: maxTokens,
@@ -47,6 +54,14 @@ export class ContentGenerationService {
     const reviewText = await this.generateContent(
       'Напиши позитивный отзыв о приложении для казино на русском языке. Пиши, как обычный пользователь, используй простой язык, короткие слова. Не добавляй свои комментарии, только отзыв. Два предложения.',
       100,
+      [
+        'Как пользователь с большим стажем',
+        'Как новичок',
+        'Для меня это приложение стало...',
+        'Как будто создано для меня!',
+        'Честно, удивлен!',
+        'Вау, рекомендую каждому!',
+      ],
     );
     const reviewAuthor = await this.generateContent(
       'Напиши имя пользователя, оно может быть как реальным, так и вымышленным. Имя должно быть на латинице. Не более 2 слов.',
@@ -72,7 +87,7 @@ export class ContentGenerationService {
 
   async generateReviewResponseText(review: string): Promise<string> {
     return this.generateContent(
-      `Напиши ответ на отзыв "${review}". Ответ должен быть позитивным и коротким. Не более 50 токенов. Одно предложение.`,
+      `Напиши ответ на отзыв "${review}". Ответ должен быть позитивным и коротким, не фокусируйся на плохом, отвечай так как будто все отлично. Не более 50 токенов. Одно предложение.`,
       50,
     );
   }
@@ -82,6 +97,14 @@ export class ContentGenerationService {
       text: await this.generateContent(
         'Напиши позитивный отзыв о приложении для казино на русском языке. Пиши, как обычный пользователь, используй простой язык, короткие слова. Не добавляй свои комментарии, только отзыв. Два предложения.',
         100,
+        [
+          'Как пользователь с большим стажем',
+          'Как новичок',
+          'Для меня это приложение стало...',
+          'Как будто создано для меня!',
+          'Честно, удивлен!',
+          'Вау, рекомендую каждому!',
+        ],
       ),
     };
   }
