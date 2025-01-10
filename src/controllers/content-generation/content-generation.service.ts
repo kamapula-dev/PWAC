@@ -30,9 +30,7 @@ export class ContentGenerationService {
           },
           {
             role: 'user',
-            content: `${prompt} ${
-              randomPhrases ? randomPhrases[randomIndex] : ''
-            }`,
+            content: `${randomPhrases ? randomPhrases[randomIndex] : ''} ${prompt}`,
           },
         ],
         max_tokens: maxTokens,
