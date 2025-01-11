@@ -7,9 +7,10 @@ import { motion } from "framer-motion";
 interface Props {
   setView: Dispatch<SetStateAction<string>>;
   pwaContent: PwaContent;
+  dark: boolean;
 }
 
-const ReviewsView: React.FC<Props> = ({ setView, pwaContent }) => {
+const ReviewsView: React.FC<Props> = ({ setView, pwaContent, dark }) => {
   const slideVariants = {
     hidden: { x: "-100%", opacity: 0 },
     visible: { x: 0, opacity: 1 },
@@ -24,6 +25,7 @@ const ReviewsView: React.FC<Props> = ({ setView, pwaContent }) => {
       transition={{ duration: 0.25, ease: "easeInOut" }}
     >
       <ViewHeader
+        dark={dark}
         setView={setView}
         appIcon={pwaContent.appIcon}
         developerName={pwaContent.developerName}
@@ -34,6 +36,7 @@ const ReviewsView: React.FC<Props> = ({ setView, pwaContent }) => {
           {pwaContent.reviews.map((review) => {
             return (
               <Review
+                dark={dark}
                 reviewIconColor={review.reviewIconColor}
                 src={review.reviewAuthorIcon}
                 key={review.reviewAuthorName}

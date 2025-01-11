@@ -11,6 +11,7 @@ interface ReviewProps {
   reviewIconColor: string;
   devResponse?: string;
   developerName?: string;
+  dark: boolean;
 }
 
 const Review: React.FC<ReviewProps> = ({
@@ -22,6 +23,7 @@ const Review: React.FC<ReviewProps> = ({
   src,
   devResponse,
   developerName,
+  dark,
 }) => {
   const avatarName = name
     .split(" ")
@@ -38,7 +40,10 @@ const Review: React.FC<ReviewProps> = ({
         >
           {avatarName}
         </Avatar>
-        <div className="font-roboto font-normal text-main text-[0.875rem] leading-[1.25rem]">
+        <div
+          style={dark ? { color: "#DFDFDF" } : {}}
+          className="font-roboto font-normal text-main text-[0.875rem] leading-[1.25rem]"
+        >
           {name}
         </div>
       </div>
@@ -48,9 +53,12 @@ const Review: React.FC<ReviewProps> = ({
           defaultValue={stars}
           precision={1}
           readOnly
-          sx={{ color: "#1357CD", fontSize: "14px" }}
+          sx={{ color: dark ? "#A8C8FB" : "#1357CD", fontSize: "14px" }}
         />
-        <div className="flex items-center text-[#605D64] text-xs ">
+        <div
+          style={dark ? { color: "#DFDFDF" } : {}}
+          className="flex items-center text-[#605D64] text-xs "
+        >
           {moment(date).format("DD.MM.YYYY")}
         </div>
       </div>
@@ -60,12 +68,18 @@ const Review: React.FC<ReviewProps> = ({
           textOverflow: "ellipsis",
           letterSpacing: "0.0142857143em",
           overflowWrap: "anywhere",
+          ...(dark && { color: "#DFDFDF" }),
         }}
       >
         {text}
       </div>
       {devResponse && developerName && (
-        <div className="rounded bg-[#EBEBEB] px-3 py-3 flex flex-col gap-4 text-sm leading-4">
+        <div
+          style={
+            dark ? { background: "rgb(48, 48, 48)", color: "#DFDFDF" } : {}
+          }
+          className="rounded bg-[#EBEBEB] px-3 py-3 flex flex-col gap-4 text-sm leading-4"
+        >
           <div className="flex justify-between">
             <div>{developerName}</div>
             <div> {moment(date).format("DD.MM.YYYY")}</div>

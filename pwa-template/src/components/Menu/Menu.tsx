@@ -4,16 +4,19 @@ import SearchIcon from "../../shared/icons/SearchIcon";
 import AppsIcon from "../../shared/icons/AppsIcon";
 import GamesIcon from "../../shared/icons/GamesIcon";
 
-const Menu = () => {
+const Menu = ({ dark }: { dark: boolean }) => {
   const intl = useIntl();
   return (
     <div className="h-[70px] box-border">
-      <div className="fixed left-0 bottom-0 right-0 h-[58px] bg-[#f0f3f8] px-6 py-1.5 flex gap-5">
+      <div
+        style={dark ? { background: "#1e1f21" } : {}}
+        className="fixed left-0 bottom-0 right-0 h-[58px] bg-[#f0f3f8] px-6 py-1.5 flex gap-5"
+      >
         <div className="flex-1 flex flex-col items-center">
           <div></div>
-          <GamesIcon />
+          <GamesIcon dark={dark} />
           <div
-            style={{ fontWeight: 600, color: "#605D64" }}
+            style={{ fontWeight: 600, color: dark ? "#DFDFDF" : "#605D64" }}
             className="font-medium text-xs"
           >
             {intl.formatMessage({
@@ -23,9 +26,9 @@ const Menu = () => {
           </div>
         </div>
         <div className="flex-1 flex flex-col items-center">
-          <AppsIcon />
+          <AppsIcon dark={dark} />
           <div
-            style={{ fontWeight: 600, color: "#056890" }}
+            style={{ fontWeight: 600, color: dark ? "#A8C8FB" : "#056890" }}
             className="font-medium text-xs"
           >
             {intl.formatMessage({
@@ -35,9 +38,9 @@ const Menu = () => {
           </div>
         </div>
         <div className="flex-1 flex flex-col items-center">
-          <SearchIcon />
+          <SearchIcon dark={dark} />
           <div
-            style={{ fontWeight: 600, color: "#605D64" }}
+            style={{ fontWeight: 600, color: dark ? "#DFDFDF" : "#605D64" }}
             className="font-medium text-xs"
           >
             {intl.formatMessage({
@@ -47,9 +50,9 @@ const Menu = () => {
           </div>
         </div>
         <div className="flex-1 flex flex-col items-center">
-          <BooksIcon />
+          <BooksIcon dark={dark} />
           <div
-            style={{ fontWeight: 600, color: "#605D64" }}
+            style={{ fontWeight: 600, color: dark ? "#DFDFDF" : "#605D64" }}
             className="font-medium text-xs"
           >
             {intl.formatMessage({

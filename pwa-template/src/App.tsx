@@ -22,17 +22,33 @@ export default function App() {
   const [isPWAActive, setIsPWAActive] = useState(false);
   const [pwaContent, setPwaContent] = useState<PwaContent | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [dark, setDark] = useState(false);
   const [installPrompt, setInstallPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
+
+  useEffect(() => {
+    window.addEventListener(
+      "beforeinstallprompt",
+      (e: BeforeInstallPromptEvent) => {
+        e.preventDefault();
+        console.log("beforeinstallprompt fired");
+        setInstallPrompt(e);
+      }
+    );
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", () => {
+        setInstallPrompt(null);
+      });
+    };
+  }, []);
 
   useEffect(() => {
     if (isPWAActive) return;
     const getPwaContent = async () => {
       try {
         const response = await axios.get(
-          `https://pwac.world/pwa-content/${
-            import.meta.env.VITE_PWA_CONTENT_ID
-          }/trusted`
+          `https://pwac.world/pwa-content/6781b4efbbf3649b4463b37c/trusted`
         );
 
         const language = navigator.language.split("-")[0];
@@ -54,12 +70,40 @@ export default function App() {
               reviewText:
                 review.reviewText[language] ??
                 Object.values(review.reviewText)[0],
-              devResponse:
-                review.devResponse[language] ??
-                Object.values(review.devResponse)[0],
+              ...(review.devResponse && {
+                devResponse:
+                  review.devResponse[language] ??
+                  Object.values(review.devResponse)[0],
+              }),
             };
           }),
         };
+
+        if (window.matchMedia && !!pwaContent?.theme?.auto) {
+          const darkModeMediaQuery = window.matchMedia(
+            "(prefers-color-scheme: dark)"
+          );
+
+          setDark(darkModeMediaQuery.matches);
+
+          if (typeof darkModeMediaQuery.addEventListener === "function") {
+            darkModeMediaQuery.addEventListener("change", (event) => {
+              setDark(event.matches);
+              console.log(131, event.matches);
+            });
+          } else if (typeof darkModeMediaQuery.addListener === "function") {
+            darkModeMediaQuery.addListener((event) => {
+              setDark(event.matches);
+              console.log(136, event.matches);
+            });
+          }
+        } else {
+          setDark(!!pwaContent?.theme?.dark);
+        }
+
+        if (window.fbq && pwaContent?.pixel?.events?.includes("ViewContent")) {
+          window.fbq("track", "PageView");
+        }
 
         setPwaContent(pwaContent);
       } catch (error) {
@@ -67,23 +111,6 @@ export default function App() {
       }
     };
     getPwaContent();
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener(
-      "beforeinstallprompt",
-      (e: BeforeInstallPromptEvent) => {
-        e.preventDefault();
-        console.log("beforeinstallprompt fired");
-        setInstallPrompt(e);
-      }
-    );
-
-    return () => {
-      window.removeEventListener("beforeinstallprompt", () => {
-        setInstallPrompt(null);
-      });
-    };
   }, []);
 
   useEffect(() => {
@@ -169,6 +196,7 @@ export default function App() {
     case "main":
       currentView = (
         <MainView
+          dark={dark}
           pwaContent={pwaContent}
           setView={setView}
           installPrompt={installPrompt}
@@ -176,10 +204,14 @@ export default function App() {
       );
       break;
     case "about":
-      currentView = <AboutView setView={setView} pwaContent={pwaContent} />;
+      currentView = (
+        <AboutView dark={dark} setView={setView} pwaContent={pwaContent} />
+      );
       break;
     case "reviews":
-      currentView = <ReviewsView pwaContent={pwaContent} setView={setView} />;
+      currentView = (
+        <ReviewsView dark={dark} pwaContent={pwaContent} setView={setView} />
+      );
       break;
   }
 
@@ -187,7 +219,15 @@ export default function App() {
     <PwaView />
   ) : (
     <div>
+      {dark && <style>{`body{background-color: #131313;}`}</style>}
       <div
+        style={
+          dark
+            ? {
+                background: "rgb(19, 19, 19)",
+              }
+            : {}
+        }
         className={`fixed z-[10000000] bg-white w-full h-full justify-center items-center top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${
           isLoading && pwaContent?.hasLoadingScreen ? "flex" : "hidden"
         }`}
@@ -195,7 +235,7 @@ export default function App() {
         <img src={playMarket} className="w-[125px] h-[137px]" />
       </div>
       {currentView}
-      {pwaContent?.hasMenu && <Menu />}
+      {pwaContent?.hasMenu && <Menu dark={dark} />}
     </div>
   );
 }

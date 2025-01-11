@@ -7,6 +7,7 @@ interface Props {
   defaultMessage: string;
   view: string;
   setView: Dispatch<SetStateAction<string>>;
+  dark: boolean;
 }
 
 const OpenSectionButton: React.FC<Props> = ({
@@ -14,6 +15,7 @@ const OpenSectionButton: React.FC<Props> = ({
   view,
   setView,
   defaultMessage,
+  dark,
 }) => {
   const intl = useIntl();
 
@@ -26,10 +28,13 @@ const OpenSectionButton: React.FC<Props> = ({
       className="flex items-center w-full justify-between"
       onClick={handleSetView}
     >
-      <div className="text-base font-medium leading-5 text-[#1D1D1D]">
+      <div
+        style={dark ? { color: "#DFDFDF" } : {}}
+        className="text-base font-medium leading-5 text-[#1D1D1D]"
+      >
         {intl.formatMessage({ id, defaultMessage })}
       </div>
-      <ArrowRight />
+      <ArrowRight dark={dark} />
     </button>
   );
 };

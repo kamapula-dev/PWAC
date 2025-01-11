@@ -1,4 +1,4 @@
-const DotsIcon = () => {
+const DotsIcon = ({ dark }: { dark: boolean }) => {
   return (
     <svg
       style={{ marginRight: "12px" }}
@@ -6,7 +6,7 @@ const DotsIcon = () => {
       width="24"
       height="24"
       viewBox="0 0 24 24"
-      fill="#605D64"
+      fill={dark ? "#C2C4C3" : "#605D64"}
     >
       <circle cx="12" cy="5" r="2" />
       <circle cx="12" cy="12" r="2" />

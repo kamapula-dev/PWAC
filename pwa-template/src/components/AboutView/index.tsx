@@ -8,9 +8,10 @@ import { motion } from "framer-motion";
 interface Props {
   setView: Dispatch<SetStateAction<string>>;
   pwaContent: PwaContent;
+  dark: boolean;
 }
 
-const AboutView: React.FC<Props> = ({ setView, pwaContent }) => {
+const AboutView: React.FC<Props> = ({ setView, pwaContent, dark }) => {
   const intl = useIntl();
 
   const slideVariants = {
@@ -21,6 +22,7 @@ const AboutView: React.FC<Props> = ({ setView, pwaContent }) => {
 
   return (
     <motion.div
+      style={dark ? { background: "#131313" } : {}}
       initial="hidden"
       animate="visible"
       exit="hidden"
@@ -28,76 +30,126 @@ const AboutView: React.FC<Props> = ({ setView, pwaContent }) => {
       transition={{ duration: 0.25, ease: "easeInOut" }}
     >
       <ViewHeader
+        dark={dark}
         appIcon={pwaContent.appIcon}
         developerName={pwaContent.developerName}
         setView={setView}
         appName={pwaContent.appName}
       />
       <section className="pt-[56px] mx-6 pb-4">
-        <div className="text-base text-main font-sans pt-4 pb-3 flex items-center">
+        <div
+          style={dark ? { color: "#DFDFDF" } : {}}
+          className="text-base text-main font-sans pt-4 pb-3 flex items-center"
+        >
           {intl.formatMessage({ id: "about" })}
         </div>
-        <div className="text-sm whitespace-pre-wrap relative text-justify text-[#605D64]">
+        <div
+          style={dark ? { color: "#DFDFDF" } : {}}
+          className="text-sm whitespace-pre-wrap relative text-justify text-[#605D64]"
+        >
           {pwaContent.fullDescription}
         </div>
       </section>
-      <div className="bg-[#C6C6C6] h-[1px] w-full" />
+      <div
+        style={dark ? { backgroundColor: "#434343" } : {}}
+        className="bg-[#C6C6C6] h-[1px] w-full"
+      />
       <div className="px-6 py-4">
         <div className="flex flex-col gap-9 text-sm leading-5 text-[#605D64]">
-          <div className="text-base text-black">
+          <div
+            style={dark ? { color: "#DFDFDF" } : {}}
+            className="text-base text-black"
+          >
             {intl.formatMessage({ id: "appInfo" })}
           </div>
-          <div className="flex flex-row justify-between items-center">
+          <div
+            style={dark ? { color: "#DFDFDF" } : {}}
+            className="flex flex-row justify-between items-center"
+          >
             <span>{intl.formatMessage({ id: "version" })}</span>
             <span>{pwaContent.version}</span>
           </div>
-          <div className="flex flex-row justify-between items-center">
+          <div
+            style={dark ? { color: "#DFDFDF" } : {}}
+            className="flex flex-row justify-between items-center"
+          >
             <span>{intl.formatMessage({ id: "updatedOn" })}</span>
             <span>{moment(pwaContent.lastUpdate).format("DD.MM.YYYY")}</span>
           </div>
-          <div className="flex flex-row justify-between items-center">
+          <div
+            style={dark ? { color: "#DFDFDF" } : {}}
+            className="flex flex-row justify-between items-center"
+          >
             <span>{intl.formatMessage({ id: "downloads" })}</span>
             <span>{pwaContent.countOfDownloads}</span>
           </div>
-          <div className="flex flex-row justify-between items-center">
+          <div
+            style={dark ? { color: "#DFDFDF" } : {}}
+            className="flex flex-row justify-between items-center"
+          >
             <span>{intl.formatMessage({ id: "downloadSize" })}</span>
             <span>{pwaContent.size}</span>
           </div>
-          <div className="flex flex-row justify-between items-center">
+          <div
+            style={dark ? { color: "#DFDFDF" } : {}}
+            className="flex flex-row justify-between items-center"
+          >
             <span>{intl.formatMessage({ id: "offeredBy" })}</span>
             <span>{pwaContent.developerName}</span>
           </div>
-          <div className="flex flex-row justify-between items-center">
+          <div
+            style={dark ? { color: "#DFDFDF" } : {}}
+            className="flex flex-row justify-between items-center"
+          >
             <span>{intl.formatMessage({ id: "releasedOn" })}</span>
             <span>{intl.formatMessage({ id: "releaseDate" })}</span>
           </div>
         </div>
       </div>
-      <div className="bg-[#C6C6C6] h-[1px] w-full" />
-      <div className="px-6 py-4">
+      <div
+        style={{
+          borderTop: `1px solid ${dark ? "rgb(67, 67, 67)" : "#C6C6C6"}`,
+          borderBottom: `1px solid ${dark ? "rgb(67, 67, 67)" : "#C6C6C6"}`,
+        }}
+        className="px-6 py-4"
+      >
         <div className="flex flex-col gap-9 text-sm leading-5 text-[#605D64]">
-          <div className="text-base text-black">
+          <div
+            style={dark ? { color: "#DFDFDF" } : {}}
+            className="text-base text-black"
+          >
             {intl.formatMessage({ id: "compatibilityTitle" })}
           </div>
-          <div className="flex flex-row justify-between items-center">
+          <div
+            style={dark ? { color: "#DFDFDF" } : {}}
+            className="flex flex-row justify-between items-center"
+          >
             <span>{intl.formatMessage({ id: "compatibility" })}</span>
             <span>{intl.formatMessage({ id: "worksOnYourDevice" })}</span>
           </div>
-          <div className="flex flex-row justify-between items-center">
+          <div
+            style={dark ? { color: "#DFDFDF" } : {}}
+            className="flex flex-row justify-between items-center"
+          >
             <span>{intl.formatMessage({ id: "version" })}</span>
             <span>{pwaContent.version}</span>
           </div>
-          <div className="flex flex-row justify-between items-center">
+          <div
+            style={dark ? { color: "#DFDFDF" } : {}}
+            className="flex flex-row justify-between items-center"
+          >
             <span>{intl.formatMessage({ id: "downloadSize" })}</span>
             <span>{pwaContent.size}</span>
           </div>
-          <div className="flex flex-row justify-between items-center">
+          <div
+            style={dark ? { color: "#DFDFDF" } : {}}
+            className="flex flex-row justify-between items-center"
+          >
             <span>{intl.formatMessage({ id: "RequiredOS" })}</span>
             <span>{intl.formatMessage({ id: "OS" })}</span>
           </div>
         </div>
       </div>
-      <div className="bg-[#C6C6C6] h-[1px] w-full" />
     </motion.div>
   );
 };

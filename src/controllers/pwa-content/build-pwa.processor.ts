@@ -148,7 +148,6 @@ export class BuildPWAProcessor {
               
               if ('${pixel.pixelId}') {
                 fbq("init", "${pixel.pixelId}");
-                fbq("track", "PageView");
               }
             </script>`
           : `<script>

@@ -6,6 +6,7 @@ interface Props {
   developerName: string;
   appName: string;
   appIcon: string;
+  dark: boolean;
 }
 
 const ViewHeader: React.FC<Props> = ({
@@ -13,14 +14,22 @@ const ViewHeader: React.FC<Props> = ({
   developerName,
   appIcon,
   appName,
+  dark,
 }) => {
   const handleClick = () => {
     setView("main");
   };
   return (
-    <div className="h-[56px] gap-5 w-full items-center flex fixed top-0 z-10 bg-white px-4 border-0 border-b border-solid border-[#C6C6C6]">
+    <div
+      style={
+        dark
+          ? { background: "rgb(19, 19, 19)", borderBottom: "1px solid #434343" }
+          : {}
+      }
+      className="h-[56px] gap-5 w-full items-center flex fixed top-0 z-10 bg-white px-4 border-0 border-b border-solid border-[#C6C6C6]"
+    >
       <button onClick={handleClick} className="flex items-center">
-        <ArrowLeft />
+        <ArrowLeft dark={dark} />
       </button>
       <img
         className="h-[30px] w-[30px] rounded-lg object-cover aspect-square"
@@ -28,8 +37,18 @@ const ViewHeader: React.FC<Props> = ({
         alt="Logo"
       />
       <div className="flex flex-col font-medium text-sm">
-        <span className="text-[#020202]">{appName}</span>
-        <span className="text-[#1357CD]">{developerName}</span>
+        <span
+          style={dark ? { color: "#DFDFDF" } : {}}
+          className="text-[#020202]"
+        >
+          {appName}
+        </span>
+        <span
+          style={dark ? { color: "#A8C8FB" } : {}}
+          className="text-[#1357CD]"
+        >
+          {developerName}
+        </span>
       </div>
     </div>
   );

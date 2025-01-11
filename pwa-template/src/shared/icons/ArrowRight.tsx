@@ -1,4 +1,4 @@
-const ArrowRight = () => {
+const ArrowRight = ({ dark }: { dark: boolean }) => {
   return (
     <svg
       width="18"
@@ -9,7 +9,7 @@ const ArrowRight = () => {
     >
       <path
         d="M12.1313 9.75H3V8.25H12.1313L7.93125 4.05L9 3L15 9L9 15L7.93125 13.95L12.1313 9.75Z"
-        fill="#1D1D1D"
+        fill={dark ? "#C2C4C3" : "#605D64"}
       />
     </svg>
   );
