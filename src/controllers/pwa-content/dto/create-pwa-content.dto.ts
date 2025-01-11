@@ -26,6 +26,16 @@ export class PixelDto {
   events: string[];
 }
 
+export class ThemeDto {
+  @IsOptional()
+  @IsBoolean()
+  auto?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  dark?: boolean;
+}
+
 export class MediaDto {
   @IsOptional()
   @IsString()
@@ -166,6 +176,11 @@ export class CreatePWAContentDto {
   @ValidateNested()
   @Type(() => PixelDto)
   pixel?: PixelDto;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => ThemeDto)
+  theme?: ThemeDto;
 
   @IsArray()
   @ArrayMinSize(5, { message: 'Array must contain exactly 5 values' })

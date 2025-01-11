@@ -116,6 +116,18 @@ export class PWAContent extends Document {
     pixelId: string;
     events: string[];
   };
+
+  @Prop({
+    type: {
+      auto: { type: Boolean, required: false },
+      dark: { type: Boolean, required: false },
+    },
+    required: false,
+  })
+  theme?: {
+    auto?: boolean;
+    dark?: boolean;
+  };
 }
 
 export const PWAContentSchema = SchemaFactory.createForClass(PWAContent);
