@@ -48,7 +48,9 @@ export default function App() {
     const getPwaContent = async () => {
       try {
         const response = await axios.get(
-          `https://pwac.world/pwa-content/6781b4efbbf3649b4463b37c/trusted`
+          `https://pwac.world/pwa-content/${
+            import.meta.env.VITE_PWA_CONTENT_ID
+          }/trusted`
         );
 
         const language = navigator.language.split("-")[0];
@@ -87,12 +89,12 @@ export default function App() {
           setDark(darkModeMediaQuery.matches);
 
           if (typeof darkModeMediaQuery.addEventListener === "function") {
-            darkModeMediaQuery.addEventListener("change", (event) => {
+            darkModeMediaQuery.addEventListener("change", (event: any) => {
               setDark(event.matches);
               console.log(131, event.matches);
             });
           } else if (typeof darkModeMediaQuery.addListener === "function") {
-            darkModeMediaQuery.addListener((event) => {
+            darkModeMediaQuery.addListener((event: any) => {
               setDark(event.matches);
               console.log(136, event.matches);
             });

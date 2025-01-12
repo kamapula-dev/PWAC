@@ -52,7 +52,7 @@ export default function InstallationProgress({
         >
           {developerName}
         </div>
-        <VerifiedIcon dark={dark} />
+        <VerifiedIcon />
       </div>
       {hasPaidContent && (
         <div

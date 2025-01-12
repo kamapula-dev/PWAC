@@ -47,4 +47,5 @@ export interface PwaContent {
   hasMenu?: boolean;
   videoUrl?: string;
   age: string;
+  pixel?: { pixelId: string; token: string; events: [string] };
 }
