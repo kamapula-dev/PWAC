@@ -1,8 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { Media, MediaSchema } from './media.scheme';
-import { Review, ReviewSchema } from './review.scheme';
 import * as deepl from 'deepl-node';
+import { Pixel, PixelSchema } from './pixel.scheme';
+import { Review, ReviewSchema } from './review.scheme';
+import { Media, MediaSchema } from './media.scheme';
 
 @Schema({ timestamps: true })
 export class PWAContent extends Document {
@@ -107,18 +108,10 @@ export class PWAContent extends Document {
   sliders: number[];
 
   @Prop({
-    type: {
-      token: { type: String, required: true },
-      pixelId: { type: String, required: true },
-      events: { type: [String], required: true },
-    },
+    type: [PixelSchema],
     required: false,
   })
-  pixel?: {
-    token: string;
-    pixelId: string;
-    events: string[];
-  };
+  pixel?: Pixel[];
 
   @Prop({
     type: {

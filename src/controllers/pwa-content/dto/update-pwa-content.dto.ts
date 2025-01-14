@@ -52,7 +52,7 @@ export class UpdatePWAContentDto {
 
   @IsBoolean()
   @IsOptional()
-  wideScreens: boolean;
+  wideScreens?: boolean;
 
   @IsOptional()
   @IsString()
