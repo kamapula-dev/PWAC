@@ -146,9 +146,11 @@ export class BuildPWAProcessor {
                 "https://connect.facebook.net/en_US/fbevents.js"
               );
               
-              if ('${pixel.pixelId}') {
-                fbq("init", "${pixel.pixelId}");
-              }
+              ${pixel}?.forEach((pixel) => {
+                if (pixel.pixelId) {
+                  fbq('init', pixel.pixelId);
+                }
+              })
             </script>`
           : `<script>
                 function getQueryParam(param) {
