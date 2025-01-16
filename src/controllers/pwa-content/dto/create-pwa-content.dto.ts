@@ -13,11 +13,11 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import * as deepl from 'deepl-node';
-import { FacebookEvent } from '../../../schemas/pixel-event.scheme';
+import { FacebookEvent, PwaEvent } from '../../../schemas/pixel-event.scheme';
 
 export class PixelEventDto {
   @IsEnum(FacebookEvent, { message: 'Invalid triggerEvent value' })
-  triggerEvent: FacebookEvent;
+  triggerEvent: PwaEvent;
 
   @IsEnum(FacebookEvent, { message: 'Invalid sentEvent value' })
   sentEvent: FacebookEvent;

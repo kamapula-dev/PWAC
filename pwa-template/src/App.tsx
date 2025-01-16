@@ -108,7 +108,7 @@ export default function App() {
             );
 
             if (event) {
-              window.fbq('track', pixel.pixelId, event.targetEvent);
+              window.fbq('track', pixel.pixelId, event.sentEvent);
             }
           });
         }

@@ -20,6 +20,13 @@ export enum FacebookEvent {
   ViewContent = 'ViewContent',
 }
 
+export enum PwaEvent {
+  OpenPage = 'OpenPage',
+  Install = 'Install',
+  Registration = 'Registration',
+  Deposit = 'Deposit',
+}
+
 @Schema({ _id: false })
 export class PixelEvent extends Document {
   @Prop({
@@ -27,14 +34,14 @@ export class PixelEvent extends Document {
     enum: FacebookEvent,
     required: true,
   })
-  sourceEvent: FacebookEvent;
+  sourceEvent: PwaEvent;
 
   @Prop({
     type: String,
     enum: FacebookEvent,
     required: true,
   })
-  targetEvent: FacebookEvent;
+  sentEvent: FacebookEvent;
 }
 
 export const PixelEventSchema = SchemaFactory.createForClass(PixelEvent);

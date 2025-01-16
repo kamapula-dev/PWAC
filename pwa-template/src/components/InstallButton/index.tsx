@@ -60,7 +60,7 @@ const InstallButton: React.FC<Props> = ({
               );
 
               if (event) {
-                window.fbq('track', pixel.pixelId, event.targetEvent);
+                window.fbq('track', pixel.pixelId, event.sentEvent);
               }
             });
           } else {
