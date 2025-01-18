@@ -46,6 +46,7 @@ const ReviewsView: React.FC<Props> = ({ setView, pwaContent, dark }) => {
                 date={review.reviewDate}
                 devResponse={review.devResponse}
                 developerName={pwaContent.developerName}
+                keepActualDateOfReviews={pwaContent.keepActualDateOfReviews}
               />
             );
           })}

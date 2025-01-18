@@ -48,4 +48,5 @@ export interface PwaContent {
   videoUrl?: string;
   age: string;
   pixel?: { pixelId: string; token: string; events: [string] };
+  keepActualDateOfReviews?: boolean;
 }

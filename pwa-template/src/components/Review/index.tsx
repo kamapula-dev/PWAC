@@ -12,6 +12,7 @@ interface ReviewProps {
   devResponse?: string;
   developerName?: string;
   dark: boolean;
+  keepActualDateOfReviews?: boolean;
 }
 
 const Review: React.FC<ReviewProps> = ({
@@ -24,12 +25,16 @@ const Review: React.FC<ReviewProps> = ({
   devResponse,
   developerName,
   dark,
+  keepActualDateOfReviews = false,
 }) => {
   const avatarName = name
     .split(" ")
     .map((word) => word[0])
     .join("")
     .toUpperCase();
+
+  const actualDate = keepActualDateOfReviews ? date : new Date().toISOString();
+
   return (
     <div className="flex flex-col w-full gap-4">
       <div className="flex gap-[14px] items-center mb-[10px]">
@@ -59,7 +64,7 @@ const Review: React.FC<ReviewProps> = ({
           style={dark ? { color: "#DFDFDF" } : {}}
           className="flex items-center text-[#605D64] text-xs "
         >
-          {moment(date).format("DD.MM.YYYY")}
+          {moment(actualDate).format("DD.MM.YYYY")}
         </div>
       </div>
       <div
@@ -82,7 +87,7 @@ const Review: React.FC<ReviewProps> = ({
         >
           <div className="flex justify-between">
             <div>{developerName}</div>
-            <div> {moment(date).format("DD.MM.YYYY")}</div>
+            <div> {moment(actualDate).format("DD.MM.YYYY")}</div>
           </div>
           <div>{devResponse}</div>
         </div>

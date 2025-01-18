@@ -308,6 +308,7 @@ const MainView: React.FC<Props> = ({
                 date={review.reviewDate}
                 devResponse={review.devResponse}
                 developerName={pwaContent.developerName}
+                keepActualDateOfReviews={pwaContent.keepActualDateOfReviews}
               />
             );
           })}
