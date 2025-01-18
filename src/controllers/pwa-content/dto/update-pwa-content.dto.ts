@@ -117,6 +117,10 @@ export class UpdatePWAContentDto {
   images?: MediaDto[];
 
   @IsOptional()
+  @IsBoolean()
+  keepActualDateOfReviews?: boolean;
+
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ReviewDto)

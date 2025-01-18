@@ -121,6 +121,10 @@ export class CreatePWAContentDto {
   @IsOptional()
   hasMenu?: boolean;
 
+  @IsOptional()
+  @IsBoolean()
+  keepActualDateOfReviews?: boolean;
+
   @IsArray()
   @IsString({ each: true })
   tags: string[];

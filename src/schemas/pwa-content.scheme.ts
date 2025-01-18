@@ -40,6 +40,9 @@ export class PWAContent extends Document {
   videoUrl?: string;
 
   @Prop()
+  keepActualDateOfReviews?: boolean;
+
+  @Prop()
   pwaTags: string[];
 
   @Prop({ required: true })
