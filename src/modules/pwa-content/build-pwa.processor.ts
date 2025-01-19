@@ -121,7 +121,7 @@ export class BuildPWAProcessor {
 
       try {
         const indexHtml = fs.readFileSync(indexPath, 'utf-8');
-        const pixelScript = pixel
+        const pixelScript = pixel?.length
           ? `
             <script>
               !(function (f, b, e, v, n, t, s) {
