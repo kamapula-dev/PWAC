@@ -29,5 +29,6 @@ import { PWAEventLogModule } from '../pwa-event-log/pwa-event-log.module';
   ],
   controllers: [PWAContentController],
   providers: [PWAContentService, BuildPWAProcessor],
+  exports: [PWAContentService],
 })
 export class PWAContentModule {}
