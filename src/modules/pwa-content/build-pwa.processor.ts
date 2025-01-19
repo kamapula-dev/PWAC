@@ -288,7 +288,7 @@ export class BuildPWAProcessor {
               archiveKey,
             ),
             this.pwaEventLogService.setPwaContentIdByDomain(
-              existingPwa.domainName,
+              existingUserPwaForDomain.domainName,
               pwaContentId,
             ),
           ]);
