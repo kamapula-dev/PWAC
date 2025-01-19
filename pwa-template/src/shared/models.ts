@@ -1,9 +1,14 @@
 export enum PWAInstallState {
-  idle = "idle",
-  installing = "installing",
-  installed = "installed",
-  downloaded = "downloaded",
-  downloading = "downloading",
+  idle = 'idle',
+  installing = 'installing',
+  installed = 'installed',
+  downloaded = 'downloaded',
+  downloading = 'downloading',
+}
+export interface Pixel {
+  token: string;
+  pixelId: string;
+  events: [{ triggerEvent: string; sentEvent: string }];
 }
 
 export interface PwaContent {
@@ -47,6 +52,7 @@ export interface PwaContent {
   hasMenu?: boolean;
   videoUrl?: string;
   age: string;
-  pixel?: { pixelId: string; token: string; events: [string] };
+  pixel?: [Pixel];
+  theme?: { dark: boolean; auto: boolean };
   keepActualDateOfReviews?: boolean;
 }

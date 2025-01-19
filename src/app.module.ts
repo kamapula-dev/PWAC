@@ -1,17 +1,21 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { UserModule } from './controllers/user/user.module';
+import { UserModule } from './modules/user/user.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './controllers/auth/auth.module';
-import { MediaModule } from './controllers/media/media.module';
-import { PWAContentModule } from './controllers/pwa-content/pwa-content.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { MediaModule } from './modules/media/media.module';
+import { PWAContentModule } from './modules/pwa-content/pwa-content.module';
 import { BullModule } from '@nestjs/bull';
-import { DomainMappingModule } from './controllers/domain-mapping/domain-mapping.module';
-import { DomainManagementModule } from './controllers/domain-managemant/domain-management.module';
-import { LanguagesModule } from './controllers/languages/languages.module';
-import { ContentGenerationModule } from './controllers/content-generation/content-generation.module';
+import { DomainMappingModule } from './modules/domain-mapping/domain-mapping.module';
+import { DomainManagementModule } from './modules/domain-managemant/domain-management.module';
+import { LanguagesModule } from './modules/languages/languages.module';
+import { ContentGenerationModule } from './modules/content-generation/content-generation.module';
+import { FacebookModule } from './modules/facebook/facebook.module';
+import { PostbackModule } from './modules/postback/postback.module';
+import { PWAEventLogModule } from './modules/pwa-event-log/pwa-event-log.module';
+import { PWAExternalMappingModule } from './modules/pwa-external-mapping/pwa-external-mapping.module';
 
 @Module({
   imports: [
@@ -44,6 +48,10 @@ import { ContentGenerationModule } from './controllers/content-generation/conten
     PWAContentModule,
     LanguagesModule,
     ContentGenerationModule,
+    PWAExternalMappingModule,
+    PWAEventLogModule,
+    PostbackModule,
+    FacebookModule,
   ],
   controllers: [AppController],
   providers: [AppService],

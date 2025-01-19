@@ -13,6 +13,15 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import * as deepl from 'deepl-node';
+import { FacebookEvent, PwaEvent } from '../../../schemas/pixel-event.scheme';
+
+export class PixelEventDto {
+  @IsEnum(PwaEvent, { message: 'Invalid triggerEvent value' })
+  triggerEvent: PwaEvent;
+
+  @IsEnum(FacebookEvent, { message: 'Invalid sentEvent value' })
+  sentEvent: FacebookEvent;
+}
 
 export class PixelDto {
   @IsString()
@@ -22,8 +31,9 @@ export class PixelDto {
   pixelId: string;
 
   @IsArray()
-  @IsString({ each: true })
-  events: string[];
+  @ValidateNested({ each: true })
+  @Type(() => PixelEventDto)
+  events: PixelEventDto[];
 }
 
 export class ThemeDto {
@@ -36,6 +46,11 @@ export class ThemeDto {
   dark?: boolean;
 }
 
+export enum MediaType {
+  Image = 'image',
+  File = 'file',
+  Video = 'video',
+}
 export class MediaDto {
   @IsOptional()
   @IsString()
@@ -44,32 +59,31 @@ export class MediaDto {
   @IsString()
   url: string;
 
-  @IsEnum(['image', 'file', 'video'])
-  type: string;
+  @IsEnum(MediaType, { message: 'Type must be either image, file, or video' })
+  type: MediaType;
 }
-
 export class ReviewDto {
   @IsString()
   reviewAuthorName: string;
 
   @IsOptional()
   @IsString()
-  reviewAuthorIcon: string;
+  reviewAuthorIcon?: string;
 
   @IsNumber()
   reviewAuthorRating: number;
 
   @IsOptional()
   @IsObject()
-  devResponse: Map<deepl.TargetLanguageCode, string>;
+  devResponse?: Map<deepl.TargetLanguageCode, string>;
 
   @IsOptional()
   @IsString()
-  reviewIconColor: string;
+  reviewIconColor?: string;
 
   @IsOptional()
   @IsObject()
-  reviewText: Map<deepl.TargetLanguageCode, string>;
+  reviewText?: Map<deepl.TargetLanguageCode, string>;
 
   @IsString()
   reviewDate: string;
@@ -91,7 +105,8 @@ export class CreatePWAContentDto {
   developerName: string;
 
   @IsOptional()
-  countOfDownloads: Map<deepl.TargetLanguageCode, string>;
+  @IsObject()
+  countOfDownloads?: Map<deepl.TargetLanguageCode, string>;
 
   @IsString()
   countOfReviews: string;
@@ -142,10 +157,12 @@ export class CreatePWAContentDto {
   rating: string;
 
   @IsOptional()
-  shortDescription: Map<deepl.TargetLanguageCode, string>;
+  @IsObject()
+  shortDescription?: Map<deepl.TargetLanguageCode, string>;
 
   @IsOptional()
-  fullDescription: Map<deepl.TargetLanguageCode, string>;
+  @IsObject()
+  fullDescription?: Map<deepl.TargetLanguageCode, string>;
 
   @IsString()
   countOfReviewsFull: string;
@@ -154,7 +171,9 @@ export class CreatePWAContentDto {
   countOfStars: number;
 
   @IsOptional()
-  pwaTags: string[];
+  @IsArray()
+  @IsString({ each: true })
+  pwaTags?: string[];
 
   @IsString()
   appIcon: string;
@@ -177,9 +196,10 @@ export class CreatePWAContentDto {
   version: string;
 
   @IsOptional()
-  @ValidateNested()
+  @IsArray()
+  @ValidateNested({ each: true })
   @Type(() => PixelDto)
-  pixel?: PixelDto;
+  pixel?: PixelDto[];
 
   @IsOptional()
   @ValidateNested()
