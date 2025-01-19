@@ -291,6 +291,11 @@ export class BuildPWAProcessor {
               existingUserPwaForDomain.domainName,
               pwaContentId,
             ),
+            this.userService.setUserPwaStatusByDomain(
+              userId,
+              existingUserPwaForDomain.domainName,
+              PwaStatus.ACTIVE,
+            ),
           ]);
         }
       } else {
