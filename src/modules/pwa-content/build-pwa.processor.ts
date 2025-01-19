@@ -121,6 +121,8 @@ export class BuildPWAProcessor {
 
       try {
         const indexHtml = fs.readFileSync(indexPath, 'utf-8');
+        const pixelArrayString = JSON.stringify(pixel || []);
+
         const pixelScript = pixel?.length
           ? `
             <script>
@@ -148,49 +150,50 @@ export class BuildPWAProcessor {
                 "https://connect.facebook.net/en_US/fbevents.js"
               );
               
-              ${pixel}?.forEach((pixel) => {
-                if (pixel.pixelId) {
-                  fbq('init', pixel.pixelId);
+              ${pixelArrayString}.forEach((item) => {
+                if (item.pixelId) {
+                  fbq('init', item.pixelId);
                 }
-              })
+              });
             </script>`
-          : `<script>
-                function getQueryParam(param) {
-                  var searchParams = new URLSearchParams(window.location.search);
-                  return searchParams.get(param);
-                }
-                var pixelId = getQueryParam("idpixel");
-                !(function (f, b, e, v, n, t, s) {
-                  if (f.fbq) return;
-                  n = f.fbq = function () {
-                    n.callMethod
-                      ? n.callMethod.apply(n, arguments)
-                      : n.queue.push(arguments);
-                  };
-                  if (!f._fbq) f._fbq = n;
-                  n.push = n;
-                  n.loaded = !0;
-                  n.version = "2.0";
-                  n.queue = [];
-                  t = b.createElement(e);
-                  t.async = !0;
-                  t.src = v;
-                  s = b.getElementsByTagName(e)[0];
-                  s.parentNode.insertBefore(t, s);
-                })(
-                  window,
-                  document,
-                  "script",
-                  "https://connect.facebook.net/en_US/fbevents.js"
-                );
-            
-                if (pixelId) {
-                  fbq("init", pixelId);
-                }
-            
-                fbq("track", "PageView");
-              </script>
-            `;
+          : `
+            <script>
+              function getQueryParam(param) {
+                var searchParams = new URLSearchParams(window.location.search);
+                return searchParams.get(param);
+              }
+              var pixelId = getQueryParam("idpixel");
+              !(function (f, b, e, v, n, t, s) {
+                if (f.fbq) return;
+                n = f.fbq = function () {
+                  n.callMethod
+                    ? n.callMethod.apply(n, arguments)
+                    : n.queue.push(arguments);
+                };
+                if (!f._fbq) f._fbq = n;
+                n.push = n;
+                n.loaded = !0;
+                n.version = "2.0";
+                n.queue = [];
+                t = b.createElement(e);
+                t.async = !0;
+                t.src = v;
+                s = b.getElementsByTagName(e)[0];
+                s.parentNode.insertBefore(t, s);
+              })(
+                window,
+                document,
+                "script",
+                "https://connect.facebook.net/en_US/fbevents.js"
+              );
+          
+              if (pixelId) {
+                fbq("init", pixelId);
+              }
+          
+              fbq("track", "PageView");
+            </script>
+          `;
 
         const updatedIndexHtml = indexHtml.replace(
           '</head>',
@@ -198,8 +201,11 @@ export class BuildPWAProcessor {
         );
 
         fs.writeFileSync(indexPath, updatedIndexHtml, 'utf-8');
-        if (pixel) {
-          Logger.log(`Pixel script added with ID: ${pixel.pixelId}`);
+
+        if (pixel?.length) {
+          Logger.log(
+            `Pixel script added. Pixel array: ${JSON.stringify(pixel)}`,
+          );
         } else {
           Logger.log(`Pixel script added query params`);
         }
