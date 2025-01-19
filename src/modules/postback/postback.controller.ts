@@ -4,6 +4,7 @@ import { PWAEventLogService } from '../pwa-event-log/pwa-event-log.service';
 import { PwaEvent } from '../../schemas/pixel-event.scheme';
 import { FacebookService } from '../facebook/facebook.service';
 import { PWAContentService } from '../pwa-content/pwa-content.service';
+import { UserService } from '../user/user.service';
 
 @Controller('postback')
 export class PostbackController {
@@ -12,6 +13,7 @@ export class PostbackController {
     private readonly eventLogService: PWAEventLogService,
     private readonly pwaContentService: PWAContentService,
     private readonly facebookService: FacebookService,
+    private readonly userService: UserService,
   ) {}
 
   @Get()
@@ -25,9 +27,10 @@ export class PostbackController {
       throw new BadRequestException('Missing externalId or event');
     }
 
-    const pwaId = await this.mappingService.findPwaByExternalId(externalId);
+    const pwaContentId =
+      await this.mappingService.findPwaByExternalId(externalId);
 
-    if (!pwaId) {
+    if (!pwaContentId) {
       throw new BadRequestException(
         `No PWA found for externalId=${externalId}`,
       );
@@ -48,19 +51,26 @@ export class PostbackController {
 
     const numericValue = value ? parseFloat(value) : undefined;
 
+    const pwaContent =
+      await this.pwaContentService.findOneTrusted(pwaContentId);
+
+    if (!pwaContent) {
+      throw new BadRequestException(
+        `PWAContent not found for _id=${pwaContentId}`,
+      );
+    }
+
+    const user = await this.userService.findById(pwaContent.user.toString());
+    const existingPwa = user.pwas.find((p) => p.pwaContentId === pwaContentId);
+
     const loggedEvent = await this.eventLogService.logEvent(
-      pwaId,
+      pwaContentId,
+      existingPwa.domainName,
       pwaEvent,
       externalId,
       numericValue,
       currency,
     );
-
-    const pwaContent = await this.pwaContentService.findOneTrusted(pwaId);
-
-    if (!pwaContent) {
-      throw new BadRequestException(`PWAContent not found for _id=${pwaId}`);
-    }
 
     if (pwaContent.pixel && pwaContent.pixel.length > 0) {
       for (const px of pwaContent.pixel) {

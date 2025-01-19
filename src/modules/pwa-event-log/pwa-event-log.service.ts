@@ -12,19 +12,43 @@ export class PWAEventLogService {
   ) {}
 
   async logEvent(
-    pwaId: string,
+    pwaContentId: string,
+    domain: string,
     event: PwaEvent,
     externalId?: string,
     value?: number,
     currency?: string,
   ): Promise<PWAEventLog> {
     const doc = new this.eventLogModel({
-      pwa: pwaId,
+      pwaContentId,
+      domain,
       externalId,
       event,
       value,
       currency,
     });
     return doc.save();
+  }
+
+  async deleteAllEventsByPwaContentId(pwaContentId: string): Promise<number> {
+    const result = await this.eventLogModel.deleteMany({ pwaContentId }).exec();
+    return result.deletedCount || 0;
+  }
+
+  async removePwaContentIdByDomain(domain: string): Promise<number> {
+    const result = await this.eventLogModel
+      .updateMany({ domain }, { $unset: { pwaContentId: 1 } })
+      .exec();
+    return result.modifiedCount || 0;
+  }
+
+  async setPwaContentIdByDomain(
+    domain: string,
+    pwaContentId: string,
+  ): Promise<number> {
+    const result = await this.eventLogModel
+      .updateMany({ domain }, { $set: { pwaContentId } })
+      .exec();
+    return result.modifiedCount || 0;
   }
 }

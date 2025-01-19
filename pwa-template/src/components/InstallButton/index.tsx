@@ -72,7 +72,12 @@ const InstallButton: React.FC<Props> = ({
             });
 
             if (leadEvent && id) {
-              logEvent(id, leadEvent, getExternalId());
+              logEvent(
+                id,
+                window.location.hostname,
+                leadEvent,
+                getExternalId(),
+              );
             }
           } else {
             window.fbq('track', 'Lead');

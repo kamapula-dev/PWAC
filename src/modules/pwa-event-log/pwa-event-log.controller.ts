@@ -2,7 +2,7 @@ import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
 import { PWAEventLogService } from './pwa-event-log.service';
 import { PwaEvent } from '../../schemas/pixel-event.scheme';
 
-@Controller('api/event-log')
+@Controller('event-log')
 export class PWAEventLogController {
   constructor(private readonly eventLogService: PWAEventLogService) {}
 
@@ -10,23 +10,25 @@ export class PWAEventLogController {
   async logEvent(
     @Body()
     body: {
-      pwaId: string;
+      pwaContentId: string;
+      domain: string;
       externalId?: string;
       event: PwaEvent;
       value?: number;
       currency?: string;
     },
   ): Promise<{ status: string }> {
-    const { pwaId, externalId, event, value, currency } = body;
+    const { domain, pwaContentId, externalId, event, value, currency } = body;
 
-    if (!pwaId || !event) {
+    if (!pwaContentId || !event) {
       throw new BadRequestException(
         'Missing required fields: pwaId, externalId, or event',
       );
     }
 
     await this.eventLogService.logEvent(
-      pwaId,
+      pwaContentId,
+      domain,
       event,
       externalId,
       value,

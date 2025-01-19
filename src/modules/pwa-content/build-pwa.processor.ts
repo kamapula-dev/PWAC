@@ -9,6 +9,7 @@ import { UserService } from '../user/user.service';
 import { Logger } from '@nestjs/common';
 import { DomainMappingService } from '../domain-mapping/domain-mapping.service';
 import { PwaStatus } from '../../schemas/user.schema';
+import { PWAEventLogService } from '../pwa-event-log/pwa-event-log.service';
 
 @Processor('buildPWA')
 export class BuildPWAProcessor {
@@ -16,6 +17,7 @@ export class BuildPWAProcessor {
     private readonly mediaService: MediaService,
     private readonly userService: UserService,
     private readonly domainMappingService: DomainMappingService,
+    private readonly pwaEventLogService: PWAEventLogService,
   ) {}
 
   @Process()
@@ -285,6 +287,10 @@ export class BuildPWAProcessor {
               pwaContentId,
               archiveKey,
             ),
+            this.pwaEventLogService.setPwaContentIdByDomain(
+              existingPwa.domainName,
+              pwaContentId,
+            ),
           ]);
         }
       } else {
@@ -325,6 +331,10 @@ export class BuildPWAProcessor {
             ),
             this.userService.setUserPwaId(
               userId,
+              existingUserPwaForDomain.domainName,
+              pwaContentId,
+            ),
+            this.pwaEventLogService.setPwaContentIdByDomain(
               existingUserPwaForDomain.domainName,
               pwaContentId,
             ),

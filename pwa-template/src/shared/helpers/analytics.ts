@@ -43,7 +43,8 @@ export async function trackExternalId(pwaId: string) {
 }
 
 export async function logEvent(
-  pwaId: string,
+  pwaContentId: string,
+  domain: string,
   event: string,
   externalId?: string | null,
   value?: number,
@@ -56,7 +57,8 @@ export async function logEvent(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        pwaId,
+        pwaContentId,
+        domain,
         externalId,
         event,
         value,

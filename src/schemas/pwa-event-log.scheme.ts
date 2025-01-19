@@ -7,8 +7,11 @@ export class PWAEventLog extends Document {
   @Prop({ required: true, enum: PwaEvent })
   event: PwaEvent;
 
-  @Prop({ type: Types.ObjectId, ref: 'PWAContent', required: true })
-  pwa: Types.ObjectId;
+  @Prop({ required: true })
+  domain: string;
+
+  @Prop()
+  pwaContentId?: string;
 
   @Prop()
   externalId?: string;

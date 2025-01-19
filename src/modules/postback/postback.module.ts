@@ -4,6 +4,7 @@ import { PWAExternalMappingModule } from '../pwa-external-mapping/pwa-external-m
 import { PWAEventLogModule } from '../pwa-event-log/pwa-event-log.module';
 import { PWAContentModule } from '../pwa-content/pwa-content.module';
 import { FacebookModule } from '../facebook/facebook.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { FacebookModule } from '../facebook/facebook.module';
     PWAEventLogModule,
     PWAContentModule,
     FacebookModule,
+    UserModule,
   ],
   controllers: [PostbackController],
   providers: [],

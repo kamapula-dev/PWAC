@@ -28,6 +28,7 @@ import { DomainManagementService } from '../domain-managemant/domain-management.
 import { DomainMappingService } from '../domain-mapping/domain-mapping.service';
 import { ReadyDomainService } from '../ready-domain/ready-domain.service';
 import * as path from 'path';
+import { PWAEventLogService } from '../pwa-event-log/pwa-event-log.service';
 
 @Controller('pwa-content')
 export class PWAContentController {
@@ -40,6 +41,7 @@ export class PWAContentController {
     private readonly domainManagementService: DomainManagementService,
     private readonly domainMappingService: DomainMappingService,
     private readonly readyDomainService: ReadyDomainService,
+    private readonly pwaEventLogService: PWAEventLogService,
     @InjectQueue('buildPWA') private readonly buildQueue: Queue,
   ) {
     const deeplApiKey = this.configService.get<string>('DEEPL_API_KEY');
@@ -188,6 +190,9 @@ export class PWAContentController {
         : Promise.resolve(),
       this.userService.setUserPwaId(userId, existingPwa.domainName, null),
       this.pwaContentService.remove(id, userId),
+      this.pwaEventLogService.removePwaContentIdByDomain(
+        existingPwa.domainName,
+      ),
     ]);
 
     return true;
@@ -230,6 +235,7 @@ export class PWAContentController {
         existingPwa.pwaContentId,
       ),
       this.pwaContentService.remove(id, userId),
+      this.pwaEventLogService.deleteAllEventsByPwaContentId(id),
     ]);
 
     return true;

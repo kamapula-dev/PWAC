@@ -122,7 +122,12 @@ export default function App() {
           });
 
           if (viewContentEvent && pwaContent.id) {
-            logEvent(pwaContent.id, viewContentEvent, getExternalId());
+            logEvent(
+              pwaContent.id,
+              window.location.hostname,
+              viewContentEvent,
+              getExternalId(),
+            );
           }
         }
 

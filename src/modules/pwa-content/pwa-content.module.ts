@@ -10,6 +10,7 @@ import { UserModule } from '../user/user.module';
 import { DomainManagementModule } from '../domain-managemant/domain-management.module';
 import { DomainMappingModule } from '../domain-mapping/domain-mapping.module';
 import { ReadyDomainModule } from '../ready-domain/ready-domain.module';
+import { PWAEventLogModule } from '../pwa-event-log/pwa-event-log.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ReadyDomainModule } from '../ready-domain/ready-domain.module';
     DomainManagementModule,
     DomainMappingModule,
     ReadyDomainModule,
+    PWAEventLogModule,
   ],
   controllers: [PWAContentController],
   providers: [PWAContentService, BuildPWAProcessor],
