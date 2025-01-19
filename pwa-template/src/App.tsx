@@ -9,6 +9,11 @@ import axios from 'axios';
 import { PwaContent } from './shared/models';
 import playMarket from './shared/icons/playMarketIcon.svg';
 import Menu from './components/Menu/Menu';
+import {
+  getExternalId,
+  logEvent,
+  trackExternalId,
+} from './shared/helpers/analytics.ts';
 
 declare const window: any;
 
@@ -102,15 +107,23 @@ export default function App() {
         }
 
         if (window.fbq && pwaContent?.pixel?.length) {
+          const eventName = 'ViewContent';
+          let viewContentEvent;
+
           pwaContent.pixel.forEach((pixel) => {
             const event = pixel.events.find(
-              ({ sourceEvent }) => sourceEvent === 'ViewContent',
+              ({ triggerEvent }) => triggerEvent === eventName,
             );
 
             if (event) {
+              viewContentEvent = eventName;
               window.fbq('track', pixel.pixelId, event.sentEvent);
             }
           });
+
+          if (viewContentEvent && pwaContent.id) {
+            logEvent(pwaContent.id, viewContentEvent, getExternalId());
+          }
         }
 
         setPwaContent(pwaContent);
@@ -118,14 +131,20 @@ export default function App() {
         console.error(error);
       }
     };
+
     getPwaContent();
   }, []);
 
   useEffect(() => {
     if (!pwaContent?.hasLoadingScreen) return;
+
     setTimeout(() => {
       setIsLoading(false);
     }, 1000);
+
+    if (pwaContent.id) {
+      trackExternalId(pwaContent.id);
+    }
   }, [pwaContent]);
 
   useEffect(() => {

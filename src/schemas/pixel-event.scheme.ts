@@ -31,10 +31,10 @@ export enum PwaEvent {
 export class PixelEvent extends Document {
   @Prop({
     type: String,
-    enum: FacebookEvent,
+    enum: PwaEvent,
     required: true,
   })
-  sourceEvent: PwaEvent;
+  triggerEvent: PwaEvent;
 
   @Prop({
     type: String,

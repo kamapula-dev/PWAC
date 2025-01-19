@@ -8,6 +8,7 @@ import {
 } from '../../Redux/feat/InstallSlice';
 import { Pixel, PWAInstallState } from '../../shared/models';
 import { RootState } from '../../Redux/store/store';
+import { getExternalId, logEvent } from '../../shared/helpers/analytics.ts';
 
 declare const window: any;
 
@@ -16,6 +17,7 @@ interface Props {
   installPrompt: BeforeInstallPromptEvent | null;
   dark: boolean;
   pixel?: [Pixel];
+  id?: string;
 }
 
 interface BeforeInstallPromptEvent extends Event {
@@ -28,6 +30,7 @@ const InstallButton: React.FC<Props> = ({
   installPrompt,
   dark,
   pixel,
+  id,
 }) => {
   const installState = useSelector((state: RootState) =>
     getInstallState(state.install),
@@ -54,15 +57,23 @@ const InstallButton: React.FC<Props> = ({
 
         if (window.fbq) {
           if (pixel?.length) {
+            const eventName = 'Lead';
+            let leadEvent;
+
             pixel.forEach((pixel) => {
               const event = pixel.events.find(
-                ({ sourceEvent }) => sourceEvent === 'Lead',
+                ({ triggerEvent }) => triggerEvent === eventName,
               );
 
               if (event) {
+                leadEvent = eventName;
                 window.fbq('track', pixel.pixelId, event.sentEvent);
               }
             });
+
+            if (leadEvent && id) {
+              logEvent(id, leadEvent, getExternalId());
+            }
           } else {
             window.fbq('track', 'Lead');
           }

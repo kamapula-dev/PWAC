@@ -8,7 +8,7 @@ export enum PWAInstallState {
 export interface Pixel {
   token: string;
   pixelId: string;
-  events: [{ sourceEvent: string; sentEvent: string }];
+  events: [{ triggerEvent: string; sentEvent: string }];
 }
 
 export interface PwaContent {

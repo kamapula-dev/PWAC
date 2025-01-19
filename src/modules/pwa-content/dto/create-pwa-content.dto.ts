@@ -16,7 +16,7 @@ import * as deepl from 'deepl-node';
 import { FacebookEvent, PwaEvent } from '../../../schemas/pixel-event.scheme';
 
 export class PixelEventDto {
-  @IsEnum(FacebookEvent, { message: 'Invalid triggerEvent value' })
+  @IsEnum(PwaEvent, { message: 'Invalid triggerEvent value' })
   triggerEvent: PwaEvent;
 
   @IsEnum(FacebookEvent, { message: 'Invalid sentEvent value' })
