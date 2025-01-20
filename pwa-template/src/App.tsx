@@ -107,7 +107,7 @@ export default function App() {
         }
 
         if (window.fbq && pwaContent?.pixel?.length) {
-          const eventName = 'ViewContent';
+          const eventName = 'OpenPage';
           let viewContentEvent;
 
           pwaContent.pixel.forEach((pixel) => {
@@ -120,10 +120,9 @@ export default function App() {
               window.fbq('track', pixel.pixelId, event.sentEvent);
             }
           });
-
-          if (viewContentEvent && pwaContent.id) {
+          if (viewContentEvent && pwaContent._id) {
             logEvent(
-              pwaContent.id,
+              pwaContent._id,
               window.location.hostname,
               viewContentEvent,
               getExternalId(),
@@ -147,8 +146,8 @@ export default function App() {
       setIsLoading(false);
     }, 1000);
 
-    if (pwaContent.id) {
-      trackExternalId(pwaContent.id);
+    if (pwaContent._id) {
+      trackExternalId(pwaContent._id);
     }
   }, [pwaContent]);
 

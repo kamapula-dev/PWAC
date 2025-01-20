@@ -1,9 +1,9 @@
 export enum PWAInstallState {
-  idle = 'idle',
-  installing = 'installing',
-  installed = 'installed',
-  downloaded = 'downloaded',
-  downloading = 'downloading',
+  idle = "idle",
+  installing = "installing",
+  installed = "installed",
+  downloaded = "downloaded",
+  downloading = "downloading",
 }
 export interface Pixel {
   token: string;
@@ -46,7 +46,7 @@ export interface PwaContent {
   }[];
   version: string;
   sliders: number[];
-  id?: string;
+  _id?: string;
   wideScreens: boolean;
   hasLoadingScreen?: boolean;
   hasMenu?: boolean;
