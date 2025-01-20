@@ -18,21 +18,21 @@ export class PostbackController {
 
   @Get()
   async handlePostback(
-    @Query('externalId') externalId: string,
+    @Query('external_id') external_id: string,
     @Query('event') event: string,
     @Query('value') value: string,
     @Query('currency') currency: string,
   ) {
-    if (!externalId || !event) {
-      throw new BadRequestException('Missing externalId or event');
+    if (!external_id || !event) {
+      throw new BadRequestException('Missing external_id or event');
     }
 
     const pwaContentId =
-      await this.mappingService.findPwaByExternalId(externalId);
+      await this.mappingService.findPwaByExternalId(external_id);
 
     if (!pwaContentId) {
       throw new BadRequestException(
-        `No PWA found for externalId=${externalId}`,
+        `No PWA found for externalId=${external_id}`,
       );
     }
 
@@ -67,7 +67,7 @@ export class PostbackController {
       pwaContentId,
       existingPwa.domainName,
       pwaEvent,
-      externalId,
+      external_id,
       numericValue,
       currency,
     );
@@ -83,9 +83,9 @@ export class PostbackController {
             px.pixelId,
             px.token,
             pixelEvent.sentEvent,
+            external_id,
             numericValue,
             currency,
-            externalId,
           );
         } else {
           throw new BadRequestException(

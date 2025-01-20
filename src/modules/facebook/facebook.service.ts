@@ -10,9 +10,9 @@ export class FacebookService {
     pixelId: string,
     accessToken: string,
     eventName: string,
+    external_id: string,
     value?: number,
     currency?: string,
-    externalId?: string,
   ) {
     const url = `https://graph.facebook.com/v16.0/${pixelId}/events?access_token=${accessToken}`;
 
@@ -21,7 +21,15 @@ export class FacebookService {
         {
           event_name: eventName,
           event_time: Math.floor(Date.now() / 1000),
-          ...(value && currency ? { metadata: { value, currency } } : {}),
+          user_data: { external_id },
+          ...(value && currency
+            ? {
+                custom_data: {
+                  value,
+                  currency,
+                },
+              }
+            : {}),
         },
       ],
     };
