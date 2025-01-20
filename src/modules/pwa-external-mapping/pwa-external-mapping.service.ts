@@ -10,7 +10,7 @@ export class PWAExternalMappingService {
     private readonly mappingModel: Model<PWAExternalMapping>,
   ) {}
 
-  async saveMapping(externalId: string, pwaId: string) {
+  async saveMapping(externalId: string, pwaContentId: string, domain: string) {
     let mapping = await this.mappingModel.findOne({ externalId }).exec();
 
     if (mapping) {
@@ -19,7 +19,8 @@ export class PWAExternalMappingService {
 
     mapping = new this.mappingModel({
       externalId,
-      pwa: pwaId,
+      pwaContentId,
+      domain,
     });
 
     return mapping.save();
@@ -27,6 +28,28 @@ export class PWAExternalMappingService {
 
   async findPwaByExternalId(externalId: string): Promise<string | null> {
     const mapping = await this.mappingModel.findOne({ externalId }).exec();
-    return mapping ? mapping.pwa.toString() : null;
+    return mapping ? mapping.pwaContentId.toString() : null;
+  }
+
+  async deleteAllByPwaContentId(pwaContentId: string): Promise<number> {
+    const result = await this.mappingModel.deleteMany({ pwaContentId }).exec();
+    return result.deletedCount || 0;
+  }
+
+  async removePwaContentIdByDomain(domain: string): Promise<number> {
+    const result = await this.mappingModel
+      .updateMany({ domain }, { $unset: { pwaContentId: 1 } })
+      .exec();
+    return result.modifiedCount || 0;
+  }
+
+  async setPwaContentIdByDomain(
+    domain: string,
+    pwaContentId: string,
+  ): Promise<number> {
+    const result = await this.mappingModel
+      .updateMany({ domain }, { $set: { pwaContentId } })
+      .exec();
+    return result.modifiedCount || 0;
   }
 }

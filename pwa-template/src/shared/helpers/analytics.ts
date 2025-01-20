@@ -1,47 +1,48 @@
 export function getExternalId() {
   const urlParams = new URLSearchParams(window.location.search);
 
-  return urlParams.get("external_id");
+  return urlParams.get('external_id');
 }
 
 export async function trackExternalId(pwaId: string) {
   const externalId = getExternalId();
 
   if (externalId) {
-    const storedExternalId = localStorage.getItem("external_id");
+    const storedExternalId = localStorage.getItem('external_id');
 
     if (!storedExternalId || storedExternalId !== externalId) {
-      localStorage.setItem("external_id", externalId);
+      localStorage.setItem('external_id', externalId);
 
       try {
         const response = await fetch(
-          "https://pwac.world/pwa-external-mapping",
+          'https://pwac.world/pwa-external-mapping',
           {
-            method: "POST",
+            method: 'POST',
             headers: {
-              "Content-Type": "application/json",
+              'Content-Type': 'application/json',
             },
             body: JSON.stringify({
               externalId: externalId,
-              pwaId: pwaId,
+              pwaContentId: pwaId,
+              domain: window.location.hostname,
             }),
           },
         );
 
         if (!response.ok) {
           console.error(
-            "Failed to save external_id mapping:",
+            'Failed to save external_id mapping:',
             await response.text(),
           );
         } else {
-          console.log("external_id mapping saved successfully.");
+          console.log('external_id mapping saved successfully.');
         }
       } catch (error) {
-        console.error("Error while saving external_id mapping:", error);
+        console.error('Error while saving external_id mapping:', error);
       }
     }
   } else {
-    console.log("No external_id found in the URL.");
+    console.log('No external_id found in the URL.');
   }
 }
 
@@ -54,10 +55,10 @@ export async function logEvent(
   currency?: string,
 ) {
   try {
-    const response = await fetch("https://pwac.world/pwa-event-log", {
-      method: "POST",
+    const response = await fetch('https://pwac.world/pwa-event-log', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         pwaContentId,
@@ -70,11 +71,11 @@ export async function logEvent(
     });
 
     if (!response.ok) {
-      console.error("Failed to log event:", await response.text());
+      console.error('Failed to log event:', await response.text());
     } else {
-      console.log("Event logged successfully.");
+      console.log('Event logged successfully.');
     }
   } catch (error) {
-    console.error("Error while logging event:", error);
+    console.error('Error while logging event:', error);
   }
 }

@@ -7,15 +7,17 @@ export class PWAExternalMappingController {
 
   @Post()
   async saveMapping(
-    @Body() body: { externalId: string; pwaId: string },
+    @Body() body: { externalId: string; pwaContentId: string; domain: string },
   ): Promise<{ status: string }> {
-    const { externalId, pwaId } = body;
+    const { externalId, pwaContentId, domain } = body;
 
-    if (!externalId || !pwaId) {
-      throw new BadRequestException('Missing externalId or pwaId');
+    if (!externalId || !pwaContentId || !domain) {
+      throw new BadRequestException(
+        'Missing externalId, pwaContentId or domain',
+      );
     }
 
-    await this.mappingService.saveMapping(externalId, pwaId);
+    await this.mappingService.saveMapping(externalId, pwaContentId, domain);
 
     return { status: 'success' };
   }

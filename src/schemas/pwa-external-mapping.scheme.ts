@@ -6,8 +6,11 @@ export class PWAExternalMapping extends Document {
   @Prop({ required: true, unique: true })
   externalId: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'PWAContent', required: true })
-  pwa: Types.ObjectId;
+  @Prop({ required: true })
+  domain: string;
+
+  @Prop()
+  pwaContentId?: string;
 }
 
 export const PWAExternalMappingSchema =

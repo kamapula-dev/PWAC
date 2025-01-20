@@ -10,6 +10,7 @@ import { Logger } from '@nestjs/common';
 import { DomainMappingService } from '../domain-mapping/domain-mapping.service';
 import { PwaStatus } from '../../schemas/user.schema';
 import { PWAEventLogService } from '../pwa-event-log/pwa-event-log.service';
+import { PWAExternalMappingService } from '../pwa-external-mapping/pwa-external-mapping.service';
 
 @Processor('buildPWA')
 export class BuildPWAProcessor {
@@ -18,6 +19,7 @@ export class BuildPWAProcessor {
     private readonly userService: UserService,
     private readonly domainMappingService: DomainMappingService,
     private readonly pwaEventLogService: PWAEventLogService,
+    private readonly pwaExternalMappingService: PWAExternalMappingService,
   ) {}
 
   @Process()
@@ -297,6 +299,10 @@ export class BuildPWAProcessor {
               existingUserPwaForDomain.domainName,
               pwaContentId,
             ),
+            this.pwaExternalMappingService.setPwaContentIdByDomain(
+              existingUserPwaForDomain.domainName,
+              pwaContentId,
+            ),
             this.userService.setUserPwaStatusByDomain(
               userId,
               existingUserPwaForDomain.domainName,
@@ -346,6 +352,10 @@ export class BuildPWAProcessor {
               pwaContentId,
             ),
             this.pwaEventLogService.setPwaContentIdByDomain(
+              existingUserPwaForDomain.domainName,
+              pwaContentId,
+            ),
+            this.pwaExternalMappingService.setPwaContentIdByDomain(
               existingUserPwaForDomain.domainName,
               pwaContentId,
             ),

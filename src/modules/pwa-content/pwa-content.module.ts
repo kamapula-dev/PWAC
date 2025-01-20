@@ -11,6 +11,7 @@ import { DomainManagementModule } from '../domain-managemant/domain-management.m
 import { DomainMappingModule } from '../domain-mapping/domain-mapping.module';
 import { ReadyDomainModule } from '../ready-domain/ready-domain.module';
 import { PWAEventLogModule } from '../pwa-event-log/pwa-event-log.module';
+import { PWAExternalMappingModule } from '../pwa-external-mapping/pwa-external-mapping.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { PWAEventLogModule } from '../pwa-event-log/pwa-event-log.module';
     DomainMappingModule,
     ReadyDomainModule,
     PWAEventLogModule,
+    PWAExternalMappingModule,
   ],
   controllers: [PWAContentController],
   providers: [PWAContentService, BuildPWAProcessor],

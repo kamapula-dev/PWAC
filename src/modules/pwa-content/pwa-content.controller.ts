@@ -29,6 +29,7 @@ import { DomainMappingService } from '../domain-mapping/domain-mapping.service';
 import { ReadyDomainService } from '../ready-domain/ready-domain.service';
 import * as path from 'path';
 import { PWAEventLogService } from '../pwa-event-log/pwa-event-log.service';
+import { PWAExternalMappingService } from '../pwa-external-mapping/pwa-external-mapping.service';
 
 @Controller('pwa-content')
 export class PWAContentController {
@@ -42,6 +43,7 @@ export class PWAContentController {
     private readonly domainMappingService: DomainMappingService,
     private readonly readyDomainService: ReadyDomainService,
     private readonly pwaEventLogService: PWAEventLogService,
+    private readonly pwaExternalMappingService: PWAExternalMappingService,
     @InjectQueue('buildPWA') private readonly buildQueue: Queue,
   ) {
     const deeplApiKey = this.configService.get<string>('DEEPL_API_KEY');
@@ -193,6 +195,9 @@ export class PWAContentController {
       this.pwaEventLogService.removePwaContentIdByDomain(
         existingPwa.domainName,
       ),
+      this.pwaExternalMappingService.removePwaContentIdByDomain(
+        existingPwa.domainName,
+      ),
     ]);
 
     return true;
@@ -235,7 +240,8 @@ export class PWAContentController {
         existingPwa.pwaContentId,
       ),
       this.pwaContentService.remove(id, userId),
-      this.pwaEventLogService.deleteAllEventsByPwaContentId(id),
+      this.pwaEventLogService.deleteAllByPwaContentId(id),
+      this.pwaExternalMappingService.deleteAllByPwaContentId(id),
     ]);
 
     return true;

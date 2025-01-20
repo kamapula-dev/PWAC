@@ -30,7 +30,7 @@ export class PWAEventLogService {
     return doc.save();
   }
 
-  async deleteAllEventsByPwaContentId(pwaContentId: string): Promise<number> {
+  async deleteAllByPwaContentId(pwaContentId: string): Promise<number> {
     const result = await this.eventLogModel.deleteMany({ pwaContentId }).exec();
     return result.deletedCount || 0;
   }
