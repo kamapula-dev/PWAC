@@ -2,7 +2,7 @@ import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
 import { PWAEventLogService } from './pwa-event-log.service';
 import { PwaEvent } from '../../schemas/pixel-event.scheme';
 
-@Controller('event-log')
+@Controller('pwa-event-log')
 export class PWAEventLogController {
   constructor(private readonly eventLogService: PWAEventLogService) {}
 

@@ -5,6 +5,7 @@ import {
   PWAEventLogSchema,
 } from '../../schemas/pwa-event-log.scheme';
 import { PWAEventLogService } from './pwa-event-log.service';
+import { PWAEventLogController } from './pwa-event-log.controller';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { PWAEventLogService } from './pwa-event-log.service';
       { name: PWAEventLog.name, schema: PWAEventLogSchema },
     ]),
   ],
+  controllers: [PWAEventLogController],
   providers: [PWAEventLogService],
   exports: [PWAEventLogService],
 })

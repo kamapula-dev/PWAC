@@ -5,6 +5,7 @@ import {
   PWAExternalMappingSchema,
 } from '../../schemas/pwa-external-mapping.scheme';
 import { PWAExternalMappingService } from './pwa-external-mapping.service';
+import { PWAExternalMappingController } from './pwa-external-mapping.controller';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { PWAExternalMappingService } from './pwa-external-mapping.service';
       { name: PWAExternalMapping.name, schema: PWAExternalMappingSchema },
     ]),
   ],
+  controllers: [PWAExternalMappingController],
   providers: [PWAExternalMappingService],
   exports: [PWAExternalMappingService],
 })

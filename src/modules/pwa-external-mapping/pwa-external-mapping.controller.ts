@@ -1,7 +1,7 @@
 import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
 import { PWAExternalMappingService } from './pwa-external-mapping.service';
 
-@Controller('external-mapping')
+@Controller('pwa-external-mapping')
 export class PWAExternalMappingController {
   constructor(private readonly mappingService: PWAExternalMappingService) {}
 
