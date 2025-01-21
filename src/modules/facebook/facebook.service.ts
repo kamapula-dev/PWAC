@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 
@@ -36,10 +36,10 @@ export class FacebookService {
 
     try {
       const response = await firstValueFrom(this.httpService.post(url, data));
-      console.log(response, 'event sent');
+      Logger.log(response, 'event sent');
       return response.data;
     } catch (error) {
-      console.error(
+      Logger.error(
         'Facebook CAPI error:',
         error?.response?.data || error.message,
       );
