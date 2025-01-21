@@ -30,6 +30,21 @@ export class PWAExternalMapping extends Document {
 
   @Prop()
   fbp?: string;
+
+  @Prop()
+  firstName?: string;
+
+  @Prop()
+  lastName?: string;
+
+  @Prop()
+  phone?: string;
+
+  @Prop()
+  email?: string;
+
+  @Prop()
+  dob?: string;
 }
 
 export const PWAExternalMappingSchema =

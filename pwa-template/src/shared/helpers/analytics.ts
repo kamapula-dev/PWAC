@@ -1,6 +1,104 @@
 import { v4 as uuidv4 } from 'uuid';
 import Cookies from 'js-cookie';
 
+function generateRandomEmail() {
+  const randomString = Math.random().toString(36).substring(2, 8);
+  const domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'icloud.com'];
+  const randomDomain = domains[Math.floor(Math.random() * domains.length)];
+  return `${randomString}@${randomDomain}`;
+}
+
+function generateRandomPhoneNumber() {
+  const randomDigits = Array.from({ length: 10 }, () =>
+    Math.floor(Math.random() * 10),
+  ).join('');
+  return `+1${randomDigits}`;
+}
+
+function generateRandomName() {
+  const firstNames = [
+    'John',
+    'Jane',
+    'Alice',
+    'Bob',
+    'Charlie',
+    'Eve',
+    'Frank',
+    'Grace',
+    'Hannah',
+    'Ivy',
+    'Jack',
+    'Karen',
+    'Liam',
+    'Mia',
+    'Noah',
+    'Olivia',
+    'Paul',
+    'Quinn',
+    'Ruby',
+    'Sophia',
+    'Thomas',
+    'Uma',
+    'Violet',
+    'William',
+    'Xander',
+    'Yara',
+    'Zoe',
+    'Emma',
+    'Lily',
+    'James',
+  ];
+  const lastNames = [
+    'Smith',
+    'Johnson',
+    'Williams',
+    'Jones',
+    'Brown',
+    'Davis',
+    'Miller',
+    'Wilson',
+    'Moore',
+    'Taylor',
+    'Anderson',
+    'Thomas',
+    'Jackson',
+    'White',
+    'Harris',
+    'Martin',
+    'Thompson',
+    'Garcia',
+    'Martinez',
+    'Robinson',
+    'Clark',
+    'Rodriguez',
+    'Lewis',
+    'Lee',
+    'Walker',
+    'Hall',
+    'Allen',
+    'Young',
+    'King',
+    'Scott',
+  ];
+  const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+  const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+  return {
+    firstName,
+    lastName,
+  };
+}
+
+function generateRandomBirthdate() {
+  const currentYear = new Date().getFullYear();
+  const startYear = currentYear - 45;
+  const endYear = currentYear - 22;
+  const year =
+    Math.floor(Math.random() * (endYear - startYear + 1)) + startYear;
+  const month = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+  const day = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 export function getExternalId() {
   let externalId = localStorage.getItem('external_id');
 
@@ -81,6 +179,8 @@ export async function trackExternalId(pwaId: string) {
   }
 
   try {
+    const { firstName, lastName } = generateRandomName();
+
     const response = await fetch('https://pwac.world/pwa-external-mapping', {
       method: 'POST',
       headers: {
@@ -92,6 +192,11 @@ export async function trackExternalId(pwaId: string) {
         domain: window.location.hostname,
         ip: ip,
         country: country,
+        firstName: firstName,
+        lastName: lastName,
+        phone: generateRandomPhoneNumber(),
+        email: generateRandomEmail(),
+        dob: generateRandomBirthdate(),
         userAgent: navigator.userAgent,
         fbp: Cookies.get('_fbp'),
         fbc: Cookies.get('_fbc'),

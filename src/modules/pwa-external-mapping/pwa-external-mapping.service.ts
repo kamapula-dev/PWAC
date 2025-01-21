@@ -14,8 +14,14 @@ export class PWAExternalMappingService {
     externalId: string,
     pwaContentId: string,
     domain: string,
-    ip: string,
     userAgent: string,
+    ip?: string,
+    country?: string,
+    dob?: string,
+    firstName?: string,
+    lastName?: string,
+    phone?: string,
+    email?: string,
   ) {
     let mapping = await this.mappingModel.findOne({ externalId }).exec();
 
@@ -29,6 +35,12 @@ export class PWAExternalMappingService {
       domain,
       ip,
       userAgent,
+      country,
+      dob,
+      firstName,
+      lastName,
+      phone,
+      email,
     });
 
     return mapping.save();

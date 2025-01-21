@@ -12,13 +12,31 @@ export class PWAExternalMappingController {
       externalId: string;
       pwaContentId: string;
       domain: string;
-      ip: string;
       userAgent: string;
+      ip?: string;
+      country?: string;
+      dob?: string;
+      firstName?: string;
+      lastName?: string;
+      phone?: string;
+      email?: string;
     },
   ): Promise<{ status: string }> {
-    const { externalId, pwaContentId, domain, ip, userAgent } = body;
+    const {
+      externalId,
+      pwaContentId,
+      ip,
+      domain,
+      userAgent,
+      country,
+      dob,
+      firstName,
+      lastName,
+      phone,
+      email,
+    } = body;
 
-    if (!externalId || !pwaContentId || !domain || !ip || !userAgent) {
+    if (!externalId || !pwaContentId || !domain || !userAgent) {
       throw new BadRequestException('Missing required params');
     }
 
@@ -26,8 +44,14 @@ export class PWAExternalMappingController {
       externalId,
       pwaContentId,
       domain,
-      ip,
       userAgent,
+      ip,
+      country,
+      dob,
+      firstName,
+      lastName,
+      phone,
+      email,
     );
 
     return { status: 'success' };
