@@ -96,7 +96,7 @@ export class PostbackController {
             currency,
           );
 
-          Logger.log(response, 'POSTBACK RESPONSE');
+          Logger.log(JSON.stringify(response, null, 2), 'POSTBACK RESPONSE');
         } else {
           throw new BadRequestException(
             `Event was not found in the pixel, event: ${event}`,

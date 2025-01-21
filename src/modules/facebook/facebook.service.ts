@@ -42,7 +42,7 @@ export class FacebookService {
 
     try {
       const response = await firstValueFrom(this.httpService.post(url, data));
-      Logger.log(response, 'event sent');
+      Logger.log(JSON.stringify(response, null, 2), 'event sent');
       return response.data;
     } catch (error) {
       Logger.error(
