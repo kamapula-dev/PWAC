@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react';
-import Cookies from 'js-cookie';
 import MainView from './components/MainView';
 import AboutView from './components/AboutView';
 import PwaView from './components/PwaView';
@@ -10,6 +9,7 @@ import { PwaContent } from './shared/models';
 import playMarket from './shared/icons/playMarketIcon.svg';
 import Menu from './components/Menu/Menu';
 import {
+  buildAppLink,
   getExternalId,
   logEvent,
   trackExternalId,
@@ -171,54 +171,6 @@ export default function App() {
     }
   }, []);
 
-  useEffect(() => {
-    if (pwaContent?.pwaLink) {
-      setTimeout(() => {
-        const searchParams = new URLSearchParams(window.location.search);
-
-        let newPwaLink = pwaContent.pwaLink;
-        let pixelId: string | null = '';
-
-        const fbc = Cookies.get('_fbc');
-        const fbp = Cookies.get('_fbp');
-
-        const domain = window.location.hostname;
-
-        newPwaLink += `${
-          newPwaLink.includes('?') ? '&' : '?'
-        }sub_id_5=${domain}`;
-
-        if (searchParams.has('idpixel') || searchParams.has('sub_id_7')) {
-          pixelId = searchParams.has('idpixel')
-            ? searchParams.get('idpixel')
-            : searchParams.get('sub_id_7');
-          newPwaLink += `${
-            newPwaLink.includes('?') ? '&' : '?'
-          }sub_id_7=${pixelId}`;
-        }
-
-        if (fbp && fbc) {
-          newPwaLink += `${
-            newPwaLink.includes('?') ? '&' : '?'
-          }sub_id_8=${fbp}&sub_id_9=${fbc}`;
-        }
-
-        searchParams.forEach((value, key) => {
-          if (key !== 'idpixel' && key !== 'sub_id_7') {
-            newPwaLink += `${
-              newPwaLink.includes('?') ? '&' : '?'
-            }${key}=${value}`;
-          }
-        });
-
-        const pwaLink = localStorage.getItem('pwaLink');
-        if (!pwaLink) {
-          localStorage.setItem('pwaLink', newPwaLink);
-        }
-      }, 3000);
-    }
-  }, [pwaContent]);
-
   if (!pwaContent) return <></>;
 
   let currentView;
@@ -246,8 +198,10 @@ export default function App() {
       break;
   }
 
+  console.log('Offer url:', buildAppLink(pwaContent?.pwaLink));
+
   return isPWAActive ? (
-    <PwaView />
+    <PwaView pwaLink={pwaContent?.pwaLink} />
   ) : (
     <div>
       {dark && <style>{`body{background-color: #131313;}`}</style>}

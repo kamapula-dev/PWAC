@@ -1,14 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { useIntl } from "react-intl";
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useIntl } from 'react-intl';
 import {
   getInstallState,
   setInstallState,
-} from "../../Redux/feat/InstallSlice";
-import { Pixel, PWAInstallState } from "../../shared/models";
-import { RootState } from "../../Redux/store/store";
-import { getExternalId, logEvent } from "../../shared/helpers/analytics.ts";
+} from '../../Redux/feat/InstallSlice';
+import { Pixel, PWAInstallState } from '../../shared/models';
+import { RootState } from '../../Redux/store/store';
+import {
+  buildAppLink,
+  getExternalId,
+  logEvent,
+} from '../../shared/helpers/analytics.ts';
 
 declare const window: any;
 
@@ -22,7 +26,7 @@ interface Props {
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
 }
 
 const InstallButton: React.FC<Props> = ({
@@ -49,15 +53,15 @@ const InstallButton: React.FC<Props> = ({
     if (installPrompt) {
       await installPrompt.prompt();
       const choiceResult = await installPrompt.userChoice;
-      if (choiceResult.outcome === "accepted") {
-        console.log("User accepted installation");
+      if (choiceResult.outcome === 'accepted') {
+        console.log('User accepted installation');
         setTimeout(() => {
           dispatch(setInstallState(PWAInstallState.installed));
         }, 8000);
 
         if (window.fbq) {
           if (pixel?.length) {
-            const eventName = "Install";
+            const eventName = 'Install';
             let leadEvent;
 
             pixel.forEach((pixel) => {
@@ -67,7 +71,7 @@ const InstallButton: React.FC<Props> = ({
 
               if (event) {
                 leadEvent = eventName;
-                window.fbq("track", pixel.pixelId, event.sentEvent);
+                window.fbq('track', pixel.pixelId, event.sentEvent);
               }
             });
 
@@ -80,40 +84,40 @@ const InstallButton: React.FC<Props> = ({
               );
             }
           } else {
-            window.fbq("track", "Lead");
+            window.fbq('track', 'Lead');
           }
         }
       } else {
-        window.open(appLink, "_blank");
-        dispatch(setInstallState("downloaded"));
+        window.open(appLink, '_blank');
+        dispatch(setInstallState('downloaded'));
       }
     }
   };
 
   const openLink = () => {
-    window.open(appLink, "_blank");
+    window.open(buildAppLink(appLink), '_blank');
   };
 
   const showButtonText = () => {
     switch (installState) {
       case PWAInstallState.idle:
         return intl.formatMessage({
-          id: "download",
-          defaultMessage: "Download",
+          id: 'download',
+          defaultMessage: 'Download',
         });
 
       case PWAInstallState.downloading:
       case PWAInstallState.installing:
       case PWAInstallState.installed:
         return intl.formatMessage({
-          id: "open",
-          defaultMessage: "Open",
+          id: 'open',
+          defaultMessage: 'Open',
         });
 
       case PWAInstallState.downloaded:
         return intl.formatMessage({
-          id: "install",
-          defaultMessage: "Install",
+          id: 'install',
+          defaultMessage: 'Install',
         });
     }
   };
@@ -141,18 +145,18 @@ const InstallButton: React.FC<Props> = ({
     <div className="flex justify-between gap-2">
       {installState === PWAInstallState.downloading && (
         <button
-          style={dark ? { background: "#A8C8FB", color: "#062961" } : {}}
+          style={dark ? { background: '#A8C8FB', color: '#062961' } : {}}
           className="h-9 rounded-[60px] bg-[#1357CD] w-full text-white mb-[22px] transition duration-300 active:scale-95 disabled:bg-gray-300"
           onClick={() => dispatch(setInstallState(PWAInstallState.idle))}
         >
           {intl.formatMessage({
-            id: "cancel",
-            defaultMessage: "Cancel",
+            id: 'cancel',
+            defaultMessage: 'Cancel',
           })}
         </button>
       )}
       <button
-        style={dark ? { background: "#A8C8FB", color: "#062961" } : {}}
+        style={dark ? { background: '#A8C8FB', color: '#062961' } : {}}
         className="h-9 rounded-[60px] bg-[#1357CD]  w-full text-white mb-[22px] transition duration-300 active:scale-95 disabled:bg-gray-300"
         onClick={handleButtonClick}
         disabled={

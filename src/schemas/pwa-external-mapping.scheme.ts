@@ -1,6 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
+export enum PostbackEvent {
+  reg = 'reg',
+  dep = 'dep',
+}
 @Schema({ timestamps: true })
 export class PWAExternalMapping extends Document {
   @Prop({ required: true, unique: true })
@@ -10,13 +14,22 @@ export class PWAExternalMapping extends Document {
   domain: string;
 
   @Prop({ required: true })
-  ip: string;
-
-  @Prop({ required: true })
   userAgent: string;
 
   @Prop()
   pwaContentId?: string;
+
+  @Prop()
+  ip?: string;
+
+  @Prop()
+  country?: string;
+
+  @Prop()
+  fbc?: string;
+
+  @Prop()
+  fbp?: string;
 }
 
 export const PWAExternalMappingSchema =

@@ -11,6 +11,7 @@ import { PwaEvent } from '../../schemas/pixel-event.scheme';
 import { FacebookService } from '../facebook/facebook.service';
 import { PWAContentService } from '../pwa-content/pwa-content.service';
 import { UserService } from '../user/user.service';
+import { PostbackEvent } from '../../schemas/pwa-external-mapping.scheme';
 
 @Controller('postback')
 export class PostbackController {
@@ -25,7 +26,7 @@ export class PostbackController {
   @Get()
   async handlePostback(
     @Query('external_id') external_id: string,
-    @Query('event') event: string,
+    @Query('event') event: PostbackEvent,
     @Query('value') value: string,
     @Query('currency') currency: string,
   ) {
@@ -45,10 +46,10 @@ export class PostbackController {
     let pwaEvent: PwaEvent;
 
     switch (event) {
-      case 'reg':
+      case PostbackEvent.reg:
         pwaEvent = PwaEvent.Registration;
         break;
-      case 'dep':
+      case PostbackEvent.dep:
         pwaEvent = PwaEvent.Deposit;
         break;
       default:
@@ -86,12 +87,11 @@ export class PostbackController {
 
         if (pixelEvent) {
           await this.facebookService.sendEventToFacebook(
+            event,
             px.pixelId,
             px.token,
             pixelEvent.sentEvent,
-            external_id,
-            mapping.ip,
-            mapping.userAgent,
+            mapping,
             numericValue,
             currency,
           );

@@ -1,18 +1,21 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import {
+  PostbackEvent,
+  PWAExternalMapping,
+} from '../../schemas/pwa-external-mapping.scheme';
 
 @Injectable()
 export class FacebookService {
   constructor(private readonly httpService: HttpService) {}
 
   async sendEventToFacebook(
+    postbackEvent: PostbackEvent,
     pixelId: string,
     accessToken: string,
-    eventName: string,
-    external_id: string,
-    ip: string,
-    userAgent: string,
+    sentEvent: string,
+    mapping: PWAExternalMapping,
     value?: number,
     currency?: string,
   ) {
@@ -21,21 +24,24 @@ export class FacebookService {
     const data = {
       data: [
         {
-          event_name: eventName,
+          event_name: sentEvent,
           event_time: Math.floor(Date.now() / 1000),
           user_data: {
-            external_id,
-            client_ip_address: ip,
-            client_user_agent: userAgent,
+            external_id: mapping.externalId,
+            client_ip_address: mapping.ip,
+            client_user_agent: mapping.userAgent,
+            email: this.generateRandomEmail(),
+            phone: this.generateRandomPhoneNumber(),
+            fbp: mapping.fbp,
+            fbc: mapping.fbc,
+            country: mapping.country,
           },
-          ...(value && currency
-            ? {
-                custom_data: {
-                  value,
-                  currency,
-                },
-              }
-            : {}),
+          ...(postbackEvent === PostbackEvent.dep && {
+            custom_data: {
+              value: value ?? 100,
+              currency: currency ?? 'USD',
+            },
+          }),
         },
       ],
     };
@@ -50,5 +56,19 @@ export class FacebookService {
       );
       throw error;
     }
+  }
+
+  private generateRandomEmail() {
+    const randomUsername = Math.random().toString(36).substring(2, 8);
+    const domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'icloud.com'];
+    const randomDomain = domains[Math.floor(Math.random() * domains.length)];
+    return `${randomUsername}@${randomDomain}`;
+  }
+
+  private generateRandomPhoneNumber() {
+    const randomDigits = Array.from({ length: 10 }, () =>
+      Math.floor(Math.random() * 10),
+    ).join('');
+    return `+1${randomDigits}`;
   }
 }
