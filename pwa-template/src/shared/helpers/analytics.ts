@@ -12,7 +12,7 @@ function generateRandomPhoneNumber() {
   const randomDigits = Array.from({ length: 10 }, () =>
     Math.floor(Math.random() * 10),
   ).join('');
-  return `+1${randomDigits}`;
+  return `1${randomDigits}`;
 }
 
 function generateRandomName() {
@@ -96,7 +96,7 @@ function generateRandomBirthdate() {
     Math.floor(Math.random() * (endYear - startYear + 1)) + startYear;
   const month = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
   const day = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  return `${year}${month}${day}`;
 }
 
 export function getExternalId() {
