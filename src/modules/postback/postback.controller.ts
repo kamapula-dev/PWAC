@@ -33,8 +33,8 @@ export class PostbackController {
       throw new BadRequestException('Missing external_id or event');
     }
 
-    const pwaContentId =
-      await this.mappingService.findPwaByExternalId(external_id);
+    const mapping = await this.mappingService.findByExternalId(external_id);
+    const pwaContentId = mapping?.pwaContentId?.toString();
 
     if (!pwaContentId) {
       throw new BadRequestException(
@@ -90,6 +90,8 @@ export class PostbackController {
             px.token,
             pixelEvent.sentEvent,
             external_id,
+            mapping.ip,
+            mapping.userAgent,
             numericValue,
             currency,
           );

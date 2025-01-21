@@ -9,6 +9,12 @@ export class PWAExternalMapping extends Document {
   @Prop({ required: true })
   domain: string;
 
+  @Prop({ required: true })
+  ip: string;
+
+  @Prop({ required: true })
+  userAgent: string;
+
   @Prop()
   pwaContentId?: string;
 }

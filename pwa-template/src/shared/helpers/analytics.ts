@@ -14,6 +14,11 @@ export async function trackExternalId(pwaId: string) {
       localStorage.setItem('external_id', externalId);
 
       try {
+        // Получение IP-адреса через ipify API
+        const ipResponse = await fetch('https://api.ipify.org?format=json');
+        const ipData = await ipResponse.json();
+        const ip = ipData.ip;
+
         const response = await fetch(
           'https://pwac.world/pwa-external-mapping',
           {
@@ -25,6 +30,8 @@ export async function trackExternalId(pwaId: string) {
               externalId: externalId,
               pwaContentId: pwaId,
               domain: window.location.hostname,
+              ip: ip,
+              userAgent: navigator.userAgent,
             }),
           },
         );

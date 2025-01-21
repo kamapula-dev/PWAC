@@ -11,6 +11,8 @@ export class FacebookService {
     accessToken: string,
     eventName: string,
     external_id: string,
+    ip: string,
+    userAgent: string,
     value?: number,
     currency?: string,
   ) {
@@ -21,7 +23,11 @@ export class FacebookService {
         {
           event_name: eventName,
           event_time: Math.floor(Date.now() / 1000),
-          user_data: { external_id },
+          user_data: {
+            external_id,
+            client_ip_address: ip,
+            client_user_agent: userAgent,
+          },
           ...(value && currency
             ? {
                 custom_data: {

@@ -10,7 +10,13 @@ export class PWAExternalMappingService {
     private readonly mappingModel: Model<PWAExternalMapping>,
   ) {}
 
-  async saveMapping(externalId: string, pwaContentId: string, domain: string) {
+  async saveMapping(
+    externalId: string,
+    pwaContentId: string,
+    domain: string,
+    ip: string,
+    userAgent: string,
+  ) {
     let mapping = await this.mappingModel.findOne({ externalId }).exec();
 
     if (mapping) {
@@ -21,14 +27,15 @@ export class PWAExternalMappingService {
       externalId,
       pwaContentId,
       domain,
+      ip,
+      userAgent,
     });
 
     return mapping.save();
   }
 
-  async findPwaByExternalId(externalId: string): Promise<string | null> {
-    const mapping = await this.mappingModel.findOne({ externalId }).exec();
-    return mapping ? mapping.pwaContentId.toString() : null;
+  async findByExternalId(externalId: string): Promise<PWAExternalMapping> {
+    return this.mappingModel.findOne({ externalId }).exec();
   }
 
   async deleteAllByPwaContentId(pwaContentId: string): Promise<number> {
