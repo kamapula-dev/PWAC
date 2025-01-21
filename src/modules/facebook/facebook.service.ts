@@ -5,7 +5,7 @@ import {
   PostbackEvent,
   PWAExternalMapping,
 } from '../../schemas/pwa-external-mapping.scheme';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 
 @Injectable()
 export class FacebookService {
