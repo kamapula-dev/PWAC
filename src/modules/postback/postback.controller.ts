@@ -85,7 +85,7 @@ export class PostbackController {
         );
 
         if (pixelEvent) {
-          const response = await this.facebookService.sendEventToFacebook(
+          await this.facebookService.sendEventToFacebook(
             px.pixelId,
             px.token,
             pixelEvent.sentEvent,
@@ -95,8 +95,6 @@ export class PostbackController {
             numericValue,
             currency,
           );
-
-          Logger.log(JSON.stringify(response, null, 2), 'POSTBACK RESPONSE');
         } else {
           throw new BadRequestException(
             `Event was not found in the pixel, event: ${event}`,
