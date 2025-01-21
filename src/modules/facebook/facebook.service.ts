@@ -5,7 +5,8 @@ import {
   PostbackEvent,
   PWAExternalMapping,
 } from '../../schemas/pwa-external-mapping.scheme';
-import SHA256 from 'crypto-js/sha256';
+
+import { Sha256 } from '@aws-crypto/sha256-js';
 
 @Injectable()
 export class FacebookService {
@@ -31,16 +32,14 @@ export class FacebookService {
             external_id: mapping.externalId,
             client_ip_address: mapping.ip,
             client_user_agent: mapping.userAgent,
-            email: this.hashData(mapping.email),
-            phone: this.hashData(mapping.phone),
+            em: await this.hashData(mapping.email),
+            ph: await this.hashData(mapping.phone),
             fbp: mapping.fbp,
             fbc: mapping.fbc,
-            country: mapping.country
-              ? this.hashData(mapping.country)
-              : undefined,
-            first_name: this.hashData(mapping.firstName),
-            last_name: this.hashData(mapping.lastName),
-            dob: this.hashData(mapping.dob),
+            country: await this.hashData(mapping.country),
+            fn: await this.hashData(mapping.firstName),
+            ln: await this.hashData(mapping.lastName),
+            db: await this.hashData(mapping.dob),
           },
           ...(postbackEvent === PostbackEvent.dep && {
             custom_data: {
@@ -56,15 +55,19 @@ export class FacebookService {
       const response = await firstValueFrom(this.httpService.post(url, data));
       return response.data;
     } catch (error) {
-      Logger.error(
-        'Facebook CAPI error:',
-        error?.response?.data || error.message,
-      );
+      Logger.error('Facebook CAPI error:', error);
       throw error;
     }
   }
 
-  private hashData(data: string) {
-    return SHA256(data).toString();
+  private async hashData(data?: string) {
+    if (data) {
+      const hash = new Sha256();
+      hash.update(data.trim().toLowerCase());
+      const result = await hash.digest();
+      return Buffer.from(result).toString('hex');
+    } else {
+      return undefined;
+    }
   }
 }
