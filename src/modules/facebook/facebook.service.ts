@@ -5,7 +5,7 @@ import {
   PostbackEvent,
   PWAExternalMapping,
 } from '../../schemas/pwa-external-mapping.scheme';
-import crypto from 'node:crypto';
+import SHA256 from 'crypto-js/sha256';
 
 @Injectable()
 export class FacebookService {
@@ -65,6 +65,6 @@ export class FacebookService {
   }
 
   private hashData(data: string) {
-    return crypto.createHash('sha256').update(data).digest('hex');
+    return SHA256(data).toString();
   }
 }
