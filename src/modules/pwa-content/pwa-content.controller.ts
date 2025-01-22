@@ -148,6 +148,17 @@ export class PWAContentController {
       }
     }
 
+    if (createPWAContentDto.customModal) {
+      await Promise.all([
+        translateFields(createPWAContentDto.customModal.content, 'content'),
+        translateFields(
+          createPWAContentDto.customModal.buttonText,
+          'buttonText',
+        ),
+        translateFields(createPWAContentDto.customModal.title, 'title'),
+      ]);
+    }
+
     return this.pwaContentService.create(createPWAContentDto, userId);
   }
 

@@ -36,6 +36,24 @@ export class PixelDto {
   events: PixelEventDto[];
 }
 
+export class CustomModalDto {
+  @IsOptional()
+  @IsBoolean()
+  showAppHeader: boolean;
+
+  @IsOptional()
+  @IsObject()
+  title?: Map<deepl.TargetLanguageCode, string>;
+
+  @IsOptional()
+  @IsBoolean()
+  content?: Map<deepl.TargetLanguageCode, string>;
+
+  @IsOptional()
+  @IsBoolean()
+  buttonText?: Map<deepl.TargetLanguageCode, string>;
+}
+
 export class ThemeDto {
   @IsOptional()
   @IsBoolean()
@@ -200,6 +218,11 @@ export class CreatePWAContentDto {
   @ValidateNested({ each: true })
   @Type(() => PixelDto)
   pixel?: PixelDto[];
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => CustomModalDto)
+  customModal?: CustomModalDto;
 
   @IsOptional()
   @ValidateNested()

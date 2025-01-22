@@ -66,5 +66,6 @@
   "dataNotEncrypted": "Data is not encrypted.",
   "dataCanNotBeDeleted": "Data cannot be deleted.",
   "noPaidContent": "No paid content.",
-  "noAds": "No ads."
+  "noAds": "No ads.",
+  "recommended": "Recommended by"
 }

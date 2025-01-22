@@ -124,6 +124,22 @@ export class PWAContent extends Document {
     auto?: boolean;
     dark?: boolean;
   };
+
+  @Prop({
+    type: {
+      showAppHeader: { type: Boolean, required: false },
+      title: { type: Map, of: String, required: false },
+      content: { type: Map, of: String, required: false },
+      buttonText: { type: Map, of: String, required: false },
+    },
+    required: false,
+  })
+  customModal?: {
+    showAppHeader?: boolean;
+    title?: Map<string, string>;
+    content?: Map<string, string>;
+    buttonText?: Map<string, string>;
+  };
 }
 
 export const PWAContentSchema = SchemaFactory.createForClass(PWAContent);
