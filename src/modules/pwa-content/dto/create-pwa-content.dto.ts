@@ -46,11 +46,11 @@ export class CustomModalDto {
   title?: Map<deepl.TargetLanguageCode, string>;
 
   @IsOptional()
-  @IsBoolean()
+  @IsObject()
   content?: Map<deepl.TargetLanguageCode, string>;
 
   @IsOptional()
-  @IsBoolean()
+  @IsObject()
   buttonText?: Map<deepl.TargetLanguageCode, string>;
 }
 
