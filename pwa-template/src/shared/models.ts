@@ -55,4 +55,10 @@ export interface PwaContent {
   pixel?: [Pixel];
   theme?: { dark: boolean; auto: boolean };
   keepActualDateOfReviews?: boolean;
+  customModal?: {
+    showAppHeader: boolean;
+    title: string;
+    content: string;
+    buttonText: string;
+  };
 }
