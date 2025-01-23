@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -17,7 +17,7 @@
 }
 
 body {
-  font-family: "Roboto", sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 :where(.css-dev-only-do-not-override-1htoz2s).ant-modal .ant-modal-close {
@@ -31,12 +31,12 @@ body {
 
 :where(.css-dev-only-do-not-override-1htoz2s).ant-modal.dark-theme
   .ant-modal-content {
-  background-color: #303030;
-  color: #ffffff;
-  border-color: #303030;
+  background-color: #303030 !important;
+  color: #ffffff !important;
+  border-color: #303030 !important;
 }
 
 :where(.css-dev-only-do-not-override-1htoz2s).ant-modal.dark-theme
   .ant-modal-close {
-  color: #aaaaaa;
+  color: #aaaaaa !important;
 }
