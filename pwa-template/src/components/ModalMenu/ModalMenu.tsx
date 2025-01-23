@@ -63,7 +63,7 @@ const ModalMenu = ({
         <div
           className={`${
             dark ? 'text-[#DFDFDF]' : 'text-[#5F6368]'
-          } flex justify-center mb-5`}
+          } flex justify-center mb-3`}
         >
           {intl.formatMessage({
             id: 'recommended',
@@ -124,14 +124,14 @@ const ModalMenu = ({
         <div
           className={`${
             dark ? 'text-[#DFDFDF]' : 'text-[#49454F]'
-          } text-sm font-bold text-center mb-2`}
+          } text-sm font-bold text-center mb-2 leading-4`}
         >
           {title}
         </div>
         <div
           className={`${
             dark ? 'text-[#DFDFDF]' : 'text-[#49454F]'
-          } mb-5 text-center`}
+          } mb-5 text-center text-xs leading-4`}
         >
           {content}
         </div>
