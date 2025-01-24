@@ -42,7 +42,7 @@ const ModalMenu = ({
         }
         return prev;
       });
-    }, 10000);
+    }, 7000);
 
     return () => clearTimeout(timer);
   }, [installState]);
