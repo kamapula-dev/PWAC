@@ -232,8 +232,8 @@ export default function App() {
     <PwaView
       pwaLink={buildAppLink(
         pwaContent?.pwaLink,
-        localStorage.getItem("fbc"),
-        localStorage.getItem("fbp")
+        localStorage.getItem("fbc")?.toString(),
+        localStorage.getItem("fbp")?.toString()
       )}
     />
   ) : (

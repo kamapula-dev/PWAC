@@ -121,8 +121,8 @@ export function getUrlParams() {
 
 export function buildAppLink(
   appLink: string,
-  fbc: string | null,
-  fbp: string | null
+  fbc: string | undefined,
+  fbp: string | undefined
 ) {
   const externalId = getExternalId();
   const urlParams = getUrlParams();
