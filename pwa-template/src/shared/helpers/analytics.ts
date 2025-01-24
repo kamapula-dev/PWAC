@@ -122,6 +122,9 @@ export function getUrlParams() {
 export function buildAppLink(appLink: string) {
   const externalId = getExternalId();
   const urlParams = getUrlParams();
+  const fbc = Cookies.get('_fbc');
+  const fbp = Cookies.get('_fbp');
+  const domain = window.location.hostname;
 
   const url = new URL(appLink, window.location.origin);
 
@@ -140,6 +143,48 @@ export function buildAppLink(appLink: string) {
           .replace(/'\{external_id\}'/g, externalId)
           .replace(/`\{external_id\}`/g, externalId),
       );
+    } else if (
+      value.includes('{domain}') ||
+      value.includes('"{domain}"') ||
+      value.includes("'{domain}'") ||
+      value.includes('`{domain}`')
+    ) {
+      url.searchParams.set(
+        key,
+        value
+          .replace(/\{domain\}/g, domain)
+          .replace(/"\{domain\}"/g, domain)
+          .replace(/'\{domain\}'/g, domain)
+          .replace(/`\{domain\}`/g, domain),
+      );
+    } else if (
+      value.includes('{fbp}') ||
+      value.includes('"{fbp}"') ||
+      value.includes("'{fbp}'") ||
+      value.includes('`{fbp}`')
+    ) {
+      url.searchParams.set(
+        key,
+        value
+          .replace(/\{fbp\}/g, fbp || '')
+          .replace(/"\{fbp\}"/g, fbp || '')
+          .replace(/'\{fbp\}'/g, fbp || '')
+          .replace(/`\{fbp\}`/g, fbp || ''),
+      );
+    } else if (
+      value.includes('{fbc}') ||
+      value.includes('"{fbc}"') ||
+      value.includes("'{fbc}'") ||
+      value.includes('`{fbc}`')
+    ) {
+      url.searchParams.set(
+        key,
+        value
+          .replace(/\{fbc\}/g, fbc || '')
+          .replace(/"\{fbc\}"/g, fbc || '')
+          .replace(/'\{fbc\}'/g, fbc || '')
+          .replace(/`\{fbc\}`/g, fbc || ''),
+      );
     }
   }
 
@@ -154,6 +199,7 @@ export function buildAppLink(appLink: string) {
 
   return url.toString();
 }
+
 export async function trackExternalId(pwaId: string) {
   const externalId = getExternalId();
 
