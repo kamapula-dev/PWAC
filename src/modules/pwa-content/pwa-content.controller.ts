@@ -58,33 +58,43 @@ export class PWAContentController {
   ): Promise<PWAContent> {
     const userId = req.user._id;
     const { languages, appIcon } = createPWAContentDto;
-    const actualLanguages = languages.includes('all')
-      ? ([
-          'en-US',
-          'DE',
-          'FR',
-          'ES',
-          'IT',
-          'PT-BR',
-          'NL',
-          'SV',
-          'DA',
-          'FI',
-          'PL',
-          'ZH-HANS',
-          'JA',
-          'ET',
-          'LT',
-          'SL',
-          'BG',
-          'SK',
-          'RO',
-          'EL',
-          'HU',
-          'CS',
-          'AR',
+    const actualLanguages: deepl.TargetLanguageCode[] = languages.includes(
+      'all',
+    )
+      ? [
+          'ar',
+          'bg',
+          'cs',
+          'da',
+          'de',
+          'el',
+          'es',
+          'et',
+          'fi',
+          'fr',
+          'hu',
+          'id',
+          'it',
+          'ja',
+          'ko',
+          'lt',
+          'lv',
+          'nb',
+          'nl',
+          'pl',
+          'ro',
           'ru',
-        ] as deepl.TargetLanguageCode[])
+          'sk',
+          'sl',
+          'sv',
+          'tr',
+          'uk',
+          'zh',
+          'en-GB',
+          'en-US',
+          'pt-BR',
+          'pt-PT',
+        ]
       : (languages as deepl.TargetLanguageCode[]);
 
     const allowedFormats = ['.png', '.jpeg', '.jpg', '.svg', '.webp'];
@@ -112,20 +122,22 @@ export class PWAContentController {
     createPWAContentDto.appIcon = validAppIcon;
 
     const translateFields = async (
-      field: Map<deepl.TargetLanguageCode, string> | undefined,
+      field: Map<deepl.LanguageCode, string> | undefined,
       fieldName: string,
     ) => {
       if (field) {
         const initialText = Object.values(field)[0];
         await Promise.all(
           actualLanguages.map(async (lang) => {
-            const translatedText = (await this.translator.translateText(
+            const translatedText = await this.translator.translateText(
               initialText,
               null,
               lang,
-            )) as deepl.TextResult;
+            );
             const languageKey = lang.split('-')[0];
-            field[languageKey] = translatedText.text;
+            field[languageKey] = Array.isArray(translatedText)
+              ? translatedText[0].text
+              : translatedText.text;
           }),
         );
       } else {
