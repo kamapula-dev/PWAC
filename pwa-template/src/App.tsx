@@ -16,8 +16,12 @@ import {
 } from './shared/helpers/analytics.ts';
 import ModalMenu from './components/ModalMenu/ModalMenu.tsx';
 import Cookies from 'js-cookie';
-import { useDispatch } from 'react-redux';
-import { setInstallState } from './Redux/feat/InstallSlice.tsx';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  getInstallState,
+  setInstallState,
+} from './Redux/feat/InstallSlice.tsx';
+import { RootState } from './Redux/store/store.tsx';
 
 declare const window: any;
 
@@ -34,25 +38,39 @@ export default function App() {
   const [dark, setDark] = useState(false);
   const [installPrompt, setInstallPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
+  const installState = useSelector((state: RootState) =>
+    getInstallState(state.install),
+  );
 
   const dispatch = useDispatch();
 
-  const checkPWAInstallation = async () => {
-    if ('getInstalledRelatedApps' in navigator) {
-      try {
-        const relatedApps = await (navigator as any).getInstalledRelatedApps();
-        if (relatedApps.length > 0) {
-          dispatch(setInstallState(PWAInstallState.installed));
-        }
-      } catch (error) {
-        console.error('Error checking related apps', error);
-      }
-    }
-  };
-
   useEffect(() => {
-    checkPWAInstallation();
-  }, [navigator]);
+    let interval: NodeJS.Timeout;
+    const checkPWAInstallation = async () => {
+      if ('getInstalledRelatedApps' in navigator) {
+        try {
+          const relatedApps = await (
+            navigator as any
+          ).getInstalledRelatedApps();
+          if (relatedApps.length > 0) {
+            dispatch(setInstallState(PWAInstallState.installed));
+            clearInterval(interval);
+          }
+        } catch (error) {
+          console.error('Error checking related apps', error);
+        }
+      }
+    };
+    if (installState === PWAInstallState.installing) {
+      interval = setInterval(() => {
+        checkPWAInstallation();
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [installState, dispatch]);
 
   useEffect(() => {
     window.addEventListener(
