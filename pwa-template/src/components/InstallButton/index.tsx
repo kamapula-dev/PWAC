@@ -60,7 +60,7 @@ const InstallButton: React.FC<Props> = ({
         console.log("User accepted installation");
         setTimeout(() => {
           dispatch(setInstallState(PWAInstallState.installed));
-        }, 8000);
+        }, 20000);
 
         if (window.fbq) {
           if (pixel?.length) {

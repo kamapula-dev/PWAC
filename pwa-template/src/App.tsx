@@ -5,7 +5,7 @@ import AboutView from "./components/AboutView";
 import PwaView from "./components/PwaView";
 import ReviewsView from "./components/ReviewsView";
 import axios from "axios";
-import { PwaContent } from "./shared/models";
+import { PwaContent, PWAInstallState } from "./shared/models";
 import playMarket from "./shared/icons/playMarketIcon.svg";
 import Menu from "./components/Menu/Menu";
 import {
@@ -16,6 +16,8 @@ import {
 } from "./shared/helpers/analytics.ts";
 import ModalMenu from "./components/ModalMenu/ModalMenu.tsx";
 import Cookies from "js-cookie";
+import { useDispatch } from "react-redux";
+import { setInstallState } from "./Redux/feat/InstallSlice.tsx";
 
 declare const window: any;
 
@@ -32,6 +34,19 @@ export default function App() {
   const [dark, setDark] = useState(false);
   const [installPrompt, setInstallPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    window.addEventListener("appinstalled", () => {
+      dispatch(setInstallState(PWAInstallState.installed));
+    });
+    return () => {
+      window.removeEventListener("appinstalled", () => {
+        console.log("Thank you for installing our app!");
+      });
+    };
+  }, []);
 
   useEffect(() => {
     window.addEventListener(
