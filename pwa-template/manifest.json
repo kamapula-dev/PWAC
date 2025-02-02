@@ -32,7 +32,7 @@
   "related_applications": [
     {
       "platform": "webapp",
-      "url": "https://plinkoplinkowinwin.com/manifest.json"
+      "url": "https://plinkoplinkowinwin.com/manifest.webmanifest"
     }
   ],
   "prefer_related_applications": false
