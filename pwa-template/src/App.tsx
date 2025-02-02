@@ -48,13 +48,11 @@ export default function App() {
   useEffect(() => {
     let interval: NodeJS.Timeout;
     const checkPWAInstallation = async () => {
-      console.log(navigator);
       if ('getInstalledRelatedApps' in navigator) {
         try {
           const relatedApps = await (
             navigator as any
           ).getInstalledRelatedApps();
-          console.log('relatedApps', relatedApps);
           if (relatedApps.length > 0) {
             dispatch(setInstallState(PWAInstallState.installed));
             clearInterval(interval);
@@ -65,9 +63,11 @@ export default function App() {
       }
     };
 
-    interval = setInterval(() => {
-      checkPWAInstallation();
-    }, 1000);
+    if (installState === PWAInstallState.installing) {
+      interval = setInterval(() => {
+        checkPWAInstallation();
+      }, 1000);
+    }
 
     return () => {
       clearInterval(interval);
@@ -242,7 +242,7 @@ export default function App() {
         window.location.href,
       )};end`;
 
-      window.location.replace(intentUrl);
+      window.location.href = intentUrl;
     }
   }, []);
 

@@ -4,7 +4,6 @@ import EnglishMessages from './Locales/English.json';
 
 const LocaleProvider = ({ children }: { children: React.ReactNode }) => {
   const userLocale = new Intl.DateTimeFormat().resolvedOptions().locale;
-  alert(userLocale);
   const [messages, setMessages] = useState<{
     [key: string]: typeof EnglishMessages;
   }>({
