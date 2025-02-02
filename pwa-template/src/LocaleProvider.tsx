@@ -3,7 +3,7 @@ import { IntlProvider } from 'react-intl';
 import EnglishMessages from './Locales/English.json';
 
 const LocaleProvider = ({ children }: { children: React.ReactNode }) => {
-  const userLocale = new Intl.DateTimeFormat().resolvedOptions().locale || 'en';
+  const userLocale = new Intl.Locale(navigator.language).language || 'en';
   const [messages, setMessages] = useState<{
     [key: string]: typeof EnglishMessages;
   }>({
@@ -31,7 +31,7 @@ const LocaleProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     fetchMessages();
-  }, [userLocale]);
+  }, []);
 
   return (
     <IntlProvider
