@@ -111,7 +111,7 @@ export default function App() {
           }/trusted`,
         );
 
-        const language = navigator.language.split('-')[0];
+        const language = new Intl.Locale(navigator.language).language || 'en';
 
         const pwaContent = {
           ...response.data,
