@@ -235,7 +235,7 @@ export default function App() {
 
     setIsPWAActive(isPWAActivated);
 
-    if (inapp.browser === 'Facebook' || inapp.isInApp) {
+    if (inapp.browser === 'Facebook') {
       const intentUrl = `intent://${window.location.hostname}${
         window.location.pathname
       }${
