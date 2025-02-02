@@ -9,7 +9,6 @@ const LocaleProvider = ({ children }: { children: React.ReactNode }) => {
   }>({
     en: EnglishMessages,
   });
-  const [languageIsLoaded, setLanguageIsLoaded] = useState(false);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -23,11 +22,9 @@ const LocaleProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         const data = await response.json();
-        setMessages((prevMessages) => ({
-          ...prevMessages,
+        setMessages({
           [userLocale]: data,
-        }));
-        setLanguageIsLoaded(true);
+        });
       } catch (error) {
         console.error('Error fetching translations:', error);
       }
@@ -38,8 +35,8 @@ const LocaleProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <IntlProvider
-      locale={languageIsLoaded ? userLocale : 'en'}
-      messages={messages[userLocale]}
+      locale={messages[userLocale] ? userLocale : 'en'}
+      messages={messages[userLocale] || messages['en']}
       defaultLocale="en"
     >
       {children}
