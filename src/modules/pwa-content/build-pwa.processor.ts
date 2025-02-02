@@ -6,11 +6,13 @@ import { exec } from 'child_process';
 import axios from 'axios';
 import { MediaService } from '../media/media.service';
 import { UserService } from '../user/user.service';
-import { Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { DomainMappingService } from '../domain-mapping/domain-mapping.service';
 import { PwaStatus } from '../../schemas/user.schema';
 import { PWAEventLogService } from '../pwa-event-log/pwa-event-log.service';
 import { PWAExternalMappingService } from '../pwa-external-mapping/pwa-external-mapping.service';
+import { DomainManagementService } from '../domain-managemant/domain-management.service';
+import { ReadyDomainService } from '../ready-domain/ready-domain.service';
 
 @Processor('buildPWA')
 export class BuildPWAProcessor {
@@ -20,11 +22,24 @@ export class BuildPWAProcessor {
     private readonly domainMappingService: DomainMappingService,
     private readonly pwaEventLogService: PWAEventLogService,
     private readonly pwaExternalMappingService: PWAExternalMappingService,
+    private readonly domainManagementService: DomainManagementService,
+    private readonly readyDomainService: ReadyDomainService,
   ) {}
 
   @Process()
   async handleBuildPWAJob(job: Job) {
-    const { pwaContentId, appIcon, userId, domain, pwaName, pixel } = job.data;
+    const {
+      pwaContentId,
+      appIcon,
+      userId,
+      domain,
+      deploy,
+      gApiKey,
+      email,
+      readyDomainId,
+      pwaName,
+      pixel,
+    } = job.data;
 
     try {
       Logger.log(
@@ -65,6 +80,30 @@ export class BuildPWAProcessor {
         Logger.log(
           `Default icon copied from ${assetsIconPath} to ${destinationIconPath}`,
         );
+
+        const wellKnownFolder = path.join(publicFolderPath, '.well-known');
+        const assetLinksPath = path.join(wellKnownFolder, 'assetlinks.json');
+
+        try {
+          fs.mkdirSync(wellKnownFolder, { recursive: true });
+          const assetLinksContent = [
+            {
+              relation: ['delegate_permission/common.handle_all_urls'],
+              target: {
+                namespace: 'web',
+                site: `https://${domain}/`,
+              },
+            },
+          ];
+          fs.writeFileSync(
+            assetLinksPath,
+            JSON.stringify(assetLinksContent, null, 2),
+          );
+          Logger.log(`assetlinks.json created at ${assetLinksPath}`);
+        } catch (error) {
+          Logger.error('Error creating assetlinks.json:', error);
+          throw new Error('Failed to create assetlinks.json');
+        }
       } catch (error) {
         Logger.error(
           'Error creating public folder or copying default icon:',
@@ -94,6 +133,13 @@ export class BuildPWAProcessor {
           manifestData.name = pwaName;
           manifestData.short_name = pwaName;
         }
+
+        manifestData.related_applications = [
+          {
+            platform: 'webapp',
+            url: `https://${domain}/manifest.webmanifest`,
+          },
+        ];
 
         fs.writeFileSync(
           manifestPath,
@@ -240,28 +286,8 @@ export class BuildPWAProcessor {
       let archiveKey: string;
 
       Logger.log('Checking for existing PWA...');
+
       const user = await this.userService.findById(userId);
-      const existingPwa = user.pwas.find(
-        (p) => p.pwaContentId === pwaContentId,
-      );
-
-      // only for test mode, not reproducible in the live application
-      if (existingPwa) {
-        try {
-          if (existingPwa.archiveKey) {
-            await this.mediaService.deleteArchive(existingPwa.archiveKey);
-          }
-
-          await this.userService.deleteUserPwaByContentId(
-            userId,
-            existingPwa.pwaContentId,
-          );
-          Logger.log(`Old archive deleted for PWA-content ID: ${pwaContentId}`);
-        } catch (error) {
-          Logger.error('Error deleting old archive from S3:', error);
-          throw new Error('Error deleting old archive from S3');
-        }
-      }
 
       Logger.log('Uploading dist folder to S3...');
 
@@ -275,7 +301,44 @@ export class BuildPWAProcessor {
         throw new Error('Error during upload to S3');
       }
 
-      if (domain) {
+      try {
+        fs.rmSync(tempBuildFolder, { recursive: true, force: true });
+      } catch (error) {
+        Logger.error(`Error deleting temporary folder:`, error);
+        throw error;
+      }
+
+      if (deploy) {
+        await this.userService.addPwa(userId, {
+          createdAt: new Date(),
+          pwaContentId,
+          archiveKey,
+          status: PwaStatus.BUILDED,
+        });
+
+        if (readyDomainId) {
+          await this.readyDomainService.attachToPwa(
+            readyDomainId,
+            pwaContentId,
+            userId,
+          );
+        } else {
+          if (!(email && gApiKey && domain)) {
+            throw new HttpException(
+              'Missing required parameters',
+              HttpStatus.BAD_REQUEST,
+            );
+          }
+
+          await this.domainManagementService.addDomain(
+            email,
+            gApiKey,
+            domain,
+            pwaContentId,
+            userId,
+          );
+        }
+      } else {
         const existingUserPwaForDomain = user.pwas.find(
           (p) => p.domainName === domain,
         );
@@ -310,20 +373,6 @@ export class BuildPWAProcessor {
             ),
           ]);
         }
-      } else {
-        await this.userService.addPwa(userId, {
-          createdAt: new Date(),
-          pwaContentId,
-          archiveKey,
-          status: PwaStatus.BUILDED,
-        });
-      }
-
-      try {
-        fs.rmSync(tempBuildFolder, { recursive: true, force: true });
-      } catch (error) {
-        Logger.error(`Error deleting temporary folder:`, error);
-        throw error;
       }
 
       Logger.log(
@@ -331,7 +380,36 @@ export class BuildPWAProcessor {
       );
       return true;
     } catch (e) {
-      if (domain) {
+      if (deploy) {
+        await this.userService.addPwa(userId, {
+          createdAt: new Date(),
+          pwaContentId,
+          status: PwaStatus.BUILD_FAILED,
+        });
+
+        if (readyDomainId) {
+          await this.readyDomainService.attachToPwa(
+            readyDomainId,
+            pwaContentId,
+            userId,
+          );
+        } else {
+          if (!(email && gApiKey && domain)) {
+            throw new HttpException(
+              'Missing required parameters',
+              HttpStatus.BAD_REQUEST,
+            );
+          }
+
+          await this.domainManagementService.addDomain(
+            email,
+            gApiKey,
+            domain,
+            pwaContentId,
+            userId,
+          );
+        }
+      } else {
         const user = await this.userService.findById(userId);
         const existingUserPwaForDomain = user.pwas.find(
           (p) => p.domainName === domain,
@@ -368,13 +446,8 @@ export class BuildPWAProcessor {
         }
       }
 
-      await this.userService.addPwa(userId, {
-        createdAt: new Date(),
-        pwaContentId,
-        status: PwaStatus.BUILD_FAILED,
-      });
-
       await job.moveToFailed(new Error(e), true);
+
       throw e;
     }
   }

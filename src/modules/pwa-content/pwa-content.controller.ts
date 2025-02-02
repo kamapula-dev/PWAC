@@ -1,17 +1,17 @@
 import {
-  Controller,
-  Get,
-  Post,
+  BadRequestException,
   Body,
-  Param,
+  Controller,
   Delete,
-  UseGuards,
-  Request,
-  Res,
+  Get,
   Logger,
   NotFoundException,
+  Param,
   Patch,
-  BadRequestException,
+  Post,
+  Request,
+  Res,
+  UseGuards,
 } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { PWAContentService } from './pwa-content.service';
@@ -118,8 +118,7 @@ export class PWAContentController {
       return cleanIcon;
     };
 
-    const validAppIcon = processAppIcon(appIcon);
-    createPWAContentDto.appIcon = validAppIcon;
+    createPWAContentDto.appIcon = processAppIcon(appIcon);
 
     const translateFields = async (
       field: Map<deepl.LanguageCode, string> | undefined,
@@ -282,42 +281,22 @@ export class PWAContentController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Post(':id/copy')
-  async copyPWAContent(
-    @Param('id') id: string,
-    @Request() req,
-  ): Promise<PWAContent> {
-    const userId = req.user._id;
-
-    const originalPWAContent = await this.pwaContentService.findOne(id, userId);
-
-    if (!originalPWAContent) {
-      throw new NotFoundException('Original PWA Content not found');
-    }
-
-    const copiedPWAContentDto = {
-      ...originalPWAContent.toObject(),
-      appName: `${originalPWAContent.appName} - Copy`,
-    };
-
-    delete copiedPWAContentDto._id;
-    delete copiedPWAContentDto.createdAt;
-    delete copiedPWAContentDto.updatedAt;
-
-    return this.pwaContentService.create(copiedPWAContentDto, userId);
-  }
-
-  @UseGuards(AuthGuard('jwt'))
-  @Post(':id/build')
-  async buildPWA(
+  @Post(':id/buildAndDeploy')
+  async buildAndDeploy(
     @Body()
     body: {
-      domain?: string;
+      deploy: boolean;
+      domain: string;
+      email?: string;
+      gApiKey?: string;
+      readyDomainId?: string;
     },
     @Param('id') id: string,
     @Request() req,
     @Res() res,
   ): Promise<void> {
+    const { deploy, email, gApiKey, domain, readyDomainId } = body;
+
     try {
       const userId = req.user._id;
       const pwaContent = await this.pwaContentService.findOne(id, userId);
@@ -332,7 +311,11 @@ export class PWAContentController {
         appIcon: pwaContent.appIcon,
         pwaContentId: id,
         userId,
-        domain: body?.domain,
+        domain: domain,
+        deploy: deploy,
+        email: email,
+        gApiKey: gApiKey,
+        readyDomainId: readyDomainId,
         pwaName: pwaContent.appName,
         ...(pwaContent?.pixel && { pixel: pwaContent.pixel }),
       });
