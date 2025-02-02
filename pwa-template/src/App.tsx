@@ -24,6 +24,7 @@ import {
 import { RootState } from './Redux/store/store.tsx';
 
 declare const window: any;
+declare const FB_IAB: any;
 
 export interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -228,7 +229,11 @@ export default function App() {
 
     setIsPWAActive(isPWAActivated);
 
-    if (/FBA[NV]/.test(navigator.userAgent)) {
+    if (
+      navigator.userAgent.match(/FBAN|FBAV/i) ||
+      typeof FB_IAB !== 'undefined' ||
+      document.documentElement.classList.contains('in-app-browser')
+    ) {
       const intentUrl = `intent://${window.location.hostname}${
         window.location.pathname
       }${
@@ -237,7 +242,7 @@ export default function App() {
         window.location.href,
       )};end`;
 
-      window.location.href = intentUrl;
+      window.location.replace(intentUrl);
     }
   }, []);
 
