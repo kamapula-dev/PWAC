@@ -47,11 +47,13 @@ export default function App() {
   useEffect(() => {
     let interval: NodeJS.Timeout;
     const checkPWAInstallation = async () => {
+      console.log(navigator);
       if ('getInstalledRelatedApps' in navigator) {
         try {
           const relatedApps = await (
             navigator as any
           ).getInstalledRelatedApps();
+          console.log('relatedApps', relatedApps);
           if (relatedApps.length > 0) {
             dispatch(setInstallState(PWAInstallState.installed));
             clearInterval(interval);
