@@ -1,19 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { IntlProvider } from "react-intl";
-import EnglishMessages from "./Locales/English.json";
+import React, { useEffect, useState } from 'react';
+import { IntlProvider } from 'react-intl';
+import EnglishMessages from './Locales/English.json';
 
 const LocaleProvider = ({ children }: { children: React.ReactNode }) => {
-  const userLocale = navigator.language.split("-")[0] || "en";
+  const userLocale = navigator.language.split('-')[0] || 'en';
   const [messages, setMessages] = useState<{
     [key: string]: typeof EnglishMessages;
   }>({
     en: EnglishMessages,
   });
+  alert(userLocale);
 
   useEffect(() => {
     const fetchMessages = async () => {
       const response = await fetch(
-        `https://pwac.world/languages/${userLocale}`
+        `https://pwac.world/languages/${userLocale}`,
       );
       const data = await response.json();
       setMessages((prevMessages) => ({
