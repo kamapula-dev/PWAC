@@ -353,9 +353,19 @@ export class PWAContentController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Get('status/:jobId')
-  async checkBuildStatus(@Param('jobId') jobId: string): Promise<any> {
-    const job = await this.buildQueue.getJob(jobId);
+  @Get('status/:pwaContentId')
+  async checkBuildStatusByPwaContentId(
+    @Param('pwaContentId') pwaContentId: string,
+  ): Promise<any> {
+    const jobs = await this.buildQueue.getJobs([
+      'waiting',
+      'active',
+      'delayed',
+      'completed',
+      'failed',
+    ]);
+
+    const job = jobs.find((j) => j.data.pwaContentId === pwaContentId);
 
     if (!job) {
       return { status: 'error', message: 'Job not found' };
