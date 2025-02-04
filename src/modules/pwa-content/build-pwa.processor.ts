@@ -1,7 +1,8 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Job } from 'bull';
-import * as fs from 'fs';
+import * as fs from 'fs/promises';
 import * as path from 'path';
+import { createWriteStream } from 'fs';
 import { exec } from 'child_process';
 import axios from 'axios';
 import { MediaService } from '../media/media.service';
@@ -25,6 +26,22 @@ export class BuildPWAProcessor {
     private readonly domainManagementService: DomainManagementService,
     private readonly readyDomainService: ReadyDomainService,
   ) {}
+
+  private async copyDir(src: string, dest: string): Promise<void> {
+    const entries = await fs.readdir(src, { withFileTypes: true });
+    await fs.mkdir(dest, { recursive: true });
+
+    for (const entry of entries) {
+      const srcPath = path.join(src, entry.name);
+      const destPath = path.join(dest, entry.name);
+
+      if (entry.isDirectory()) {
+        await this.copyDir(srcPath, destPath);
+      } else {
+        await fs.copyFile(srcPath, destPath);
+      }
+    }
+  }
 
   @Process()
   async handleBuildPWAJob(job: Job) {
@@ -51,32 +68,30 @@ export class BuildPWAProcessor {
       const tempBuildFolder = path.join(projectRoot, pwaContentId);
 
       try {
-        fs.mkdirSync(tempBuildFolder, { recursive: true });
-        fs.cpSync(templatePath, tempBuildFolder, { recursive: true });
+        await fs.mkdir(tempBuildFolder, { recursive: true });
+        await this.copyDir(templatePath, tempBuildFolder);
 
         const envFilePath = path.join(tempBuildFolder, '.env');
         const envContent = `
           VITE_PWA_CONTENT_ID=${pwaContentId}
           VITE_API_URL=https://pwac.world
         `;
-        fs.writeFileSync(envFilePath, envContent);
+        await fs.writeFile(envFilePath, envContent);
         Logger.log(`.env file created at ${envFilePath}`);
       } catch (error) {
         Logger.error('Error during folder creation or file copying:', error);
         throw new Error('Failed to prepare build environment');
       }
 
-      // Create the 'public' directory before downloading the icon
       const publicFolderPath = path.join(tempBuildFolder, 'public');
 
       try {
-        fs.mkdirSync(publicFolderPath, { recursive: true });
+        await fs.mkdir(publicFolderPath, { recursive: true });
         Logger.log(`Public folder created at ${publicFolderPath}`);
 
-        // Copy the default icon from assets to public
         const assetsIconPath = path.join(templatePath, 'assets', '18.png');
         const destinationIconPath = path.join(publicFolderPath, '18.png');
-        fs.copyFileSync(assetsIconPath, destinationIconPath);
+        await fs.copyFile(assetsIconPath, destinationIconPath);
         Logger.log(
           `Default icon copied from ${assetsIconPath} to ${destinationIconPath}`,
         );
@@ -85,7 +100,7 @@ export class BuildPWAProcessor {
         const assetLinksPath = path.join(wellKnownFolder, 'assetlinks.json');
 
         try {
-          fs.mkdirSync(wellKnownFolder, { recursive: true });
+          await fs.mkdir(wellKnownFolder, { recursive: true });
           const assetLinksContent = [
             {
               relation: ['delegate_permission/common.handle_all_urls'],
@@ -95,7 +110,7 @@ export class BuildPWAProcessor {
               },
             },
           ];
-          fs.writeFileSync(
+          await fs.writeFile(
             assetLinksPath,
             JSON.stringify(assetLinksContent, null, 2),
           );
@@ -126,7 +141,7 @@ export class BuildPWAProcessor {
 
       try {
         const manifestPath = path.join(tempBuildFolder, 'manifest.json');
-        const rawManifest = fs.readFileSync(manifestPath, 'utf-8');
+        const rawManifest = await fs.readFile(manifestPath, 'utf-8');
         const manifestData = JSON.parse(rawManifest);
 
         if (pwaName) {
@@ -141,7 +156,7 @@ export class BuildPWAProcessor {
           },
         ];
 
-        fs.writeFileSync(
+        await fs.writeFile(
           manifestPath,
           JSON.stringify(manifestData, null, 2),
           'utf-8',
@@ -155,12 +170,12 @@ export class BuildPWAProcessor {
       const indexPath = path.join(tempBuildFolder, 'index.html');
 
       try {
-        const indexHtml = fs.readFileSync(indexPath, 'utf-8');
+        const indexHtml = await fs.readFile(indexPath, 'utf-8');
         const updatedIndexHtml = indexHtml.replace(
           /<title>.*<\/title>/,
           `<title>${pwaName}</title>`,
         );
-        fs.writeFileSync(indexPath, updatedIndexHtml, 'utf-8');
+        await fs.writeFile(indexPath, updatedIndexHtml, 'utf-8');
         Logger.log(`Title in index.html updated to: ${pwaName}`);
       } catch (error) {
         Logger.error('Error updating title in index.html:', error);
@@ -168,7 +183,7 @@ export class BuildPWAProcessor {
       }
 
       try {
-        const indexHtml = fs.readFileSync(indexPath, 'utf-8');
+        const indexHtml = await fs.readFile(indexPath, 'utf-8');
         const pixelArrayString = JSON.stringify(pixel || []);
 
         const pixelScript = pixel?.length
@@ -248,7 +263,7 @@ export class BuildPWAProcessor {
           `${pixelScript}</head>`,
         );
 
-        fs.writeFileSync(indexPath, updatedIndexHtml, 'utf-8');
+        await fs.writeFile(indexPath, updatedIndexHtml, 'utf-8');
 
         if (pixel?.length) {
           Logger.log(
@@ -302,7 +317,7 @@ export class BuildPWAProcessor {
       }
 
       try {
-        fs.rmSync(tempBuildFolder, { recursive: true, force: true });
+        await fs.rm(tempBuildFolder, { recursive: true, force: true });
       } catch (error) {
         Logger.error(`Error deleting temporary folder:`, error);
         throw error;
@@ -453,7 +468,7 @@ export class BuildPWAProcessor {
   }
 
   private async downloadImage(url: string, filePath: string): Promise<void> {
-    const writer = fs.createWriteStream(filePath);
+    const writer = createWriteStream(filePath);
     const response = await axios({
       url,
       method: 'GET',
