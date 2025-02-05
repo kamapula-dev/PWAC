@@ -120,7 +120,7 @@ export default function App() {
           }/trusted`,
         );
 
-        const language = new Intl.Locale(navigator.language).baseName || 'en';
+        const language = navigator.languages[0] || navigator.language || 'en';
 
         const pwaContent = {
           ...response.data,
