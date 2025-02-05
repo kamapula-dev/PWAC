@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { IntlProvider } from "react-intl";
-import EnglishMessages from "./Locales/English.json";
+import React, { useEffect, useState } from 'react';
+import { IntlProvider } from 'react-intl';
+import EnglishMessages from './Locales/English.json';
 
 const LocaleProvider = ({ children }: { children: React.ReactNode }) => {
-  const userLocale = new Intl.DateTimeFormat().resolvedOptions().locale || "en";
+  const userLocale = new Intl.Locale(navigator.language).baseName || 'en';
   const [messages, setMessages] = useState<{
     [key: string]: typeof EnglishMessages;
   }>({
@@ -14,7 +14,7 @@ const LocaleProvider = ({ children }: { children: React.ReactNode }) => {
     const fetchMessages = async () => {
       try {
         const response = await fetch(
-          `https://pwac.world/languages/${userLocale}`
+          `https://pwac.world/languages/${userLocale}`,
         );
 
         if (!response.ok) {
@@ -26,7 +26,7 @@ const LocaleProvider = ({ children }: { children: React.ReactNode }) => {
           [userLocale]: data,
         });
       } catch (error) {
-        console.error("Error fetching translations:", error);
+        console.error('Error fetching translations:', error);
       }
     };
 
@@ -35,8 +35,8 @@ const LocaleProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <IntlProvider
-      locale={messages[userLocale] ? userLocale : "en"}
-      messages={messages[userLocale] || messages["en"]}
+      locale={messages[userLocale] ? userLocale : 'en'}
+      messages={messages[userLocale] || messages['en']}
       defaultLocale="en"
     >
       {children}
