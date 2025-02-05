@@ -213,6 +213,9 @@ export class CreatePWAContentDto {
   @IsString()
   version: string;
 
+  @IsBoolean()
+  simulate_install: boolean;
+
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
