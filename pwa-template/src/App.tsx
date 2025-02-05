@@ -122,6 +122,7 @@ export default function App() {
 
         const language =
           Intl.DateTimeFormat().resolvedOptions().locale ??
+          window.navigator.language ??
           navigator.language ??
           'en';
 

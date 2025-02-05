@@ -6,6 +6,7 @@ const LocaleProvider = ({ children }: { children: React.ReactNode }) => {
   const userLocale =
     Intl.DateTimeFormat().resolvedOptions().locale ??
     navigator.language ??
+    window.navigator.language ??
     'en';
   const [messages, setMessages] = useState<{
     [key: string]: typeof EnglishMessages;
