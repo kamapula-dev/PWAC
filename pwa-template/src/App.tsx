@@ -120,7 +120,10 @@ export default function App() {
           }/trusted`,
         );
 
-        const language = navigator.languages[0] || navigator.language || 'en';
+        const language =
+          Intl.DateTimeFormat().resolvedOptions().locale ??
+          navigator.language ??
+          'en';
 
         const pwaContent = {
           ...response.data,

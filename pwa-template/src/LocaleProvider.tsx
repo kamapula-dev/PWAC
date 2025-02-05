@@ -3,7 +3,10 @@ import { IntlProvider } from 'react-intl';
 import EnglishMessages from './Locales/English.json';
 
 const LocaleProvider = ({ children }: { children: React.ReactNode }) => {
-  const userLocale = navigator.languages[0] || navigator.language || 'en';
+  const userLocale =
+    Intl.DateTimeFormat().resolvedOptions().locale ??
+    navigator.language ??
+    'en';
   const [messages, setMessages] = useState<{
     [key: string]: typeof EnglishMessages;
   }>({
