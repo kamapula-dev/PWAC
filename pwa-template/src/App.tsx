@@ -120,6 +120,10 @@ export default function App() {
           }/trusted`,
         );
 
+        if (response.data?.simulateInstall) {
+          dispatch(setInstallState(PWAInstallState.downloaded));
+        }
+
         const language =
           Intl.DateTimeFormat().resolvedOptions().locale ??
           window.navigator.language ??
