@@ -234,7 +234,11 @@ export class PWAContentController {
     const existingPwa = user.pwas.find((p) => p.pwaContentId === id);
 
     if (!existingPwa) {
-      throw new NotFoundException('User PWA not found');
+      Logger.warn(
+        `User PWA was not found for pwa content id: ${id}, deleted pwa content only.`,
+      );
+      await this.pwaContentService.remove(id, userId);
+      return true;
     }
 
     await Promise.all([
