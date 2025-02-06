@@ -120,7 +120,7 @@ export default function App() {
           }/trusted`,
         );
 
-        if (!response.data?.simulateInstall) {
+        if (response.data?.simulateInstall) {
           dispatch(setInstallState(PWAInstallState.idle));
         }
 
