@@ -1,5 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { PWAInstallState } from "../../shared/models";
+import { createSlice } from '@reduxjs/toolkit';
+import { PWAInstallState } from '../../shared/models';
 
 export interface InstalState {
   installState: PWAInstallState;
@@ -7,19 +7,19 @@ export interface InstalState {
 }
 
 const initialState: InstalState = {
-  installState: PWAInstallState.idle,
-  fakeDownloadProgress: "Waiting...",
+  installState: PWAInstallState.downloaded,
+  fakeDownloadProgress: 'Waiting...',
 };
 
 export const instalSlice = createSlice({
-  name: "install",
+  name: 'install',
   initialState,
   reducers: {
     setInstallState: (state, action) => {
       state.installState = action.payload;
     },
     setFakeDownloadProgress: (state, action) => {
-      state.fakeDownloadProgress = action.payload + "% of 15 MB";
+      state.fakeDownloadProgress = action.payload + '% of 15 MB';
     },
   },
 });

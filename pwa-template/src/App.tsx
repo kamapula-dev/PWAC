@@ -121,7 +121,7 @@ export default function App() {
         );
 
         if (!response.data?.simulateInstall) {
-          dispatch(setInstallState(PWAInstallState.downloaded));
+          dispatch(setInstallState(PWAInstallState.idle));
         }
 
         const language =
