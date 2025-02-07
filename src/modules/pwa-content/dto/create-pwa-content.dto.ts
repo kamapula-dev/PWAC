@@ -24,8 +24,9 @@ export class PixelEventDto {
 }
 
 export class PixelDto {
+  @IsOptional()
   @IsString()
-  token: string;
+  token?: string;
 
   @IsString()
   pixelId: string;

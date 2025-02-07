@@ -4,8 +4,8 @@ import { PixelEvent, PixelEventSchema } from './pixel-event.scheme';
 
 @Schema({ _id: false })
 export class Pixel extends Document {
-  @Prop({ type: String, required: true })
-  token: string;
+  @Prop({ type: String, required: false })
+  token?: string;
 
   @Prop({ type: String, required: true })
   pixelId: string;
