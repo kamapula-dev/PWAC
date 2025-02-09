@@ -1,0 +1,38 @@
+import * as deepl from 'deepl-node';
+
+export const LANGUAGES: deepl.TargetLanguageCode[] = [
+  'ar',
+  'bg',
+  'cs',
+  'da',
+  'de',
+  'el',
+  'es',
+  'et',
+  'fi',
+  'fr',
+  'hu',
+  'id',
+  'it',
+  'ja',
+  'ko',
+  'lt',
+  'lv',
+  'nb',
+  'nl',
+  'pl',
+  'ro',
+  'ru',
+  'sk',
+  'sl',
+  'sv',
+  'tr',
+  'uk',
+  'zh',
+  'en-GB',
+  'en-US',
+  'pt-BR',
+  'pt-PT',
+];
+
+export const SUPPORTED_IMAGES = ['.png', '.jpeg', '.jpg', '.svg', '.webp'];

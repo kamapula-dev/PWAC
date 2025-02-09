@@ -30,6 +30,7 @@ import { ReadyDomainService } from '../ready-domain/ready-domain.service';
 import * as path from 'path';
 import { PWAEventLogService } from '../pwa-event-log/pwa-event-log.service';
 import { PWAExternalMappingService } from '../pwa-external-mapping/pwa-external-mapping.service';
+import { LANGUAGES, SUPPORTED_IMAGES } from './consts';
 
 @Controller('pwa-content')
 export class PWAContentController {
@@ -61,43 +62,8 @@ export class PWAContentController {
     const actualLanguages: deepl.TargetLanguageCode[] = languages.includes(
       'all',
     )
-      ? [
-          'ar',
-          'bg',
-          'cs',
-          'da',
-          'de',
-          'el',
-          'es',
-          'et',
-          'fi',
-          'fr',
-          'hu',
-          'id',
-          'it',
-          'ja',
-          'ko',
-          'lt',
-          'lv',
-          'nb',
-          'nl',
-          'pl',
-          'ro',
-          'ru',
-          'sk',
-          'sl',
-          'sv',
-          'tr',
-          'uk',
-          'zh',
-          'en-GB',
-          'en-US',
-          'pt-BR',
-          'pt-PT',
-        ]
+      ? LANGUAGES
       : (languages as deepl.TargetLanguageCode[]);
-
-    const allowedFormats = ['.png', '.jpeg', '.jpg', '.svg', '.webp'];
 
     const processAppIcon = (icon: string): string => {
       if (!icon) {
@@ -107,9 +73,9 @@ export class PWAContentController {
       const cleanIcon = icon.split('?')[0];
       const ext = path.extname(cleanIcon).toLowerCase();
 
-      if (!allowedFormats.includes(ext)) {
+      if (!SUPPORTED_IMAGES.includes(ext)) {
         throw new BadRequestException(
-          `Invalid appIcon format. Allowed formats are: ${allowedFormats.join(
+          `Invalid appIcon format. Allowed formats are: ${SUPPORTED_IMAGES.join(
             ', ',
           )}`,
         );

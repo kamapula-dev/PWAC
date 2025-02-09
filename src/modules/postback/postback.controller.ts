@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Get,
-  Query,
-  BadRequestException,
-  Logger,
-} from '@nestjs/common';
+import { Controller, Get, Query, BadRequestException } from '@nestjs/common';
 import { PWAExternalMappingService } from '../pwa-external-mapping/pwa-external-mapping.service';
 import { PWAEventLogService } from '../pwa-event-log/pwa-event-log.service';
 import { PwaEvent } from '../../schemas/pixel-event.scheme';
@@ -104,7 +98,7 @@ export class PostbackController {
     }
 
     return {
-      status: 'ok',
+      status: 'success',
       eventLogged: loggedEvent,
     };
   }

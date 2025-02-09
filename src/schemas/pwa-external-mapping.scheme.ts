@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document } from 'mongoose';
 
 export enum PostbackEvent {
   reg = 'reg',
@@ -21,6 +21,12 @@ export class PWAExternalMapping extends Document {
 
   @Prop()
   ip?: string;
+
+  @Prop()
+  language?: string;
+
+  @Prop()
+  pushToken?: string;
 
   @Prop()
   country?: string;

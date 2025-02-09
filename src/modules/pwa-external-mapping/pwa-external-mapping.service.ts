@@ -17,6 +17,7 @@ export class PWAExternalMappingService {
     userAgent: string,
     ip?: string,
     country?: string,
+    language?: string,
     dob?: string,
     firstName?: string,
     lastName?: string,
@@ -36,6 +37,7 @@ export class PWAExternalMappingService {
       ip,
       userAgent,
       country,
+      language,
       dob,
       firstName,
       lastName,
@@ -70,5 +72,16 @@ export class PWAExternalMappingService {
       .updateMany({ domain }, { $set: { pwaContentId } })
       .exec();
     return result.modifiedCount || 0;
+  }
+
+  async updatePushToken(
+    externalId: string,
+    pushToken: string,
+  ): Promise<PWAExternalMapping | null> {
+    return this.mappingModel.findOneAndUpdate(
+      { externalId },
+      { pushToken },
+      { new: true },
+    );
   }
 }
