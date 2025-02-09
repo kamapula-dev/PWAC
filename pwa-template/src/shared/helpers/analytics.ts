@@ -202,35 +202,40 @@ export function buildAppLink(
   return url.toString();
 }
 
+const getIPInfo = async () => {
+  const endpoints = [
+    { url: 'https://ipapi.co/json/', ipKey: 'ip', countryKey: 'country_name' },
+    { url: 'http://ip-api.com/json/', ipKey: 'query', countryKey: 'country' },
+  ];
+
+  for (const { url, ipKey, countryKey } of endpoints) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Request failed: ${url}`);
+
+      const data = await response.json();
+      if (data[ipKey] && data[countryKey]) {
+        return { ip: data[ipKey], country: data[countryKey] };
+      }
+    } catch (error) {
+      console.warn(`Error fetching from ${url}:`, error);
+    }
+  }
+
+  return { ip: null, country: null };
+};
+
 export async function trackExternalId(pwaId: string) {
   const externalId = getExternalId();
 
-  let ip = null,
-    country = null;
-
-  fetch('https://ipapi.co/json/')
-    .then((response) => (response.ok ? response.json() : Promise.reject()))
-    .then((data) => {
-      if (data.ip && data.country_name) {
-        ip = data.ip;
-        country = data.country_name;
-      } else {
-        return Promise.reject();
-      }
-    })
-    .catch(() =>
-      fetch('http://ip-api.com/json/')
-        .then((response) => (response.ok ? response.json() : Promise.reject()))
-        .then((data) => {
-          if (data?.query && data?.country) {
-            ip = data?.query;
-            country = data?.country;
-          }
-        }),
-    );
-
   try {
     const { firstName, lastName } = generateRandomName();
+    const { ip, country } = await getIPInfo();
+    const language =
+      Intl.DateTimeFormat().resolvedOptions().locale?.split('-')[0] ??
+      window.navigator.language ??
+      navigator.language ??
+      'en';
 
     const response = await fetch('https://pwac.world/pwa-external-mapping', {
       method: 'POST',
@@ -243,6 +248,7 @@ export async function trackExternalId(pwaId: string) {
         domain: window.location.hostname,
         ip: ip,
         country: country,
+        language: language,
         firstName: firstName,
         lastName: lastName,
         phone: generateRandomPhoneNumber(),
