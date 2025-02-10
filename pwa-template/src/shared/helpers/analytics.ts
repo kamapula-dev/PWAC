@@ -112,11 +112,7 @@ export function getExternalId() {
 
 export function getUrlParams() {
   const urlParams = new URLSearchParams(window.location.search);
-  const paramsString = urlParams.toString();
-
-  localStorage.setItem('url_params', paramsString);
-
-  return paramsString;
+  return urlParams.toString();
 }
 
 export function buildAppLink(
@@ -199,7 +195,11 @@ export function buildAppLink(
     }
   }
 
-  return url.toString();
+  const link = url.toString();
+
+  console.log(link);
+
+  return link;
 }
 
 const getIPInfo = async () => {
