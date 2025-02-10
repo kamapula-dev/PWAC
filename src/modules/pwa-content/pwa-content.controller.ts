@@ -143,7 +143,6 @@ export class PWAContentController {
   @Get()
   async findAll(@Request() req): Promise<PWAContent[]> {
     const userId = req.user._id;
-
     return this.pwaContentService.findAll(userId);
   }
 

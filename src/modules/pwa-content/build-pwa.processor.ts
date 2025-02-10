@@ -296,7 +296,9 @@ export class BuildPWAProcessor {
     email: string,
     gApiKey: string,
   ): Promise<void> {
-    if (deploy) {
+    const isOwnDomainValuesPresent = email && gApiKey && domain;
+
+    if (deploy && (readyDomainId || isOwnDomainValuesPresent)) {
       await this.userService.addPwa(userId, {
         createdAt: new Date(),
         pwaContentId,
@@ -311,7 +313,7 @@ export class BuildPWAProcessor {
           userId,
         );
       } else {
-        if (!(email && gApiKey && domain)) {
+        if (!isOwnDomainValuesPresent) {
           throw new HttpException(
             'Missing required parameters',
             HttpStatus.BAD_REQUEST,
@@ -378,7 +380,9 @@ export class BuildPWAProcessor {
   ): Promise<void> {
     Logger.error(`Job failed: ${error.message}`, error.stack);
 
-    if (deploy) {
+    const isOwnDomainValuesPresent = email && gApiKey && domain;
+
+    if (deploy && (readyDomainId || isOwnDomainValuesPresent)) {
       await this.userService.addPwa(userId, {
         createdAt: new Date(),
         pwaContentId,
@@ -392,7 +396,7 @@ export class BuildPWAProcessor {
           userId,
         );
       } else {
-        if (!(email && gApiKey && domain)) {
+        if (!isOwnDomainValuesPresent) {
           throw new HttpException(
             'Missing required parameters',
             HttpStatus.BAD_REQUEST,
