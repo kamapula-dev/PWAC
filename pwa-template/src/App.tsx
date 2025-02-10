@@ -285,6 +285,15 @@ export default function App() {
       break;
   }
 
+  console.log(
+    buildAppLink(
+      pwaContent?.pwaLink,
+      localStorage.getItem('fbc')?.toString(),
+      localStorage.getItem('fbp')?.toString(),
+    ),
+    'offer_link',
+  );
+
   return isPWAActive ? (
     <PwaView
       pwaLink={buildAppLink(

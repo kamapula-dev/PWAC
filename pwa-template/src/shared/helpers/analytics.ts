@@ -195,11 +195,7 @@ export function buildAppLink(
     }
   }
 
-  const link = url.toString();
-
-  console.log(link);
-
-  return link;
+  return url.toString();
 }
 
 const getIPInfo = async () => {
