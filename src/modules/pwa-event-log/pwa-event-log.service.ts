@@ -51,4 +51,67 @@ export class PWAEventLogService {
       .exec();
     return result.modifiedCount || 0;
   }
+
+  async getEventStats(
+    pwaContentId: string,
+    sinceDays?: number,
+    event?: PwaEvent,
+  ): Promise<{
+    opens: number;
+    installs: number;
+    registrations: number;
+    deposits: number;
+  }> {
+    const matchFilter: { [key: string]: unknown } = { pwaContentId };
+
+    if (sinceDays) {
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - sinceDays);
+      matchFilter.createdAt = { $gte: startDate };
+    }
+
+    if (event) {
+      matchFilter.event = event;
+    } else {
+      matchFilter.event = {
+        $in: [
+          PwaEvent.OpenPage,
+          PwaEvent.Install,
+          PwaEvent.Registration,
+          PwaEvent.Deposit,
+        ],
+      };
+    }
+
+    const results = await this.eventLogModel.aggregate([
+      { $match: matchFilter },
+      { $group: { _id: '$event', count: { $sum: 1 } } },
+    ]);
+
+    const stats = {
+      opens: 0,
+      installs: 0,
+      registrations: 0,
+      deposits: 0,
+    };
+
+    results.forEach((item) => {
+      switch (item._id) {
+        case PwaEvent.OpenPage:
+          stats.opens = item.count;
+          break;
+        case PwaEvent.Install:
+          stats.installs = item.count;
+          break;
+        case PwaEvent.Registration:
+          stats.registrations = item.count;
+          break;
+        case PwaEvent.Deposit:
+          stats.deposits = item.count;
+          break;
+      }
+    });
+
+    return stats;
+  }
 }

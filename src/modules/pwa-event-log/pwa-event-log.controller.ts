@@ -1,4 +1,11 @@
-import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  BadRequestException,
+  Get,
+  Query,
+} from '@nestjs/common';
 import { PWAEventLogService } from './pwa-event-log.service';
 import { PwaEvent } from '../../schemas/pixel-event.scheme';
 
@@ -36,5 +43,23 @@ export class PWAEventLogController {
     );
 
     return { status: 'success' };
+  }
+
+  @Get('stats')
+  async getStats(
+    @Query('pwaContentId') pwaContentId: string,
+    @Query('since') sinceDays?: number,
+    @Query('event') event?: PwaEvent,
+  ): Promise<{
+    opens: number;
+    installs: number;
+    registrations: number;
+    deposits: number;
+  }> {
+    if (!pwaContentId) {
+      throw new BadRequestException('pwaContentId is required');
+    }
+
+    return this.eventLogService.getEventStats(pwaContentId, sinceDays, event);
   }
 }
