@@ -7,7 +7,6 @@ const PageLoader = ({ pwaLink }: { pwaLink: string }) => {
     window.location.href = pwaLink;
   }, []);
 
-  alert(pwaLink);
   return (
     <Box
       display="flex"
