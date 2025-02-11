@@ -99,16 +99,19 @@ export default function App() {
     };
   }, []);
 
+  const pwaLink = localStorage.getItem('pwaLink');
+
   useEffect(() => {
-    if (!isPWAActive) {
+    if (pwaLink || isPWAActive) return;
+    if (!isPWAActive && pwaContent?.pwaLink) {
       setTimeout(() => {
         const fbc = Cookies.get('_fbc');
         const fbp = Cookies.get('_fbp');
-        localStorage.setItem('fbc', fbc || '');
-        localStorage.setItem('fbp', fbp || '');
+        const generatedPwaLink = buildAppLink(pwaContent?.pwaLink, fbc, fbp);
+        localStorage.setItem('pwaLink', generatedPwaLink);
       }, 3000);
     }
-  }, [isPWAActive]);
+  }, [isPWAActive, pwaContent]);
 
   useEffect(() => {
     if (isPWAActive) return;
@@ -286,13 +289,7 @@ export default function App() {
   }
 
   return isPWAActive ? (
-    <PwaView
-      pwaLink={buildAppLink(
-        pwaContent?.pwaLink,
-        localStorage.getItem('fbc')?.toString(),
-        localStorage.getItem('fbp')?.toString(),
-      )}
-    />
+    <PwaView pwaLink={pwaLink} />
   ) : (
     <div>
       {dark && <style>{`body{background-color: #131313;}`}</style>}
