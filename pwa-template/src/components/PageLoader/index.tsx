@@ -1,12 +1,13 @@
-import CircularProgress from "@mui/material/CircularProgress";
-import Box from "@mui/material/Box";
-import { useEffect } from "react";
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
+import { useEffect } from 'react';
 
 const PageLoader = ({ pwaLink }: { pwaLink: string }) => {
   useEffect(() => {
     window.location.href = pwaLink;
   }, []);
 
+  alert(pwaLink);
   return (
     <Box
       display="flex"
