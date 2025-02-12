@@ -54,8 +54,8 @@ export class PWAEventLogService {
 
   async getEventStats(
     pwaContentId: string,
-    startDate?: string,
-    endDate?: string,
+    startDate?: Date,
+    endDate?: Date,
     event?: PwaEvent,
   ): Promise<{
     opens: number;
@@ -63,16 +63,14 @@ export class PWAEventLogService {
     registrations: number;
     deposits: number;
   }> {
-    const matchFilter: { [key: string]: unknown } = { pwaContentId };
+    const matchFilter: Record<string, unknown> = { pwaContentId };
+
+    const dateConditions: Record<string, Date> = {};
+    if (startDate) dateConditions.$gte = startDate;
+    if (endDate) dateConditions.$lte = endDate;
 
     if (startDate || endDate) {
-      matchFilter.createdAt = {};
-      if (startDate) {
-        matchFilter.createdAt['$gte'] = new Date(startDate);
-      }
-      if (endDate) {
-        matchFilter.createdAt['$lte'] = new Date(endDate);
-      }
+      matchFilter.createdAt = dateConditions;
     }
 
     if (event) {

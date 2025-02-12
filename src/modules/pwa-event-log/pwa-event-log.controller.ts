@@ -48,8 +48,8 @@ export class PWAEventLogController {
   @Get('stats')
   async getStats(
     @Query('pwaContentId') pwaContentId: string,
-    @Query('startDate') startDate?: string,
-    @Query('endDate') endDate?: string,
+    @Query('startDate') startDateStr?: string,
+    @Query('endDate') endDateStr?: string,
     @Query('event') event?: PwaEvent,
   ): Promise<{
     opens: number;
@@ -59,6 +59,23 @@ export class PWAEventLogController {
   }> {
     if (!pwaContentId) {
       throw new BadRequestException('pwaContentId is required');
+    }
+
+    let startDate: Date | undefined;
+    let endDate: Date | undefined;
+
+    if (startDateStr) {
+      startDate = new Date(startDateStr);
+      if (isNaN(startDate.getTime())) {
+        throw new BadRequestException('Invalid startDate format');
+      }
+    }
+
+    if (endDateStr) {
+      endDate = new Date(endDateStr);
+      if (isNaN(endDate.getTime())) {
+        throw new BadRequestException('Invalid endDate format');
+      }
     }
 
     return this.eventLogService.getEventStats(
