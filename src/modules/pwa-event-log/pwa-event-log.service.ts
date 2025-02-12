@@ -51,4 +51,44 @@ export class PWAEventLogService {
       .exec();
     return result.modifiedCount || 0;
   }
+
+  async getEventStats(
+    pwaContentId: string,
+    startDate?: string,
+    endDate?: string,
+    event?: PwaEvent,
+  ) {
+    const matchFilter: any = { pwaContentId };
+
+    if (startDate || endDate) {
+      matchFilter.createdAt = {};
+      if (startDate) matchFilter.createdAt.$gte = startDate;
+      if (endDate) matchFilter.createdAt.$lte = endDate;
+    }
+
+    matchFilter.event = event || {
+      $in: [
+        PwaEvent.OpenPage,
+        PwaEvent.Install,
+        PwaEvent.Registration,
+        PwaEvent.Deposit,
+      ],
+    };
+
+    const results = await this.eventLogModel.aggregate([
+      { $match: matchFilter },
+      { $group: { _id: '$event', count: { $sum: 1 } } },
+    ]);
+
+    return {
+      opens: this.getCount(results, PwaEvent.OpenPage),
+      installs: this.getCount(results, PwaEvent.Install),
+      registrations: this.getCount(results, PwaEvent.Registration),
+      deposits: this.getCount(results, PwaEvent.Deposit),
+    };
+  }
+
+  private getCount(results: { _id: string; count: number }[], event: PwaEvent) {
+    return results.find((r) => r._id === event)?.count || 0;
+  }
 }
