@@ -48,7 +48,8 @@ export class PWAEventLogController {
   @Get('stats')
   async getStats(
     @Query('pwaContentId') pwaContentId: string,
-    @Query('since') sinceDays?: number,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
     @Query('event') event?: PwaEvent,
   ): Promise<{
     opens: number;
@@ -60,6 +61,11 @@ export class PWAEventLogController {
       throw new BadRequestException('pwaContentId is required');
     }
 
-    return this.eventLogService.getEventStats(pwaContentId, sinceDays, event);
+    return this.eventLogService.getEventStats(
+      pwaContentId,
+      startDate,
+      endDate,
+      event,
+    );
   }
 }

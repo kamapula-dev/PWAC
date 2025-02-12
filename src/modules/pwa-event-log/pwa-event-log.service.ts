@@ -54,7 +54,8 @@ export class PWAEventLogService {
 
   async getEventStats(
     pwaContentId: string,
-    sinceDays?: number,
+    startDate?: string,
+    endDate?: string,
     event?: PwaEvent,
   ): Promise<{
     opens: number;
@@ -64,10 +65,14 @@ export class PWAEventLogService {
   }> {
     const matchFilter: { [key: string]: unknown } = { pwaContentId };
 
-    if (sinceDays) {
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - sinceDays);
-      matchFilter.createdAt = { $gte: startDate };
+    if (startDate || endDate) {
+      matchFilter.createdAt = {};
+      if (startDate) {
+        matchFilter.createdAt['$gte'] = new Date(startDate);
+      }
+      if (endDate) {
+        matchFilter.createdAt['$lte'] = new Date(endDate);
+      }
     }
 
     if (event) {
