@@ -56,15 +56,15 @@ export class PWAEventLogController {
       throw new BadRequestException('pwaContentId is required');
     }
 
-    let startDateISO: string | undefined;
-    let endDateISO: string | undefined;
+    let startDate: Date | undefined;
+    let endDate: Date | undefined;
 
     if (startDateStr) {
       const date = new Date(startDateStr);
       if (isNaN(date.getTime())) {
         throw new BadRequestException('Invalid startDate');
       }
-      startDateISO = date.toISOString();
+      startDate = date;
     }
 
     if (endDateStr) {
@@ -72,13 +72,13 @@ export class PWAEventLogController {
       if (isNaN(date.getTime())) {
         throw new BadRequestException('Invalid endDate');
       }
-      endDateISO = date.toISOString();
+      endDate = date;
     }
 
     return this.eventLogService.getEventStats(
       pwaContentId,
-      startDateISO,
-      endDateISO,
+      startDate,
+      endDate,
       event,
     );
   }

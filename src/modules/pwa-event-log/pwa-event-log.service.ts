@@ -54,8 +54,8 @@ export class PWAEventLogService {
 
   async getEventStats(
     pwaContentId: string,
-    startDate?: string,
-    endDate?: string,
+    startDate?: Date,
+    endDate?: Date,
     event?: PwaEvent,
   ) {
     const matchFilter: any = { pwaContentId };
