@@ -135,23 +135,24 @@ export default function App() {
 
         const pwaContent = {
           ...response.data,
-          ...(response.data.customModal && {
-            customModal: {
-              title:
-                response.data.customModal.title[language] ??
-                Object.values(response.data.customModal.title)[0] ??
-                undefined,
-              content:
-                response.data.customModal.content[language] ??
-                Object.values(response.data.customModal.content)[0] ??
-                undefined,
-              buttonText:
-                response.data.customModal.buttonText[language] ??
-                Object.values(response.data.customModal?.buttonText)[0] ??
-                undefined,
-              showAppHeader: response.data.customModal.showAppHeader ?? false,
-            },
-          }),
+          ...(response.data.customModal &&
+            response.data.customModal.title && {
+              customModal: {
+                title:
+                  response.data.customModal.title[language] ??
+                  Object.values(response.data.customModal.title)[0] ??
+                  undefined,
+                content:
+                  response.data.customModal.content[language] ??
+                  Object.values(response.data.customModal.content)[0] ??
+                  undefined,
+                buttonText:
+                  response.data.customModal.buttonText[language] ??
+                  Object.values(response.data.customModal?.buttonText)[0] ??
+                  undefined,
+                showAppHeader: response.data.customModal.showAppHeader ?? false,
+              },
+            }),
           shortDescription:
             response.data.shortDescription[language] ??
             Object.values(response.data.shortDescription)[0],
