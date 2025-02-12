@@ -54,67 +54,41 @@ export class PWAEventLogService {
 
   async getEventStats(
     pwaContentId: string,
-    startDate?: Date,
-    endDate?: Date,
+    startDate?: string,
+    endDate?: string,
     event?: PwaEvent,
-  ): Promise<{
-    opens: number;
-    installs: number;
-    registrations: number;
-    deposits: number;
-  }> {
-    const matchFilter: Record<string, unknown> = { pwaContentId };
-
-    const dateConditions: Record<string, Date> = {};
-    if (startDate) dateConditions.$gte = startDate;
-    if (endDate) dateConditions.$lte = endDate;
+  ) {
+    const matchFilter: any = { pwaContentId };
 
     if (startDate || endDate) {
-      matchFilter.createdAt = dateConditions;
+      matchFilter.createdAt = {};
+      if (startDate) matchFilter.createdAt.$gte = startDate;
+      if (endDate) matchFilter.createdAt.$lte = endDate;
     }
 
-    if (event) {
-      matchFilter.event = event;
-    } else {
-      matchFilter.event = {
-        $in: [
-          PwaEvent.OpenPage,
-          PwaEvent.Install,
-          PwaEvent.Registration,
-          PwaEvent.Deposit,
-        ],
-      };
-    }
+    matchFilter.event = event || {
+      $in: [
+        PwaEvent.OpenPage,
+        PwaEvent.Install,
+        PwaEvent.Registration,
+        PwaEvent.Deposit,
+      ],
+    };
 
     const results = await this.eventLogModel.aggregate([
       { $match: matchFilter },
       { $group: { _id: '$event', count: { $sum: 1 } } },
     ]);
 
-    const stats = {
-      opens: 0,
-      installs: 0,
-      registrations: 0,
-      deposits: 0,
+    return {
+      opens: this.getCount(results, PwaEvent.OpenPage),
+      installs: this.getCount(results, PwaEvent.Install),
+      registrations: this.getCount(results, PwaEvent.Registration),
+      deposits: this.getCount(results, PwaEvent.Deposit),
     };
+  }
 
-    results.forEach((item) => {
-      switch (item._id) {
-        case PwaEvent.OpenPage:
-          stats.opens = item.count;
-          break;
-        case PwaEvent.Install:
-          stats.installs = item.count;
-          break;
-        case PwaEvent.Registration:
-          stats.registrations = item.count;
-          break;
-        case PwaEvent.Deposit:
-          stats.deposits = item.count;
-          break;
-      }
-    });
-
-    return stats;
+  private getCount(results: { _id: string; count: number }[], event: PwaEvent) {
+    return results.find((r) => r._id === event)?.count || 0;
   }
 }

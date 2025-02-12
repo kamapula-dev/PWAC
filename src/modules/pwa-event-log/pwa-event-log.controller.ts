@@ -51,37 +51,34 @@ export class PWAEventLogController {
     @Query('startDate') startDateStr?: string,
     @Query('endDate') endDateStr?: string,
     @Query('event') event?: PwaEvent,
-  ): Promise<{
-    opens: number;
-    installs: number;
-    registrations: number;
-    deposits: number;
-  }> {
+  ) {
     if (!pwaContentId) {
       throw new BadRequestException('pwaContentId is required');
     }
 
-    let startDate: Date | undefined;
-    let endDate: Date | undefined;
+    let startDateISO: string | undefined;
+    let endDateISO: string | undefined;
 
     if (startDateStr) {
-      startDate = new Date(startDateStr);
-      if (isNaN(startDate.getTime())) {
-        throw new BadRequestException('Invalid startDate format');
+      const date = new Date(startDateStr);
+      if (isNaN(date.getTime())) {
+        throw new BadRequestException('Invalid startDate');
       }
+      startDateISO = date.toISOString();
     }
 
     if (endDateStr) {
-      endDate = new Date(endDateStr);
-      if (isNaN(endDate.getTime())) {
-        throw new BadRequestException('Invalid endDate format');
+      const date = new Date(endDateStr);
+      if (isNaN(date.getTime())) {
+        throw new BadRequestException('Invalid endDate');
       }
+      endDateISO = date.toISOString();
     }
 
     return this.eventLogService.getEventStats(
       pwaContentId,
-      startDate,
-      endDate,
+      startDateISO,
+      endDateISO,
       event,
     );
   }
