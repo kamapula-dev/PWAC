@@ -34,6 +34,7 @@ export class PushController {
     return this.pushService.update(id, dto);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get()
   async getAllPushes(
     @Query('active') active?: string,
@@ -44,6 +45,7 @@ export class PushController {
     return this.pushService.findAll({ active: isActive, event, search });
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get(':id')
   async getPush(@Param('id') id: string): Promise<Push> {
     return this.pushService.findOne(id);
