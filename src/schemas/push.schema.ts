@@ -1,0 +1,96 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Types } from 'mongoose';
+import { PwaEvent } from './pixel-event.scheme';
+
+export type PushDocument = Push & Document;
+
+export enum FilterEvent {
+  Deposit = 'Deposit',
+  Registration = 'Registration',
+}
+
+export enum SendToType {
+  all = 'all',
+  with = 'with',
+  without = 'without',
+}
+
+@Schema()
+export class PushContent {
+  @Prop({ required: false })
+  color?: string;
+
+  @Prop({ type: [String], default: [] })
+  languages: string[];
+
+  @Prop()
+  title: string;
+
+  @Prop()
+  description: string;
+
+  @Prop()
+  badge: string;
+
+  @Prop()
+  icon: string;
+
+  @Prop()
+  picture: string;
+
+  @Prop()
+  url: string;
+}
+
+const PushContentSchema = SchemaFactory.createForClass(PushContent);
+
+@Schema()
+export class Filter {
+  @Prop({ enum: FilterEvent, required: true })
+  event: FilterEvent;
+
+  @Prop({ enum: SendToType, required: true })
+  sendTo: SendToType;
+}
+
+const FilterSchema = SchemaFactory.createForClass(Filter);
+
+@Schema()
+export class Recipient {
+  @Prop({ type: [String], default: [] })
+  domains: string[];
+
+  @Prop({ type: [FilterSchema], default: [] })
+  filters: Filter[];
+}
+
+const RecipientSchema = SchemaFactory.createForClass(Recipient);
+
+@Schema({ timestamps: true })
+export class Push {
+  @Prop({ required: true })
+  systemName: string;
+
+  @Prop({ default: false })
+  active: boolean;
+
+  @Prop({ enum: PwaEvent, required: true })
+  triggerEvent: PwaEvent;
+
+  @Prop({ default: 0 })
+  delay: number;
+
+  @Prop({ default: 0 })
+  interval: number;
+
+  @Prop({ type: PushContentSchema, required: true })
+  content: PushContent;
+
+  @Prop({ type: [RecipientSchema], default: [] })
+  recipients: Recipient[];
+
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  user: Types.ObjectId;
+}
+
+export const PushSchema = SchemaFactory.createForClass(Push);
