@@ -1,12 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { PwaEvent } from './pixel-event.scheme';
+import * as deepl from 'deepl-node';
 
 export type PushDocument = Push & Document;
 
 export enum FilterEvent {
   Deposit = 'Deposit',
   Registration = 'Registration',
+  Install = 'Install',
 }
 
 export enum SendToType {
@@ -15,13 +17,13 @@ export enum SendToType {
   without = 'without',
 }
 
-@Schema()
+@Schema({ _id: false })
 export class PushContent {
   @Prop({ required: false })
   color?: string;
 
-  @Prop({ type: [String], default: [] })
-  languages: string[];
+  @Prop()
+  languages?: (deepl.TargetLanguageCode | 'all')[];
 
   @Prop()
   title: string;
@@ -44,7 +46,7 @@ export class PushContent {
 
 const PushContentSchema = SchemaFactory.createForClass(PushContent);
 
-@Schema()
+@Schema({ _id: false })
 export class Filter {
   @Prop({ enum: FilterEvent, required: true })
   event: FilterEvent;
@@ -55,7 +57,7 @@ export class Filter {
 
 const FilterSchema = SchemaFactory.createForClass(Filter);
 
-@Schema()
+@Schema({ _id: false })
 export class Recipient {
   @Prop({ type: [String], default: [] })
   domains: string[];
