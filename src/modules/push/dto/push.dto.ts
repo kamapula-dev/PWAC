@@ -6,7 +6,6 @@ import {
   ValidateNested,
   IsOptional,
   IsEnum,
-  IsUrl,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { FilterEvent, SendToType } from '../../../schemas/push.schema';
