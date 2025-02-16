@@ -117,7 +117,11 @@ export class PushService {
     return duplicatedPush.save();
   }
 
-  async sendPushViaFirebase(pushData: Push) {
+  async testPush(pushId: string): Promise<any> {
+    const pushData = await this.findOne(pushId);
+
+    Logger.log(`[PushService] Manually triggering push for pushId: ${pushId}`);
+
     const { content, recipients } = pushData;
     const { title, description, icon, url } = content;
 
@@ -132,12 +136,15 @@ export class PushService {
       });
 
       for (const filter of filters) {
-        if (filter.event === PwaEvent.Deposit) {
-          if (filter.sendTo === SendToType.with) {
-            mappings = mappings.filter((m) => (m as any).depositCount > 0);
-          } else if (filter.sendTo === SendToType.without) {
-            mappings = mappings.filter((m) => !(m as any).depositCount);
-          }
+        const userHasEvent = await this.pwaEventLogModel.exists({
+          event: filter.event,
+        });
+
+        if (filter.sendTo === SendToType.with && !userHasEvent) {
+          continue;
+        }
+        if (filter.sendTo === SendToType.without && userHasEvent) {
+          continue;
         }
       }
 
@@ -147,12 +154,18 @@ export class PushService {
 
     const uniqueTokens = Array.from(new Set(allTokens));
 
+    if (uniqueTokens.length === 0) {
+      Logger.log(`[PushService] No recipients found for test push.`);
+      return { success: false, message: 'No recipients found' };
+    }
+
     Logger.log(
-      `[PushService] Will send push to ${uniqueTokens.length} tokens...`,
+      `[PushService] Sending test push to ${uniqueTokens.length} recipients...`,
     );
 
     const chunkSize = 500;
     const results = [];
+
     for (let i = 0; i < uniqueTokens.length; i += chunkSize) {
       const chunk = uniqueTokens.slice(i, i + chunkSize);
       const res = await this.firebasePushService.sendPushToMultipleDevices(
@@ -172,11 +185,6 @@ export class PushService {
       totalTokens: uniqueTokens.length,
       results,
     };
-  }
-
-  async testPush(pushId: string): Promise<any> {
-    const pushData = await this.findOne(pushId);
-    return this.sendPushViaFirebase(pushData);
   }
 
   async handleNewEvent(eventLog: PWAEventLog): Promise<void> {
