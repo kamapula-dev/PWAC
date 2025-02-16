@@ -396,6 +396,7 @@ Temporary Items
 # Local
 .env
 dist
+firebase-config.json
 !cdn-worker/dist/
 !cdn-worker/dist/**
 .webpack

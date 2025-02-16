@@ -15,6 +15,6 @@ import { PWAExternalMappingController } from './pwa-external-mapping.controller'
   ],
   controllers: [PWAExternalMappingController],
   providers: [PWAExternalMappingService],
-  exports: [PWAExternalMappingService],
+  exports: [MongooseModule, PWAExternalMappingService],
 })
 export class PWAExternalMappingModule {}
