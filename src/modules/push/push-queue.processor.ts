@@ -14,11 +14,25 @@ export class PushQueueProcessor {
 
     const pushData = await this.pushService.findOne(pushId);
     if (!pushData) {
-      Logger.log(`[PushQueueProcessor] Push ID ${pushId} not found`);
+      Logger.warn(`[PushQueueProcessor] Push ID ${pushId} not found`);
       return;
     }
 
+    if (!pushData.active) {
+      Logger.log(
+        `[PushQueueProcessor] Push ID ${pushId} is inactive. Skipping.`,
+      );
+      return;
+    }
+
+    Logger.log(
+      `[PushQueueProcessor] Sending push from queue for pushId=${pushId}`,
+    );
     const result = await this.pushService.sendPushViaFirebase(pushData);
-    Logger.log('[PushQueueProcessor] Push job completed:', result);
+
+    Logger.log(
+      `[PushQueueProcessor] Push job completed for pushId=${pushId}`,
+      JSON.stringify(result),
+    );
   }
 }
