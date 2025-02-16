@@ -1,29 +1,77 @@
 import {
-  IsString,
   IsBoolean,
-  IsNumber,
-  IsArray,
-  ValidateNested,
-  IsOptional,
   IsEnum,
-  IsUrl,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateNested,
+  IsArray,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { FilterEvent, SendToType } from '../../../schemas/push.schema';
+import { SendToType } from '../../../schemas/push.schema';
 import { PwaEvent } from '../../../schemas/pixel-event.scheme';
 
-class FilterDto {
-  @IsEnum(FilterEvent)
-  event: FilterEvent;
+class PushContentDto {
+  @IsOptional()
+  @IsString()
+  color?: string;
 
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  languages?: string[];
+
+  @IsNotEmpty()
+  @IsString()
+  title: string;
+
+  @IsNotEmpty()
+  @IsString()
+  description: string;
+
+  @IsNotEmpty()
+  @IsString()
+  badge: string;
+
+  @IsNotEmpty()
+  @IsString()
+  icon: string;
+
+  @IsNotEmpty()
+  @IsString()
+  picture: string;
+
+  @IsNotEmpty()
+  @IsString()
+  url: string;
+}
+
+class FilterDto {
+  @IsNotEmpty()
+  @IsEnum(PwaEvent)
+  event: PwaEvent;
+
+  @IsNotEmpty()
   @IsEnum(SendToType)
   sendTo: SendToType;
 }
 
+class PwaMappingDto {
+  @IsNotEmpty()
+  @IsString()
+  id: string;
+
+  @IsNotEmpty()
+  @IsString()
+  domain: string;
+}
+
 class RecipientDto {
   @IsArray()
-  @IsString({ each: true })
-  pwas: string[];
+  @ValidateNested({ each: true })
+  @Type(() => PwaMappingDto)
+  pwas: PwaMappingDto[];
 
   @IsArray()
   @ValidateNested({ each: true })
@@ -31,51 +79,28 @@ class RecipientDto {
   filters: FilterDto[];
 }
 
-class PushContentDto {
-  @IsOptional()
-  @IsString()
-  color?: string;
-
-  @IsArray()
-  @IsString({ each: true })
-  languages: string[];
-
-  @IsString()
-  title: string;
-
-  @IsString()
-  description: string;
-
-  @IsOptional()
-  badge: string;
-
-  @IsOptional()
-  icon: string;
-
-  @IsOptional()
-  picture: string;
-
-  @IsOptional()
-  @IsString()
-  url: string;
-}
-
 export class PushDto {
+  @IsNotEmpty()
   @IsString()
   systemName: string;
 
+  @IsOptional()
   @IsBoolean()
-  active: boolean;
+  active?: boolean;
 
+  @IsNotEmpty()
   @IsEnum(PwaEvent)
   triggerEvent: PwaEvent;
 
-  @IsNumber()
-  delay: number;
+  @IsOptional()
+  @IsInt()
+  delay?: number;
 
   @IsOptional()
-  interval: number;
+  @IsInt()
+  interval?: number;
 
+  @IsNotEmpty()
   @ValidateNested()
   @Type(() => PushContentDto)
   content: PushContentDto;

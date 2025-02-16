@@ -17,6 +17,7 @@ import { PostbackModule } from './modules/postback/postback.module';
 import { PWAEventLogModule } from './modules/pwa-event-log/pwa-event-log.module';
 import { PWAExternalMappingModule } from './modules/pwa-external-mapping/pwa-external-mapping.module';
 import { PushModule } from './modules/push/push.module';
+import { FirebaseModule } from './modules/firebase/firebase.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { PushModule } from './modules/push/push.module';
     PostbackModule,
     FacebookModule,
     PushModule,
+    FirebaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],

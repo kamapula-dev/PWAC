@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { PwaEvent } from './pixel-event.scheme';
+import { PushService } from '../modules/push/push.service';
 
 @Schema({ timestamps: true })
 export class PWAEventLog extends Document {
@@ -22,5 +23,4 @@ export class PWAEventLog extends Document {
   @Prop()
   currency?: string;
 }
-
 export const PWAEventLogSchema = SchemaFactory.createForClass(PWAEventLog);
