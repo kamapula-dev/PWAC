@@ -1,13 +1,26 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
+
 import { PushDto } from './dto/push.dto';
-import { Push, PushDocument } from '../../schemas/push.schema';
+import { Push, PushDocument, SendToType } from '../../schemas/push.schema';
+import { PWAExternalMapping } from '../../schemas/pwa-external-mapping.scheme';
+import { FirebaseService } from '../firebase/firebase.service';
+import { PWAEventLog } from '../../schemas/pwa-event-log.scheme';
+import { PwaEvent } from '../../schemas/pixel-event.scheme';
 
 @Injectable()
 export class PushService {
   constructor(
     @InjectModel(Push.name) private readonly pushModel: Model<PushDocument>,
+    @InjectModel(PWAExternalMapping.name)
+    private readonly mappingModel: Model<PWAExternalMapping>,
+    @InjectModel(PWAEventLog.name)
+    private readonly pwaEventLogModel: Model<PWAEventLog>,
+    private readonly firebasePushService: FirebaseService,
+    @InjectQueue('pushQueue') private readonly pushQueue: Queue,
   ) {}
 
   async create(dto: PushDto, userId: string): Promise<Push> {
@@ -15,19 +28,45 @@ export class PushService {
       ...dto,
       user: new Types.ObjectId(userId),
     });
-    return created.save();
+    const savedPush = await created.save();
+
+    if (savedPush.active && savedPush.delay && savedPush.delay > 0) {
+      await this.schedulePush(savedPush._id.toString(), savedPush.delay);
+    }
+
+    return savedPush;
   }
 
-  async update(id: string, dto: PushDto): Promise<Push> {
+  async update(id: string, dto: Partial<PushDto>): Promise<Push> {
     const updated = await this.pushModel.findByIdAndUpdate(id, dto, {
       new: true,
+      runValidators: true,
     });
 
     if (!updated) {
       throw new NotFoundException(`Push with id "${id}" not found`);
     }
 
+    if (updated.active && updated.delay && updated.delay > 0) {
+      await this.schedulePush(updated._id.toString(), updated.delay);
+    }
+
     return updated;
+  }
+
+  async delete(id: string): Promise<{ success: boolean }> {
+    const deleted = await this.pushModel.findByIdAndDelete(id);
+    if (!deleted) {
+      throw new NotFoundException(`Push with id "${id}" not found`);
+    }
+    return { success: true };
+  }
+
+  async schedulePush(pushId: string, delaySeconds: number) {
+    Logger.log(
+      `[PushService] Scheduling push (ID=${pushId}) with delay=${delaySeconds}s`,
+    );
+    await this.pushQueue.add({ pushId }, { delay: delaySeconds * 1000 });
   }
 
   async findAll(params: {
@@ -61,57 +100,172 @@ export class PushService {
     return push;
   }
 
-  /**
-   * Тестовый пуш: один раз отправляем на все PWA исходя из filters.
-   * В реальном приложении вам нужно будет:
-   * 1. Определить логику, как формируются конечные получатели (например,
-   *    фильтрация пользователей/устройств по событию, статусу и т. д.)
-   * 2. Вызвать сервис уведомлений (например, WebPush, FCM, OneSignal и т. п.)
-   */
-  async testPush(pushId: string): Promise<any> {
-    const pushData = await this.findOne(pushId);
-
-    // допустим, нам нужно пройтись по всем recipients и применить фильтры
-    const recipients = pushData.recipients;
-
-    // Здесь псевдо-код для отбора PWA.
-    // Допустим, у вас есть сервис, где вы храните пользовательские subscription’ы
-    // или список доменов, на которые реально можно отправить push.
-
-    // const allUserSubscriptions = await this.someSubscriptionService.findAll();
-
-    for (const recipient of recipients) {
-      const { domains, filters } = recipient;
-
-      // 1. Проверяем, есть ли у нас необходимый event из filters
-      // 2. В зависимости от sendTo = 'all' | 'with' | 'without' – выбираем subset
-      // 3. На практике здесь будет логика, которую вы опишете согласно бизнес-требованиям
-
-      console.log('PWA domains:', domains);
-      console.log('Filters:', filters);
-
-      // Пример перебора фильтров:
-      for (const filter of filters) {
-        // filter.event => 'Deposit' | 'Registration'
-        // filter.sendTo => 'all' | 'with' | 'without'
-
-        // В реальном коде здесь будет выборка, кто подходит под "with deposit" или "without deposit" и т.д.
-        console.log(
-          `Filter event = ${filter.event}, sendTo = ${filter.sendTo}`,
-        );
-      }
-
-      // Далее отправляем пуш. Условно:
-      // await this.pushNotificationService.send({
-      //   pwaDomains: pwas,
-      //   title: pushData.content.title,
-      //   message: pushData.content.description,
-      //   icon: pushData.content.icon,
-      //   url: pushData.content.url
-      //   ...
-      // });
+  async duplicatePush(id: string): Promise<Push> {
+    const existingPush = await this.pushModel.findById(id).lean();
+    if (!existingPush) {
+      throw new NotFoundException(`Push with id "${id}" not found`);
     }
 
-    return { success: true, message: 'Test push sent (mock)' };
+    const duplicatedPush = new this.pushModel({
+      ...existingPush,
+      _id: new Types.ObjectId(),
+      createdAt: undefined,
+      updatedAt: undefined,
+      systemName: `${existingPush.systemName} (Copy)`,
+      active: false,
+    });
+
+    return duplicatedPush.save();
+  }
+
+  async sendPushViaFirebase(pushData: Push) {
+    const { content, recipients } = pushData;
+    const { title, description, icon, url } = content;
+
+    let allTokens: string[] = [];
+
+    for (const recipient of recipients) {
+      const { pwas, filters } = recipient;
+
+      let mappings = await this.mappingModel.find({
+        pwaContentId: { $in: pwas },
+        pushToken: { $exists: true, $ne: '' },
+      });
+
+      for (const filter of filters) {
+        if (filter.event === PwaEvent.Deposit) {
+          if (filter.sendTo === SendToType.with) {
+            mappings = mappings.filter((m) => (m as any).depositCount > 0);
+          } else if (filter.sendTo === SendToType.without) {
+            mappings = mappings.filter((m) => !(m as any).depositCount);
+          }
+        }
+      }
+
+      const tokens = mappings.map((m) => m.pushToken).filter(Boolean);
+      allTokens = [...allTokens, ...tokens];
+    }
+
+    const uniqueTokens = Array.from(new Set(allTokens));
+
+    Logger.log(
+      `[PushService] Will send push to ${uniqueTokens.length} tokens...`,
+    );
+
+    const chunkSize = 500;
+    const results = [];
+    for (let i = 0; i < uniqueTokens.length; i += chunkSize) {
+      const chunk = uniqueTokens.slice(i, i + chunkSize);
+      const res = await this.firebasePushService.sendPushToMultipleDevices(
+        chunk,
+        {
+          title,
+          body: description,
+          icon,
+          url,
+        },
+      );
+      results.push(res);
+    }
+
+    return {
+      success: true,
+      totalTokens: uniqueTokens.length,
+      results,
+    };
+  }
+
+  async testPush(pushId: string): Promise<any> {
+    const pushData = await this.findOne(pushId);
+    return this.sendPushViaFirebase(pushData);
+  }
+
+  async handleNewEvent(eventLog: PWAEventLog): Promise<void> {
+    Logger.log(
+      `[PushService] New event detected: ${eventLog.event} for externalId: ${eventLog.externalId}`,
+    );
+
+    // Найти все активные пуши, у которых triggerEvent совпадает с eventLog.event
+    const activePushes = await this.pushModel.find({
+      active: true,
+      triggerEvent: eventLog.event,
+    });
+
+    for (const push of activePushes) {
+      // Фильтруем получателей по pwaContentId
+      const matchingRecipients = push.recipients.filter((recipient) =>
+        recipient.pwas.some((pwa) => pwa.id === eventLog.pwaContentId),
+      );
+
+      if (matchingRecipients.length === 0) {
+        Logger.log(
+          `[PushService] No matching recipients for event ${eventLog.event}`,
+        );
+        continue;
+      }
+
+      // Получаем PWAExternalMapping (токены пушей)
+      const pwaMapping = await this.mappingModel.findOne({
+        externalId: eventLog.externalId,
+        pwaContentId: eventLog.pwaContentId,
+      });
+
+      if (!pwaMapping || !pwaMapping.pushToken) {
+        Logger.log(
+          `[PushService] No push token found for externalId ${eventLog.externalId}`,
+        );
+        continue;
+      }
+
+      // Проверяем фильтры событий и sendTo (with | without)
+      let shouldSend = false;
+
+      for (const recipient of matchingRecipients) {
+        for (const filter of recipient.filters) {
+          if (filter.event === eventLog.event) {
+            const userHasEvent = await this.pwaEventLogModel.exists({
+              externalId: eventLog.externalId,
+              event: filter.event,
+            });
+
+            if (filter.sendTo === SendToType.with && userHasEvent) {
+              shouldSend = true;
+            } else if (filter.sendTo === SendToType.without && !userHasEvent) {
+              shouldSend = true;
+            } else if (filter.sendTo === SendToType.all) {
+              shouldSend = true;
+            }
+          }
+        }
+      }
+
+      if (!shouldSend) {
+        Logger.log(
+          `[PushService] Push not sent for event ${eventLog.event} due to filters`,
+        );
+        continue;
+      }
+
+      // Если есть задержка, ставим в очередь Bull
+      if (push.delay > 0) {
+        await this.schedulePush(push._id.toString(), push.delay);
+        continue;
+      }
+
+      // Отправляем пуш сразу
+      await this.firebasePushService.sendPushToMultipleDevices(
+        [pwaMapping.pushToken],
+        {
+          title: push.content.title,
+          body: push.content.description,
+          icon: push.content.icon,
+          url: push.content.url,
+        },
+      );
+
+      Logger.log(
+        `[PushService] Push sent immediately for event ${eventLog.event}`,
+      );
+    }
   }
 }

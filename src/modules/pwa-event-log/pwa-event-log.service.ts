@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { PWAEventLog } from '../../schemas/pwa-event-log.scheme';
+import { PushService } from '../push/push.service';
+import { PWAEventLog } from 'src/schemas/pwa-event-log.scheme';
 import { PwaEvent } from '../../schemas/pixel-event.scheme';
 
 @Injectable()
@@ -9,6 +10,7 @@ export class PWAEventLogService {
   constructor(
     @InjectModel(PWAEventLog.name)
     private readonly eventLogModel: Model<PWAEventLog>,
+    private readonly pushService: PushService,
   ) {}
 
   async logEvent(
@@ -27,7 +29,12 @@ export class PWAEventLogService {
       value,
       currency,
     });
-    return doc.save();
+
+    const savedEvent = await doc.save();
+
+    await this.pushService.handleNewEvent(savedEvent);
+
+    return savedEvent;
   }
 
   async deleteAllByPwaContentId(pwaContentId: string): Promise<number> {

@@ -2,17 +2,18 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
+  Delete,
   Body,
   Param,
-  Patch,
   Query,
   UseGuards,
   Request,
 } from '@nestjs/common';
-import { PushService } from './push.service';
-import { PushDto } from './dto/push.dto';
-import { Push } from '../../schemas/push.schema';
 import { AuthGuard } from '@nestjs/passport';
+import { PushService } from './push.service';
+import { Push } from '../../schemas/push.schema';
+import { PushDto } from './dto/push.dto';
 
 @Controller('push')
 export class PushController {
@@ -29,9 +30,15 @@ export class PushController {
   @Patch(':id')
   async updatePush(
     @Param('id') id: string,
-    @Body() dto: PushDto,
+    @Body() dto: Partial<PushDto>,
   ): Promise<Push> {
     return this.pushService.update(id, dto);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Delete(':id')
+  async deletePush(@Param('id') id: string) {
+    return this.pushService.delete(id);
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -55,5 +62,11 @@ export class PushController {
   @Post('test/:id')
   async testPush(@Param('id') id: string) {
     return this.pushService.testPush(id);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('duplicate/:id')
+  async duplicatePush(@Param('id') id: string) {
+    return this.pushService.duplicatePush(id);
   }
 }

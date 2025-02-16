@@ -5,12 +5,6 @@ import * as deepl from 'deepl-node';
 
 export type PushDocument = Push & Document;
 
-export enum FilterEvent {
-  Deposit = 'Deposit',
-  Registration = 'Registration',
-  Install = 'Install',
-}
-
 export enum SendToType {
   all = 'all',
   with = 'with',
@@ -48,8 +42,8 @@ const PushContentSchema = SchemaFactory.createForClass(PushContent);
 
 @Schema({ _id: false })
 export class Filter {
-  @Prop({ enum: FilterEvent, required: true })
-  event: FilterEvent;
+  @Prop({ enum: PwaEvent, required: true })
+  event: PwaEvent;
 
   @Prop({ enum: SendToType, required: true })
   sendTo: SendToType;
@@ -58,9 +52,20 @@ export class Filter {
 const FilterSchema = SchemaFactory.createForClass(Filter);
 
 @Schema({ _id: false })
+export class PwaMapping {
+  @Prop({ required: true })
+  id: string;
+
+  @Prop({ required: true })
+  domain: string;
+}
+
+const PwaMappingSchema = SchemaFactory.createForClass(PwaMapping);
+
+@Schema({ _id: false })
 export class Recipient {
-  @Prop({ type: [String], default: [] })
-  domains: string[];
+  @Prop({ type: [PwaMappingSchema], default: [] })
+  pwas: PwaMapping[];
 
   @Prop({ type: [FilterSchema], default: [] })
   filters: Filter[];
