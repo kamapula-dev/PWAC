@@ -47,15 +47,12 @@ class PushContentDto {
   description: string;
 
   @IsOptional()
-  @IsUrl()
   badge: string;
 
   @IsOptional()
-  @IsUrl()
   icon: string;
 
   @IsOptional()
-  @IsUrl()
   picture: string;
 
   @IsOptional()
@@ -74,6 +71,7 @@ export class PushDto {
   triggerEvent: PwaEvent;
 
   @IsNumber()
+  @IsOptional()
   delay: number;
 
   @IsNumber()
