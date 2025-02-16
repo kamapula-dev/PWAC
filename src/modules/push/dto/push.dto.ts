@@ -70,7 +70,6 @@ export class PushDto {
   @IsEnum(PwaEvent)
   triggerEvent: PwaEvent;
 
-  @IsNumber()
   @IsOptional()
   delay: number;
 

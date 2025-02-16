@@ -83,7 +83,7 @@ export class Push {
   delay: number;
 
   @Prop({ default: 0 })
-  interval: number;
+  interval?: number;
 
   @Prop({ type: PushContentSchema, required: true })
   content: PushContent;
