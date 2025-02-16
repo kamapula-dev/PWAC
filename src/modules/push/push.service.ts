@@ -117,11 +117,7 @@ export class PushService {
     return duplicatedPush.save();
   }
 
-  async testPush(pushId: string): Promise<any> {
-    const pushData = await this.findOne(pushId);
-
-    Logger.log(`[PushService] Manually triggering push for pushId: ${pushId}`);
-
+  async sendPushViaFirebase(pushData: Push) {
     const { content, recipients } = pushData;
     const { title, description, icon, url } = content;
 
@@ -130,11 +126,13 @@ export class PushService {
     for (const recipient of recipients) {
       const { pwas, filters } = recipient;
 
+      // Найти все PWA, у которых есть `pushToken`
       let mappings = await this.mappingModel.find({
-        pwaContentId: { $in: pwas },
+        pwaContentId: { $in: pwas.map((pwa) => pwa.id) },
         pushToken: { $exists: true, $ne: '' },
       });
 
+      // Применяем фильтры `sendTo: all | with | without`
       for (const filter of filters) {
         const userHasEvent = await this.pwaEventLogModel.exists({
           event: filter.event,
@@ -148,21 +146,24 @@ export class PushService {
         }
       }
 
+      // Собираем `pushToken`
       const tokens = mappings.map((m) => m.pushToken).filter(Boolean);
       allTokens = [...allTokens, ...tokens];
     }
 
+    // Убираем дублирующиеся токены
     const uniqueTokens = Array.from(new Set(allTokens));
 
     if (uniqueTokens.length === 0) {
-      Logger.log(`[PushService] No recipients found for test push.`);
+      Logger.log(`[PushService] No recipients found for push.`);
       return { success: false, message: 'No recipients found' };
     }
 
     Logger.log(
-      `[PushService] Sending test push to ${uniqueTokens.length} recipients...`,
+      `[PushService] Sending push to ${uniqueTokens.length} recipients...`,
     );
 
+    // Разбиваем токены на чанки по 500 штук (Firebase ограничение)
     const chunkSize = 500;
     const results = [];
 
@@ -185,6 +186,28 @@ export class PushService {
       totalTokens: uniqueTokens.length,
       results,
     };
+  }
+
+  async testPush(pushId: string): Promise<any> {
+    const pushData = await this.findOne(pushId);
+
+    if (!pushData) {
+      throw new NotFoundException(`Push with ID ${pushId} not found`);
+    }
+
+    Logger.log(
+      `[PushService] Manually triggering test push for pushId=${pushId}`,
+    );
+
+    // Отправляем пуш через Firebase
+    const result = await this.sendPushViaFirebase(pushData);
+
+    Logger.log(
+      `[PushService] Test push completed for pushId=${pushId}`,
+      JSON.stringify(result),
+    );
+
+    return result;
   }
 
   async handleNewEvent(eventLog: PWAEventLog): Promise<void> {
