@@ -3,12 +3,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
-
-import { PushDto } from './dto/push.dto';
 import { Push, PushDocument, SendToType } from '../../schemas/push.schema';
 import { PWAExternalMapping } from '../../schemas/pwa-external-mapping.scheme';
-import { FirebaseService } from '../firebase/firebase.service';
 import { PWAEventLog } from '../../schemas/pwa-event-log.scheme';
+import { FirebaseService } from '../firebase/firebase.service';
+import { PushDto } from './dto/push.dto';
 import { PwaEvent } from '../../schemas/pixel-event.scheme';
 
 @Injectable()
