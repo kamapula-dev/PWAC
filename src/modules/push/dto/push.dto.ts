@@ -69,6 +69,8 @@ class PwaMappingDto {
 
 class RecipientDto {
   @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => PwaMappingDto)
   pwas: PwaMappingDto[];
 
   @IsArray()
@@ -102,5 +104,7 @@ export class PushDto {
   content: PushContentDto;
 
   @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => RecipientDto)
   recipients: RecipientDto[];
 }
