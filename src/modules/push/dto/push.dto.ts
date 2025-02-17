@@ -104,7 +104,5 @@ export class PushDto {
   content: PushContentDto;
 
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => RecipientDto)
   recipients: RecipientDto[];
 }
