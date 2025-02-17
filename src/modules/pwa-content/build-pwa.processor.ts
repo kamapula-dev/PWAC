@@ -65,14 +65,14 @@ export class BuildPWAProcessor {
         const envContent = `
           VITE_PWA_CONTENT_ID=${pwaContentId}
           VITE_API_URL=https://pwac.world
-          VITE_APP_API_KEY=AIzaSyB1P__loORpCgNQIz7gaqiMibDZUinYCT0
-          VITE_APP_AUTH_DOMAIN=pwa-monster.firebaseapp.com
-          VITE_APP_PROJECT_ID=pwa-monster
-          VITE_APP_STORAGE_BUCKET=pwa-monster.firebasestorage.app
-          VITE_APP_MESSAGING_SENDER_ID=922267238276
-          VITE_APP_APP_ID=1:922267238276:web:45cd2b3bc9ed61089c27d1
-          VITE_APP_MEASUREMENT_ID=G-BV7W837DCB
-          VITE_APP_VAPID_KEY=BKJaycC1D_CvQEmde3Roid9rzjf-B2ni9e1dWmb0CtMxMx-hX6UE2loi5c7H-YQ3jbv1hEC4Iat6QCKgGl2Z00o
+          VITE_APP_API_KEY=AIzaSyDrnHccHsbP1qexi0TPW0wt5dw95QB6SYQ
+          VITE_APP_AUTH_DOMAIN=pwac-f4fa7.firebaseapp.com
+          VITE_APP_PROJECT_ID=pwac-f4fa7
+          VITE_APP_STORAGE_BUCKET=pwac-f4fa7.firebasestorage.app
+          VITE_APP_MESSAGING_SENDER_ID=1082672576795
+          VITE_APP_APP_ID=1:1082672576795:web:da0be39788c3431bd4bbbe
+          VITE_APP_MEASUREMENT_ID=G-PQN430W6DQ
+          VITE_APP_VAPID_KEY=BK_A7jh_hRtPuk_AmQIUSGsZS96du-BvCMKbKuI9Lk7-zImex-Zxlqv7T_Y5bEKNPyiERktNCnkjkEX-rFXRthQ
         `;
         await fse.writeFile(envFilePath, envContent);
         Logger.log(`.env file created at ${envFilePath}`);
