@@ -64,11 +64,11 @@ const PwaMappingSchema = SchemaFactory.createForClass(PwaMapping);
 
 @Schema({ _id: false })
 export class Recipient {
-  @Prop({ type: [PwaMappingSchema], default: [] })
-  pwas: PwaMapping[];
-
   @Prop({ type: [FilterSchema], default: [] })
   filters: Filter[];
+
+  @Prop({ type: [PwaMappingSchema], default: [] })
+  pwas: PwaMapping[];
 }
 
 const RecipientSchema = SchemaFactory.createForClass(Recipient);
