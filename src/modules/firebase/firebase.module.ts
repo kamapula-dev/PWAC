@@ -1,7 +1,5 @@
 import { Module, Global } from '@nestjs/common';
 import * as admin from 'firebase-admin';
-import * as fs from 'fs';
-import * as path from 'path';
 import { FirebaseService } from './firebase.service';
 
 @Global()
@@ -10,27 +8,35 @@ import { FirebaseService } from './firebase.service';
     {
       provide: 'FirebaseAdmin',
       useFactory: () => {
-        let serviceAccount: admin.ServiceAccount;
-
-        const serviceAccountPath = path.join(
-          process.cwd(),
-          'firebase-config.json',
-        );
-        if (fs.existsSync(serviceAccountPath)) {
-          serviceAccount = JSON.parse(
-            fs.readFileSync(serviceAccountPath, 'utf8'),
-          );
-        } else if (process.env.FIREBASE_CREDENTIALS) {
-          serviceAccount = JSON.parse(process.env.FIREBASE_CREDENTIALS);
-        } else {
+        if (
+          !process.env.FIREBASE_PROJECT_ID ||
+          !process.env.FIREBASE_PRIVATE_KEY ||
+          !process.env.FIREBASE_CLIENT_EMAIL
+        ) {
           throw new Error(
-            'Firebase config not found. Please set FIREBASE_CREDENTIALS.',
+            'Missing Firebase credentials in environment variables.',
           );
         }
 
+        const serviceAccount = {
+          type: 'service_account',
+          project_id: process.env.FIREBASE_PROJECT_ID,
+          private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+          private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+          client_email: process.env.FIREBASE_CLIENT_EMAIL,
+          client_id: process.env.FIREBASE_CLIENT_ID,
+          auth_uri: process.env.FIREBASE_AUTH_URI,
+          token_uri: process.env.FIREBASE_TOKEN_URI,
+          auth_provider_x509_cert_url:
+            process.env.FIREBASE_AUTH_PROVIDER_CERT_URL,
+          client_x509_cert_url: process.env.FIREBASE_CLIENT_CERT_URL,
+        };
+
         if (!admin.apps.length) {
           return admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount),
+            credential: admin.credential.cert(
+              serviceAccount as admin.ServiceAccount,
+            ),
           });
         }
         return admin.app();
