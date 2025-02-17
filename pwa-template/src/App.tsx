@@ -1,30 +1,30 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
-import MainView from "./components/MainView";
-import AboutView from "./components/AboutView";
-import PwaView from "./components/PwaView";
-import ReviewsView from "./components/ReviewsView";
-import axios from "axios";
-import { PwaContent, PWAInstallState } from "./shared/models";
-import playMarket from "./shared/icons/playMarketIcon.svg";
-import Menu from "./components/Menu/Menu";
+import { useEffect, useState } from 'react';
+import MainView from './components/MainView';
+import AboutView from './components/AboutView';
+import PwaView from './components/PwaView';
+import ReviewsView from './components/ReviewsView';
+import axios from 'axios';
+import { PwaContent, PWAInstallState } from './shared/models';
+import playMarket from './shared/icons/playMarketIcon.svg';
+import Menu from './components/Menu/Menu';
 import {
   buildAppLink,
   getExternalId,
   logEvent,
   trackExternalId,
-} from "./shared/helpers/analytics.ts";
-import ModalMenu from "./components/ModalMenu/ModalMenu.tsx";
-import Cookies from "js-cookie";
-import { useDispatch, useSelector } from "react-redux";
+} from './shared/helpers/analytics.ts';
+import ModalMenu from './components/ModalMenu/ModalMenu.tsx';
+import Cookies from 'js-cookie';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   getInstallState,
   setInstallState,
-} from "./Redux/feat/InstallSlice.tsx";
-import { RootState } from "./Redux/store/store.tsx";
-import { UAParser } from "ua-parser-js";
-import { getToken } from "firebase/messaging";
-import { messaging } from "./firebaseConfig.ts";
+} from './Redux/feat/InstallSlice.tsx';
+import { RootState } from './Redux/store/store.tsx';
+import { UAParser } from 'ua-parser-js';
+import { getToken } from 'firebase/messaging';
+import { messaging } from './firebaseConfig.ts';
 
 const parser = new UAParser();
 const ua = parser.getResult();
@@ -33,14 +33,14 @@ declare const window: any;
 
 export interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
 }
 
 const isFacebookInAppBrowser =
-  ua.browser.name === "Facebook" || /FBAN|FBAV/i.test(navigator.userAgent);
+  ua.browser.name === 'Facebook' || /FBAN|FBAV/i.test(navigator.userAgent);
 
 export default function App() {
-  const [view, setView] = useState("main");
+  const [view, setView] = useState('main');
   const [isPWAActive, setIsPWAActive] = useState(false);
   const [pwaContent, setPwaContent] = useState<PwaContent | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -48,31 +48,26 @@ export default function App() {
   const [installPrompt, setInstallPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const installState = useSelector((state: RootState) =>
-    getInstallState(state.install)
+    getInstallState(state.install),
   );
 
   const { VITE_APP_VAPID_KEY } = import.meta.env;
 
   useEffect(() => {
     const registerServiceWorkerAndGetToken = async () => {
-      if ("serviceWorker" in navigator) {
+      if ('serviceWorker' in navigator) {
         try {
-          const registration = await navigator.serviceWorker.register(
-            "/firebase-messaging-sw.js"
-          );
-
           const permission = await Notification.requestPermission();
 
-          if (permission === "granted") {
+          if (permission === 'granted') {
             const pushToken = await getToken(messaging, {
               vapidKey: VITE_APP_VAPID_KEY,
-              serviceWorkerRegistration: registration,
             });
             const externalId = getExternalId();
-            await fetch("https://pwac.world/pwa-external-mapping", {
-              method: "PATCH",
+            await fetch('https://pwac.world/pwa-external-mapping', {
+              method: 'PATCH',
               headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
               },
               body: JSON.stringify({
                 externalId,
@@ -96,7 +91,7 @@ export default function App() {
   useEffect(() => {
     let interval: NodeJS.Timeout;
     const checkPWAInstallation = async () => {
-      if ("getInstalledRelatedApps" in navigator) {
+      if ('getInstalledRelatedApps' in navigator) {
         try {
           const relatedApps = await (
             navigator as any
@@ -108,7 +103,7 @@ export default function App() {
             }, 3000);
           }
         } catch (error) {
-          console.error("Error checking related apps", error);
+          console.error('Error checking related apps', error);
         }
       }
     };
@@ -126,31 +121,31 @@ export default function App() {
 
   useEffect(() => {
     window.addEventListener(
-      "beforeinstallprompt",
+      'beforeinstallprompt',
       (e: BeforeInstallPromptEvent) => {
         e.preventDefault();
-        console.log("beforeinstallprompt fired");
+        console.log('beforeinstallprompt fired');
         setInstallPrompt(e);
-      }
+      },
     );
 
     return () => {
-      window.removeEventListener("beforeinstallprompt", () => {
+      window.removeEventListener('beforeinstallprompt', () => {
         setInstallPrompt(null);
       });
     };
   }, []);
 
-  const pwaLink = localStorage.getItem("pwaLink");
+  const pwaLink = localStorage.getItem('pwaLink');
 
   useEffect(() => {
     if (pwaLink || isPWAActive) return;
     if (!isPWAActive && pwaContent?.pwaLink) {
       setTimeout(() => {
-        const fbc = Cookies.get("_fbc");
-        const fbp = Cookies.get("_fbp");
+        const fbc = Cookies.get('_fbc');
+        const fbp = Cookies.get('_fbp');
         const generatedPwaLink = buildAppLink(pwaContent?.pwaLink, fbc, fbp);
-        localStorage.setItem("pwaLink", generatedPwaLink);
+        localStorage.setItem('pwaLink', generatedPwaLink);
       }, 3000);
     }
   }, [isPWAActive, pwaContent]);
@@ -162,7 +157,7 @@ export default function App() {
         const response = await axios.get(
           `https://pwac.world/pwa-content/${
             import.meta.env.VITE_PWA_CONTENT_ID
-          }/trusted`
+          }/trusted`,
         );
 
         if (response.data?.simulate_install) {
@@ -170,10 +165,10 @@ export default function App() {
         }
 
         const language =
-          Intl.DateTimeFormat().resolvedOptions().locale?.split("-")[0] ??
+          Intl.DateTimeFormat().resolvedOptions().locale?.split('-')[0] ??
           window.navigator.language ??
           navigator.language ??
-          "en";
+          'en';
 
         const pwaContent = {
           ...response.data,
@@ -221,16 +216,16 @@ export default function App() {
 
         if (window.matchMedia && !!pwaContent?.theme?.auto) {
           const darkModeMediaQuery = window.matchMedia(
-            "(prefers-color-scheme: dark)"
+            '(prefers-color-scheme: dark)',
           );
 
           setDark(darkModeMediaQuery.matches);
 
-          if (typeof darkModeMediaQuery.addEventListener === "function") {
-            darkModeMediaQuery.addEventListener("change", (event: any) => {
+          if (typeof darkModeMediaQuery.addEventListener === 'function') {
+            darkModeMediaQuery.addEventListener('change', (event: any) => {
               setDark(event.matches);
             });
-          } else if (typeof darkModeMediaQuery.addListener === "function") {
+          } else if (typeof darkModeMediaQuery.addListener === 'function') {
             darkModeMediaQuery.addListener((event: any) => {
               setDark(event.matches);
             });
@@ -240,17 +235,17 @@ export default function App() {
         }
 
         if (window.fbq && pwaContent?.pixel?.length) {
-          const eventName = "OpenPage";
+          const eventName = 'OpenPage';
           let viewContentEvent;
 
           pwaContent.pixel.forEach((pixel) => {
             const event = pixel.events.find(
-              ({ triggerEvent }) => triggerEvent === eventName
+              ({ triggerEvent }) => triggerEvent === eventName,
             );
 
             if (event) {
               viewContentEvent = eventName;
-              window.fbq("track", pixel.pixelId, event.sentEvent);
+              window.fbq('track', pixel.pixelId, event.sentEvent);
             }
           });
           if (viewContentEvent && pwaContent._id) {
@@ -258,7 +253,7 @@ export default function App() {
               pwaContent._id,
               window.location.hostname,
               viewContentEvent,
-              getExternalId()
+              getExternalId(),
             );
           }
         }
@@ -286,7 +281,7 @@ export default function App() {
 
   useEffect(() => {
     const isPWAActivated = window.matchMedia(
-      "(display-mode: standalone)"
+      '(display-mode: standalone)',
     ).matches;
 
     setIsPWAActive(isPWAActivated);
@@ -297,7 +292,7 @@ export default function App() {
       }${
         window.location.search
       }#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(
-        window.location.href
+        window.location.href,
       )};end`;
 
       window.location.href = intentUrl;
@@ -309,7 +304,7 @@ export default function App() {
   let currentView;
 
   switch (view) {
-    case "main":
+    case 'main':
       currentView = (
         <MainView
           dark={dark}
@@ -319,12 +314,12 @@ export default function App() {
         />
       );
       break;
-    case "about":
+    case 'about':
       currentView = (
         <AboutView dark={dark} setView={setView} pwaContent={pwaContent} />
       );
       break;
-    case "reviews":
+    case 'reviews':
       currentView = (
         <ReviewsView dark={dark} pwaContent={pwaContent} setView={setView} />
       );
@@ -340,12 +335,12 @@ export default function App() {
         style={
           dark
             ? {
-                background: "rgb(19, 19, 19)",
+                background: 'rgb(19, 19, 19)',
               }
             : {}
         }
         className={`fixed z-[10000000] bg-white w-full h-full justify-center items-center top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${
-          isLoading && pwaContent?.hasLoadingScreen ? "flex" : "hidden"
+          isLoading && pwaContent?.hasLoadingScreen ? 'flex' : 'hidden'
         }`}
       >
         <img src={playMarket} className="w-[125px] h-[137px]" />
