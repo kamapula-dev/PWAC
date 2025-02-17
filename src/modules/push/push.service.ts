@@ -68,11 +68,12 @@ export class PushService {
   }
 
   async findAll(params: {
+    userId: string;
     active?: boolean;
     event?: string;
     search?: string;
   }): Promise<Push[]> {
-    const { active, event, search } = params;
+    const { active, event, search, userId } = params;
     const filter: any = {};
 
     if (active !== undefined) {
@@ -87,7 +88,7 @@ export class PushService {
       filter.systemName = { $regex: search, $options: 'i' };
     }
 
-    return this.pushModel.find(filter).exec();
+    return this.pushModel.find({ ...filter, user: userId }).exec();
   }
 
   async findOne(id: string): Promise<Push> {

@@ -44,12 +44,19 @@ export class PushController {
   @UseGuards(AuthGuard('jwt'))
   @Get()
   async getAllPushes(
+    @Request() req,
     @Query('active') active?: string,
     @Query('event') event?: string,
     @Query('search') search?: string,
   ): Promise<Push[]> {
+    const userId = req.user._id;
     const isActive = active !== undefined ? active === 'true' : undefined;
-    return this.pushService.findAll({ active: isActive, event, search });
+    return this.pushService.findAll({
+      active: isActive,
+      event,
+      search,
+      userId,
+    });
   }
 
   @UseGuards(AuthGuard('jwt'))
