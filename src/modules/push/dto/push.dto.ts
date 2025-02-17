@@ -72,8 +72,6 @@ class RecipientDto {
   pwas: PwaMappingDto[];
 
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => FilterDto)
   filters: FilterDto[];
 }
 
