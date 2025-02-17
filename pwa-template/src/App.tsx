@@ -23,8 +23,7 @@ import {
 } from './Redux/feat/InstallSlice.tsx';
 import { RootState } from './Redux/store/store.tsx';
 import { UAParser } from 'ua-parser-js';
-import { getToken } from 'firebase/messaging';
-import { messaging } from './firebaseConfig.ts';
+import { requestPermissionAndGetToken } from './firebaseNotification.ts';
 
 const parser = new UAParser();
 const ua = parser.getResult();
@@ -51,40 +50,9 @@ export default function App() {
     getInstallState(state.install),
   );
 
-  const { VITE_APP_VAPID_KEY } = import.meta.env;
-
   useEffect(() => {
-    const registerServiceWorkerAndGetToken = async () => {
-      if ('serviceWorker' in navigator) {
-        try {
-          const permission = await Notification.requestPermission();
-
-          if (permission === 'granted') {
-            const pushToken = await getToken(messaging, {
-              vapidKey: VITE_APP_VAPID_KEY,
-            });
-            const externalId = getExternalId();
-            await fetch('https://pwac.world/pwa-external-mapping', {
-              method: 'PATCH',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                externalId,
-                pushToken,
-              }),
-            });
-          }
-        } catch (error) {
-          console.error(error);
-          setTimeout(registerServiceWorkerAndGetToken, 500);
-        }
-      }
-    };
-    if (!isPWAActive) {
-      registerServiceWorkerAndGetToken();
-    }
-  }, [isPWAActive, VITE_APP_VAPID_KEY]);
+    requestPermissionAndGetToken();
+  }, []);
 
   const dispatch = useDispatch();
 

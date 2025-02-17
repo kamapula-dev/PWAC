@@ -106,6 +106,36 @@ export class BuildPWAProcessor {
           },
         ];
         await fse.writeJson(assetLinksPath, assetLinksContent, { spaces: 2 });
+
+        // Create firebase-messaging-sw.js
+        const serviceWorkerPath = path.join(
+          publicFolderPath,
+          'firebase-messaging-sw.js',
+        );
+        const serviceWorkerContent = `
+          importScripts("https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js");
+          importScripts("https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js");
+          
+          firebase.initializeApp({
+            apiKey: "AIzaSyDrnHccHsbP1qexi0TPW0wt5dw95QB6SYQ",
+            authDomain: "pwac-f4fa7.firebaseapp.com",
+            projectId: "pwac-f4fa7",
+            storageBucket: "pwac-f4fa7.firebasestorage.app",
+            messagingSenderId: "1082672576795",
+            appId: "1:1082672576795:web:da0be39788c3431bd4bbbe"
+          });
+          
+          const messaging = firebase.messaging();
+          
+          messaging.onBackgroundMessage((payload) => {
+            console.log("Background message received:", payload);
+            self.registration.showNotification(payload.notification.title, {
+              body: payload.notification.body,
+              icon: "/favicon.ico",
+            });
+          });
+        `;
+        await fse.writeFile(serviceWorkerPath, serviceWorkerContent);
       } catch (error) {
         Logger.error('Error creating public folder structure:', error);
         throw new Error('Failed to create public folder structure');
