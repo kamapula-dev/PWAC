@@ -8,7 +8,6 @@ import { PWAExternalMapping } from '../../schemas/pwa-external-mapping.scheme';
 import { PWAEventLog } from '../../schemas/pwa-event-log.scheme';
 import { FirebaseService } from '../firebase/firebase.service';
 import { PushDto } from './dto/push.dto';
-import { PwaEvent } from '../../schemas/pixel-event.scheme';
 
 @Injectable()
 export class PushService {
@@ -126,13 +125,11 @@ export class PushService {
     for (const recipient of recipients) {
       const { pwas, filters } = recipient;
 
-      // Найти все PWA, у которых есть `pushToken`
       let mappings = await this.mappingModel.find({
         pwaContentId: { $in: pwas.map((pwa) => pwa.id) },
         pushToken: { $exists: true, $ne: '' },
       });
 
-      // Применяем фильтры `sendTo: all | with | without`
       for (const filter of filters) {
         const userHasEvent = await this.pwaEventLogModel.exists({
           event: filter.event,
@@ -141,17 +138,16 @@ export class PushService {
         if (filter.sendTo === SendToType.with && !userHasEvent) {
           continue;
         }
+
         if (filter.sendTo === SendToType.without && userHasEvent) {
           continue;
         }
       }
 
-      // Собираем `pushToken`
       const tokens = mappings.map((m) => m.pushToken).filter(Boolean);
       allTokens = [...allTokens, ...tokens];
     }
 
-    // Убираем дублирующиеся токены
     const uniqueTokens = Array.from(new Set(allTokens));
 
     if (uniqueTokens.length === 0) {
@@ -163,7 +159,6 @@ export class PushService {
       `[PushService] Sending push to ${uniqueTokens.length} recipients...`,
     );
 
-    // Разбиваем токены на чанки по 500 штук (Firebase ограничение)
     const chunkSize = 500;
     const results = [];
 
@@ -188,7 +183,7 @@ export class PushService {
     };
   }
 
-  async testPush(pushId: string): Promise<any> {
+  async testPush(pushId: string): Promise<void> {
     const pushData = await this.findOne(pushId);
 
     if (!pushData) {
@@ -199,15 +194,12 @@ export class PushService {
       `[PushService] Manually triggering test push for pushId=${pushId}`,
     );
 
-    // Отправляем пуш через Firebase
     const result = await this.sendPushViaFirebase(pushData);
 
     Logger.log(
       `[PushService] Test push completed for pushId=${pushId}`,
       JSON.stringify(result),
     );
-
-    return result;
   }
 
   async handleNewEvent(eventLog: PWAEventLog): Promise<void> {
@@ -215,14 +207,12 @@ export class PushService {
       `[PushService] New event detected: ${eventLog.event} for externalId: ${eventLog.externalId}`,
     );
 
-    // Найти все активные пуши, у которых triggerEvent совпадает с eventLog.event
     const activePushes = await this.pushModel.find({
       active: true,
       triggerEvent: eventLog.event,
     });
 
     for (const push of activePushes) {
-      // Фильтруем получателей по pwaContentId
       const matchingRecipients = push.recipients.filter((recipient) =>
         recipient.pwas.some((pwa) => pwa.id === eventLog.pwaContentId),
       );
@@ -234,20 +224,18 @@ export class PushService {
         continue;
       }
 
-      // Получаем PWAExternalMapping (токены пушей)
       const pwaMapping = await this.mappingModel.findOne({
         externalId: eventLog.externalId,
         pwaContentId: eventLog.pwaContentId,
       });
 
-      if (!pwaMapping || !pwaMapping.pushToken) {
+      if (!(pwaMapping && pwaMapping.pushToken)) {
         Logger.log(
           `[PushService] No push token found for externalId ${eventLog.externalId}`,
         );
         continue;
       }
 
-      // Проверяем фильтры событий и sendTo (with | without)
       let shouldSend = false;
 
       for (const recipient of matchingRecipients) {
@@ -276,13 +264,11 @@ export class PushService {
         continue;
       }
 
-      // Если есть задержка, ставим в очередь Bull
       if (push.delay > 0) {
         await this.schedulePush(push._id.toString(), push.delay);
         continue;
       }
 
-      // Отправляем пуш сразу
       await this.firebasePushService.sendPushToMultipleDevices(
         [pwaMapping.pushToken],
         {
