@@ -69,8 +69,6 @@ class PwaMappingDto {
 
 class RecipientDto {
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => PwaMappingDto)
   pwas: PwaMappingDto[];
 
   @IsArray()
