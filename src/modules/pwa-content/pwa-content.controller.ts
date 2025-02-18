@@ -31,6 +31,7 @@ import * as path from 'path';
 import { PWAEventLogService } from '../pwa-event-log/pwa-event-log.service';
 import { PWAExternalMappingService } from '../pwa-external-mapping/pwa-external-mapping.service';
 import { LANGUAGES, SUPPORTED_IMAGES } from './consts';
+import { PushService } from '../push/push.service';
 
 @Controller('pwa-content')
 export class PWAContentController {
@@ -45,6 +46,7 @@ export class PWAContentController {
     private readonly readyDomainService: ReadyDomainService,
     private readonly pwaEventLogService: PWAEventLogService,
     private readonly pwaExternalMappingService: PWAExternalMappingService,
+    private readonly pushService: PushService,
     @InjectQueue('buildPWA') private readonly buildQueue: Queue,
   ) {
     const deeplApiKey = this.configService.get<string>('DEEPL_API_KEY');
@@ -179,6 +181,11 @@ export class PWAContentController {
         : Promise.resolve(),
       this.userService.setUserPwaId(userId, existingPwa.domainName, null),
       this.pwaContentService.remove(id, userId),
+      this.pushService.updatePwaIdByDomain(
+        userId,
+        existingPwa.domainName,
+        null,
+      ),
       this.pwaEventLogService.removePwaContentIdByDomain(
         existingPwa.domainName,
       ),
@@ -231,6 +238,7 @@ export class PWAContentController {
         existingPwa.pwaContentId,
       ),
       this.pwaContentService.remove(id, userId),
+      this.pushService.removePwaById(userId, id),
       this.pwaEventLogService.deleteAllByPwaContentId(id),
       this.pwaExternalMappingService.deleteAllByPwaContentId(id),
     ]);

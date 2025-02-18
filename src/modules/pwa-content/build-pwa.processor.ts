@@ -14,12 +14,15 @@ import { PWAEventLogService } from '../pwa-event-log/pwa-event-log.service';
 import { PWAExternalMappingService } from '../pwa-external-mapping/pwa-external-mapping.service';
 import { DomainManagementService } from '../domain-managemant/domain-management.service';
 import { ReadyDomainService } from '../ready-domain/ready-domain.service';
+import { PushService } from '../push/push.service';
+import { ConfigService } from '@nestjs/config';
 
 const execAsync = promisify(exec);
 
 @Processor('buildPWA')
 export class BuildPWAProcessor {
   constructor(
+    private readonly configService: ConfigService,
     private readonly mediaService: MediaService,
     private readonly userService: UserService,
     private readonly domainMappingService: DomainMappingService,
@@ -27,6 +30,7 @@ export class BuildPWAProcessor {
     private readonly pwaExternalMappingService: PWAExternalMappingService,
     private readonly domainManagementService: DomainManagementService,
     private readonly readyDomainService: ReadyDomainService,
+    private readonly pushService: PushService,
   ) {}
 
   @Process()
@@ -64,15 +68,15 @@ export class BuildPWAProcessor {
         const envFilePath = path.join(tempBuildFolder, '.env');
         const envContent = `
           VITE_PWA_CONTENT_ID=${pwaContentId}
-          VITE_API_URL=https://pwac.world
-          VITE_APP_API_KEY=AIzaSyDrnHccHsbP1qexi0TPW0wt5dw95QB6SYQ
-          VITE_APP_AUTH_DOMAIN=pwac-f4fa7.firebaseapp.com
-          VITE_APP_PROJECT_ID=pwac-f4fa7
-          VITE_APP_STORAGE_BUCKET=pwac-f4fa7.firebasestorage.app
-          VITE_APP_MESSAGING_SENDER_ID=1082672576795
-          VITE_APP_APP_ID=1:1082672576795:web:da0be39788c3431bd4bbbe
-          VITE_APP_MEASUREMENT_ID=G-PQN430W6DQ
-          VITE_APP_VAPID_KEY=BK_A7jh_hRtPuk_AmQIUSGsZS96du-BvCMKbKuI9Lk7-zImex-Zxlqv7T_Y5bEKNPyiERktNCnkjkEX-rFXRthQ
+          VITE_API_URL=${this.configService.get<string>('VITE_API_URL')}
+          VITE_APP_API_KEY=${this.configService.get<string>('VITE_APP_API_KEY')}
+          VITE_APP_AUTH_DOMAIN=${this.configService.get<string>('VITE_APP_AUTH_DOMAIN')}
+          VITE_APP_PROJECT_ID=${this.configService.get<string>('VITE_APP_PROJECT_ID')}
+          VITE_APP_STORAGE_BUCKET=${this.configService.get<string>('VITE_APP_STORAGE_BUCKET')}
+          VITE_APP_MESSAGING_SENDER_ID=${this.configService.get<string>('VITE_APP_MESSAGING_SENDER_ID')}
+          VITE_APP_APP_ID=${this.configService.get<string>('VITE_APP_APP_ID')}
+          VITE_APP_MEASUREMENT_ID=${this.configService.get<string>('VITE_APP_MEASUREMENT_ID')}
+          VITE_APP_VAPID_KEY=${this.configService.get<string>('VITE_APP_VAPID_KEY')}
         `;
         await fse.writeFile(envFilePath, envContent);
         Logger.log(`.env file created at ${envFilePath}`);
@@ -367,6 +371,11 @@ export class BuildPWAProcessor {
             existingUserPwaForDomain.domainName,
             pwaContentId,
           ),
+          this.pushService.updatePwaIdByDomain(
+            userId,
+            existingUserPwaForDomain.domainName,
+            pwaContentId,
+          ),
           this.userService.setUserPwaStatusByDomain(
             userId,
             existingUserPwaForDomain.domainName,
@@ -446,6 +455,11 @@ export class BuildPWAProcessor {
             pwaContentId,
           ),
           this.pwaExternalMappingService.setPwaContentIdByDomain(
+            existingUserPwaForDomain.domainName,
+            pwaContentId,
+          ),
+          this.pushService.updatePwaIdByDomain(
+            userId,
             existingUserPwaForDomain.domainName,
             pwaContentId,
           ),

@@ -58,9 +58,9 @@ class FilterDto {
 }
 
 class PwaMappingDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  id: string;
+  id?: string;
 
   @IsNotEmpty()
   @IsString()

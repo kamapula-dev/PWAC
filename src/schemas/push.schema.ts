@@ -53,8 +53,8 @@ const FilterSchema = SchemaFactory.createForClass(Filter);
 
 @Schema({ _id: false })
 export class PwaMapping {
-  @Prop({ required: true })
-  id: string;
+  @Prop()
+  id?: string;
 
   @Prop({ required: true })
   domain: string;

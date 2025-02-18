@@ -12,6 +12,7 @@ import { DomainMappingModule } from '../domain-mapping/domain-mapping.module';
 import { ReadyDomainModule } from '../ready-domain/ready-domain.module';
 import { PWAEventLogModule } from '../pwa-event-log/pwa-event-log.module';
 import { PWAExternalMappingModule } from '../pwa-external-mapping/pwa-external-mapping.module';
+import { PushModule } from '../push/push.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { PWAExternalMappingModule } from '../pwa-external-mapping/pwa-external-m
     ReadyDomainModule,
     PWAEventLogModule,
     PWAExternalMappingModule,
+    PushModule,
   ],
   controllers: [PWAContentController],
   providers: [PWAContentService, BuildPWAProcessor],

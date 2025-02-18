@@ -99,6 +99,47 @@ export class PushService {
     return push;
   }
 
+  async updatePwaIdByDomain(
+    userId: string,
+    domain: string,
+    newId: string | null,
+  ): Promise<void> {
+    const pushes = await this.pushModel.find({ user: userId });
+
+    if (!pushes.length) {
+      throw new NotFoundException(`No pushes found for user "${userId}"`);
+    }
+
+    pushes.forEach((push) => {
+      push.recipients.forEach((recipient) => {
+        recipient.pwas.forEach((pwa) => {
+          if (pwa.domain === domain) {
+            pwa.id = newId;
+          }
+        });
+      });
+    });
+
+    await Promise.all(pushes.map((push) => push.save()));
+  }
+
+  async removePwaById(userId: string, pwaId: string): Promise<void> {
+    const pushes = await this.pushModel.find({ user: userId });
+
+    if (!pushes.length) {
+      throw new NotFoundException(`No pushes found for user "${userId}"`);
+    }
+
+    pushes.forEach((push) => {
+      push.recipients = push.recipients.map((recipient) => {
+        recipient.pwas = recipient.pwas.filter((pwa) => pwa.id !== pwaId);
+        return recipient;
+      });
+    });
+
+    await Promise.all(pushes.map((push) => push.save()));
+  }
+
   async duplicatePush(id: string): Promise<Push> {
     const existingPush = await this.pushModel.findById(id).lean();
     if (!existingPush) {
@@ -275,7 +316,10 @@ export class PushService {
         {
           title: push.content.title,
           body: push.content.description,
+          color: push.content.color,
+          badge: push.content.badge,
           icon: push.content.icon,
+          picture: push.content.picture,
           url: push.content.url,
         },
       );
