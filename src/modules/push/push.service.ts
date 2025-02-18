@@ -8,7 +8,10 @@ import { PWAExternalMapping } from '../../schemas/pwa-external-mapping.scheme';
 import { PWAEventLog } from '../../schemas/pwa-event-log.scheme';
 import { FirebaseService } from '../firebase/firebase.service';
 import { PushDto } from './dto/push.dto';
+<<<<<<< HEAD
 import { PwaEvent } from '../../schemas/pixel-event.scheme';
+=======
+>>>>>>> 37f5fa5e25d4540a50145f5eb40ffb567c4a60dc
 
 @Injectable()
 export class PushService {
@@ -103,6 +106,7 @@ export class PushService {
     const existingPush = await this.pushModel.findById(id).lean();
     if (!existingPush) {
       throw new NotFoundException(`Push with id "${id}" not found`);
+<<<<<<< HEAD
     }
 
     const duplicatedPush = new this.pushModel({
@@ -195,19 +199,115 @@ export class PushService {
       throw new NotFoundException(`Push with ID ${pushId} not found`);
     }
 
+=======
+    }
+
+    const duplicatedPush = new this.pushModel({
+      ...existingPush,
+      _id: new Types.ObjectId(),
+      createdAt: undefined,
+      updatedAt: undefined,
+      systemName: `${existingPush.systemName} (Copy)`,
+      active: false,
+    });
+
+    return duplicatedPush.save();
+  }
+
+  async sendPushViaFirebase(pushData: Push) {
+    const { content, recipients } = pushData;
+    const { title, description, icon, url } = content;
+
+    let allTokens: string[] = [];
+
+    for (const recipient of recipients) {
+      const { pwas, filters } = recipient;
+
+      let mappings = await this.mappingModel.find({
+        pwaContentId: { $in: pwas.map((pwa) => pwa.id) },
+        pushToken: { $exists: true, $ne: '' },
+      });
+
+      for (const filter of filters) {
+        const userHasEvent = await this.pwaEventLogModel.exists({
+          event: filter.event,
+        });
+
+        if (filter.sendTo === SendToType.with && !userHasEvent) {
+          continue;
+        }
+
+        if (filter.sendTo === SendToType.without && userHasEvent) {
+          continue;
+        }
+      }
+
+      const tokens = mappings.map((m) => m.pushToken).filter(Boolean);
+      allTokens = [...allTokens, ...tokens];
+    }
+
+    const uniqueTokens = Array.from(new Set(allTokens));
+
+    if (uniqueTokens.length === 0) {
+      Logger.log(`[PushService] No recipients found for push.`);
+      return { success: false, message: 'No recipients found' };
+    }
+
+    Logger.log(
+      `[PushService] Sending push to ${uniqueTokens.length} recipients...`,
+    );
+
+    const chunkSize = 500;
+    const results = [];
+
+    for (let i = 0; i < uniqueTokens.length; i += chunkSize) {
+      const chunk = uniqueTokens.slice(i, i + chunkSize);
+      const res = await this.firebasePushService.sendPushToMultipleDevices(
+        chunk,
+        {
+          title,
+          body: description,
+          icon,
+          url,
+        },
+      );
+      results.push(res);
+    }
+
+    return {
+      success: true,
+      totalTokens: uniqueTokens.length,
+      results,
+    };
+  }
+
+  async testPush(pushId: string): Promise<void> {
+    const pushData = await this.findOne(pushId);
+
+    if (!pushData) {
+      throw new NotFoundException(`Push with ID ${pushId} not found`);
+    }
+
+>>>>>>> 37f5fa5e25d4540a50145f5eb40ffb567c4a60dc
     Logger.log(
       `[PushService] Manually triggering test push for pushId=${pushId}`,
     );
 
+<<<<<<< HEAD
     // Отправляем пуш через Firebase
+=======
+>>>>>>> 37f5fa5e25d4540a50145f5eb40ffb567c4a60dc
     const result = await this.sendPushViaFirebase(pushData);
 
     Logger.log(
       `[PushService] Test push completed for pushId=${pushId}`,
       JSON.stringify(result),
     );
+<<<<<<< HEAD
 
     return result;
+=======
+>>>>>>> 37f5fa5e25d4540a50145f5eb40ffb567c4a60dc
   }
 
   async handleNewEvent(eventLog: PWAEventLog): Promise<void> {
@@ -215,14 +315,20 @@ export class PushService {
       `[PushService] New event detected: ${eventLog.event} for externalId: ${eventLog.externalId}`,
     );
 
+<<<<<<< HEAD
     // Найти все активные пуши, у которых triggerEvent совпадает с eventLog.event
+=======
+>>>>>>> 37f5fa5e25d4540a50145f5eb40ffb567c4a60dc
     const activePushes = await this.pushModel.find({
       active: true,
       triggerEvent: eventLog.event,
     });
 
     for (const push of activePushes) {
+<<<<<<< HEAD
       // Фильтруем получателей по pwaContentId
+=======
+>>>>>>> 37f5fa5e25d4540a50145f5eb40ffb567c4a60dc
       const matchingRecipients = push.recipients.filter((recipient) =>
         recipient.pwas.some((pwa) => pwa.id === eventLog.pwaContentId),
       );
@@ -234,20 +340,30 @@ export class PushService {
         continue;
       }
 
+<<<<<<< HEAD
       // Получаем PWAExternalMapping (токены пушей)
+=======
+>>>>>>> 37f5fa5e25d4540a50145f5eb40ffb567c4a60dc
       const pwaMapping = await this.mappingModel.findOne({
         externalId: eventLog.externalId,
         pwaContentId: eventLog.pwaContentId,
       });
 
+<<<<<<< HEAD
       if (!pwaMapping || !pwaMapping.pushToken) {
+=======
+      if (!(pwaMapping && pwaMapping.pushToken)) {
+>>>>>>> 37f5fa5e25d4540a50145f5eb40ffb567c4a60dc
         Logger.log(
           `[PushService] No push token found for externalId ${eventLog.externalId}`,
         );
         continue;
       }
 
+<<<<<<< HEAD
       // Проверяем фильтры событий и sendTo (with | without)
+=======
+>>>>>>> 37f5fa5e25d4540a50145f5eb40ffb567c4a60dc
       let shouldSend = false;
 
       for (const recipient of matchingRecipients) {
@@ -276,13 +392,19 @@ export class PushService {
         continue;
       }
 
+<<<<<<< HEAD
       // Если есть задержка, ставим в очередь Bull
+=======
+>>>>>>> 37f5fa5e25d4540a50145f5eb40ffb567c4a60dc
       if (push.delay > 0) {
         await this.schedulePush(push._id.toString(), push.delay);
         continue;
       }
 
+<<<<<<< HEAD
       // Отправляем пуш сразу
+=======
+>>>>>>> 37f5fa5e25d4540a50145f5eb40ffb567c4a60dc
       await this.firebasePushService.sendPushToMultipleDevices(
         [pwaMapping.pushToken],
         {
