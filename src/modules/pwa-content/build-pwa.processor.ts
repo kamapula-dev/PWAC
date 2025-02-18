@@ -113,26 +113,30 @@ export class BuildPWAProcessor {
           'firebase-messaging-sw.js',
         );
         const serviceWorkerContent = `
-          importScripts("https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js");
-          importScripts("https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js");
+          importScripts("https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js");
+          importScripts(
+            "https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"
+          );
           
-          firebase.initializeApp({
-            apiKey: "AIzaSyDrnHccHsbP1qexi0TPW0wt5dw95QB6SYQ",
-            authDomain: "pwac-f4fa7.firebaseapp.com",
-            projectId: "pwac-f4fa7",
-            storageBucket: "pwac-f4fa7.firebasestorage.app",
-            messagingSenderId: "1082672576795",
-            appId: "1:1082672576795:web:da0be39788c3431bd4bbbe"
-          });
+          const defaultConfig = {
+            apiKey: true,
+            projectId: true,
+            messagingSenderId: true,
+            appId: true,
+          };
+          
+          firebase.initializeApp(firebaseConfig);
           
           const messaging = firebase.messaging();
           
           messaging.onBackgroundMessage((payload) => {
-            console.log("Background message received:", payload);
-            self.registration.showNotification(payload.notification.title, {
+            const notificationTitle = payload.notification.title;
+            const notificationOptions = {
               body: payload.notification.body,
-              icon: "/favicon.ico",
-            });
+              icon: payload.notification.image,
+            };
+          
+            self.registration.showNotification(notificationTitle, notificationOptions);
           });
         `;
         await fse.writeFile(serviceWorkerPath, serviceWorkerContent);
