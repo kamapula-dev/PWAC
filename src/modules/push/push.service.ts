@@ -104,7 +104,8 @@ export class PushService {
     domain: string,
     newId: string | null,
   ): Promise<void> {
-    const pushes = await this.pushModel.find({ user: userId });
+    const objectId = new Types.ObjectId(userId);
+    const pushes = await this.pushModel.find({ user: objectId });
 
     if (!pushes.length) {
       throw new NotFoundException(`No pushes found for user "${userId}"`);
@@ -124,7 +125,8 @@ export class PushService {
   }
 
   async removePwaById(userId: string, pwaId: string): Promise<void> {
-    const pushes = await this.pushModel.find({ user: userId });
+    const objectId = new Types.ObjectId(userId);
+    const pushes = await this.pushModel.find({ user: objectId });
 
     if (!pushes.length) {
       throw new NotFoundException(`No pushes found for user "${userId}"`);
