@@ -113,31 +113,7 @@ export class BuildPWAProcessor {
           'firebase-messaging-sw.js',
         );
         const serviceWorkerContent = `
-          importScripts("https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js");
-          importScripts(
-            "https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"
-          );
-          
-          const defaultConfig = {
-            apiKey: true,
-            projectId: true,
-            messagingSenderId: true,
-            appId: true,
-          };
-          
-          firebase.initializeApp(firebaseConfig);
-          
-          const messaging = firebase.messaging();
-          
-          messaging.onBackgroundMessage((payload) => {
-            const notificationTitle = payload.notification.title;
-            const notificationOptions = {
-              body: payload.notification.body,
-              icon: payload.notification.image,
-            };
-          
-            self.registration.showNotification(notificationTitle, notificationOptions);
-          });
+          importScripts("https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"),importScripts("https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"),firebase.initializeApp({apiKey:"AIzaSyDrnHccHsbP1qexi0TPW0wt5dw95QB6SYQ",authDomain:"pwac-f4fa7.firebaseapp.com",projectId:"pwac-f4fa7",storageBucket:"pwac-f4fa7.firebasestorage.app",messagingSenderId:"1082672576795",appId:"1:1082672576795:web:da0be39788c3431bd4bbbe"});const messaging=firebase.messaging();messaging.onBackgroundMessage(a=>{let i=a.notification.title,e={body:a.notification.body,icon:a.notification.image};self.registration.showNotification(i,e)});
         `;
         await fse.writeFile(serviceWorkerPath, serviceWorkerContent);
       } catch (error) {
