@@ -108,7 +108,8 @@ export class PushService {
     const pushes = await this.pushModel.find({ user: objectId });
 
     if (!pushes.length) {
-      throw new NotFoundException(`No pushes found for user "${userId}"`);
+      Logger.warn(`No pushes found for user "${userId}". Nothing to update.`);
+      return;
     }
 
     pushes.forEach((push) => {
@@ -129,7 +130,8 @@ export class PushService {
     const pushes = await this.pushModel.find({ user: objectId });
 
     if (!pushes.length) {
-      throw new NotFoundException(`No pushes found for user "${userId}"`);
+      Logger.warn(`No pushes found for user "${userId}". Nothing to update.`);
+      return;
     }
 
     pushes.forEach((push) => {
@@ -144,6 +146,7 @@ export class PushService {
 
   async duplicatePush(id: string): Promise<Push> {
     const existingPush = await this.pushModel.findById(id).lean();
+
     if (!existingPush) {
       throw new NotFoundException(`Push with id "${id}" not found`);
     }
