@@ -287,19 +287,17 @@ export class PushService {
 
       for (const recipient of matchingRecipients) {
         for (const filter of recipient.filters) {
-          if (filter.event === eventLog.event) {
-            const userHasEvent = await this.pwaEventLogModel.exists({
-              externalId: eventLog.externalId,
-              event: filter.event,
-            });
+          const userHasEvent = await this.pwaEventLogModel.exists({
+            externalId: eventLog.externalId,
+            event: filter.event,
+          });
 
-            if (filter.sendTo === SendToType.with && userHasEvent) {
-              shouldSend = true;
-            } else if (filter.sendTo === SendToType.without && !userHasEvent) {
-              shouldSend = true;
-            } else if (filter.sendTo === SendToType.all) {
-              shouldSend = true;
-            }
+          if (filter.sendTo === SendToType.with && userHasEvent) {
+            shouldSend = true;
+          } else if (filter.sendTo === SendToType.without && !userHasEvent) {
+            shouldSend = true;
+          } else if (filter.sendTo === SendToType.all) {
+            shouldSend = true;
           }
         }
       }
