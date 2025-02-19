@@ -148,6 +148,22 @@ export class BuildPWAProcessor {
           manifestData.short_name = pwaName;
         }
 
+        manifestData.id = domain;
+        manifestData.start_url = `https://${domain}/`;
+        manifestData.display_override = ['standalone', 'minimal-ui'];
+        manifestData.scope = '/';
+        manifestData.intent_filters = {
+          scope_url_scheme: 'https',
+          scope_url_host: domain,
+          scope_url_path: '/',
+        };
+        manifestData.version_code = '1';
+        manifestData.version_name = '1.0';
+        manifestData.bound_webapk = {
+          runtime_host: 'org.chromium.chrome',
+          runtime_host_application_name: 'Chromium',
+        };
+
         manifestData.related_applications = [
           {
             platform: 'webapp',
