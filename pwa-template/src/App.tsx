@@ -23,7 +23,7 @@ import {
 } from './Redux/feat/InstallSlice.tsx';
 import { RootState } from './Redux/store/store.tsx';
 import { UAParser } from 'ua-parser-js';
-import { requestPermissionAndGetToken } from './firebaseNotification.ts';
+// import { requestPermissionAndGetToken } from './firebaseNotification.ts';
 
 const parser = new UAParser();
 const ua = parser.getResult();
