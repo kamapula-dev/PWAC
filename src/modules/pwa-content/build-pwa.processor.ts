@@ -170,6 +170,7 @@ export class BuildPWAProcessor {
             url: `https://${domain}/manifest.webmanifest`,
           },
         ];
+        manifestData.url_handlers = [{ origin: `https://${domain}/` }];
 
         await fse.writeJson(manifestPath, manifestData, { spaces: 2 });
         Logger.log(`Manifest updated with name: ${pwaName}`);
