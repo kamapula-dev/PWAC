@@ -1,21 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { useIntl } from "react-intl";
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useIntl } from 'react-intl';
 import {
   getInstallState,
   setInstallState,
-} from "../../Redux/feat/InstallSlice";
-import { Pixel, PWAInstallState } from "../../shared/models";
-import { RootState } from "../../Redux/store/store";
+} from '../../Redux/feat/InstallSlice';
+import { Pixel, PWAInstallState } from '../../shared/models';
+import { RootState } from '../../Redux/store/store';
 import {
   buildAppLink,
   getExternalId,
   logEvent,
-} from "../../shared/helpers/analytics.ts";
-import Cookies from "js-cookie";
-import { Spin } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
+} from '../../shared/helpers/analytics.ts';
+import Cookies from 'js-cookie';
+import { Spin } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
 
 declare const window: any;
 
@@ -30,7 +30,7 @@ interface Props {
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
 }
 
 const InstallButton: React.FC<Props> = ({
@@ -42,7 +42,7 @@ const InstallButton: React.FC<Props> = ({
   customText,
 }) => {
   const installState = useSelector((state: RootState) =>
-    getInstallState(state.install)
+    getInstallState(state.install),
   );
 
   const dispatch = useDispatch();
@@ -56,17 +56,17 @@ const InstallButton: React.FC<Props> = ({
   const handleSendInfoAboutInstall = () => {
     if (window.fbq) {
       if (pixel?.length) {
-        const eventName = "Install";
+        const eventName = 'Install';
         let leadEvent;
 
         pixel.forEach((pixel) => {
           const event = pixel.events.find(
-            ({ triggerEvent }) => triggerEvent === eventName
+            ({ triggerEvent }) => triggerEvent === eventName,
           );
 
           if (event) {
             leadEvent = eventName;
-            window.fbq("track", pixel.pixelId, event.sentEvent);
+            window.fbq('track', pixel.pixelId, event.sentEvent);
           }
         });
 
@@ -74,16 +74,16 @@ const InstallButton: React.FC<Props> = ({
           logEvent(id, window.location.hostname, leadEvent, getExternalId());
         }
       } else {
-        window.fbq("track", "Lead");
+        window.fbq('track', 'Lead');
       }
     }
   };
 
   const redirectToOffer = () => {
-    const pwaLink = localStorage.getItem("pwaLink");
+    const pwaLink = localStorage.getItem('pwaLink');
     dispatch(setInstallState(PWAInstallState.waitingForRedirect));
     setTimeout(() => {
-      window.open(pwaLink, "_blank");
+      window.location.href(pwaLink);
     }, 5000);
   };
 
@@ -93,7 +93,7 @@ const InstallButton: React.FC<Props> = ({
     if (installPrompt) {
       await installPrompt.prompt();
       const choiceResult = await installPrompt.userChoice;
-      if (choiceResult.outcome === "accepted") {
+      if (choiceResult.outcome === 'accepted') {
         setTimeout(() => {
           dispatch(setInstallState(PWAInstallState.installed));
         }, 40000);
@@ -106,9 +106,9 @@ const InstallButton: React.FC<Props> = ({
   };
 
   const openLink = () => {
-    const fbc = Cookies.get("_fbc");
-    const fbp = Cookies.get("_fbp");
-    window.open(buildAppLink(appLink, fbc, fbp), "_blank");
+    const fbc = Cookies.get('_fbc');
+    const fbp = Cookies.get('_fbp');
+    window.open(buildAppLink(appLink, fbc, fbp), '_blank');
   };
 
   const showButtonText = () => {
@@ -117,8 +117,8 @@ const InstallButton: React.FC<Props> = ({
         return (
           customText ??
           intl.formatMessage({
-            id: "download",
-            defaultMessage: "Download",
+            id: 'download',
+            defaultMessage: 'Download',
           })
         );
 
@@ -126,14 +126,14 @@ const InstallButton: React.FC<Props> = ({
       case PWAInstallState.installing:
       case PWAInstallState.installed:
         return intl.formatMessage({
-          id: "open",
-          defaultMessage: "Open",
+          id: 'open',
+          defaultMessage: 'Open',
         });
 
       case PWAInstallState.downloaded:
         return intl.formatMessage({
-          id: "install",
-          defaultMessage: "Install",
+          id: 'install',
+          defaultMessage: 'Install',
         });
     }
   };
@@ -160,9 +160,9 @@ const InstallButton: React.FC<Props> = ({
   if (installState === PWAInstallState.waitingForRedirect) {
     return (
       <button
-        style={dark ? { background: "#A8C8FB", color: "#062961" } : {}}
+        style={dark ? { background: '#A8C8FB', color: '#062961' } : {}}
         className={`h-9 rounded-[60px] bg-[#1357CD]  w-full text-white ${
-          customText ? "" : "mb-[22px]"
+          customText ? '' : 'mb-[22px]'
         } transition duration-300 active:scale-95 disabled:bg-gray-300`}
         disabled
       >
@@ -175,22 +175,22 @@ const InstallButton: React.FC<Props> = ({
     <div className="flex justify-between gap-2">
       {installState === PWAInstallState.downloading && (
         <button
-          style={dark ? { background: "#A8C8FB", color: "#062961" } : {}}
+          style={dark ? { background: '#A8C8FB', color: '#062961' } : {}}
           className={`h-9 rounded-[60px] bg-[#1357CD] w-full text-white ${
-            customText ? "" : "mb-[22px]"
+            customText ? '' : 'mb-[22px]'
           } transition duration-300 active:scale-95 disabled:bg-gray-300`}
           onClick={() => dispatch(setInstallState(PWAInstallState.idle))}
         >
           {intl.formatMessage({
-            id: "cancel",
-            defaultMessage: "Cancel",
+            id: 'cancel',
+            defaultMessage: 'Cancel',
           })}
         </button>
       )}
       <button
-        style={dark ? { background: "#A8C8FB", color: "#062961" } : {}}
+        style={dark ? { background: '#A8C8FB', color: '#062961' } : {}}
         className={`h-9 rounded-[60px] bg-[#1357CD]  w-full text-white ${
-          customText ? "" : "mb-[22px]"
+          customText ? '' : 'mb-[22px]'
         } transition duration-300 active:scale-95 disabled:bg-gray-300 `}
         onClick={handleButtonClick}
         disabled={
