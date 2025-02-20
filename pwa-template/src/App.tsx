@@ -51,11 +51,11 @@ export default function App() {
     getInstallState(state.install),
   );
 
-  useEffect(() => {
-    const projectId = import.meta.env.VITE_APP_PROJECT_ID;
-    if (!projectId || !isPWAActive) return;
-    requestPermissionAndGetToken();
-  }, [isPWAActive]);
+  // useEffect(() => {
+  //   const projectId = import.meta.env.VITE_APP_PROJECT_ID;
+  //   if (!projectId || !isPWAActive) return;
+  //   requestPermissionAndGetToken();
+  // }, [isPWAActive]);
 
   const dispatch = useDispatch();
 
