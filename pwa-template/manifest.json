@@ -35,5 +35,5 @@
       "url": "https://plinkoplinkowinwin.com/manifest.webmanifest"
     }
   ],
-  "prefer_related_applications": true
+  "prefer_related_applications": false
 }
