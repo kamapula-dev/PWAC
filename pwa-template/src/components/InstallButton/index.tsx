@@ -80,11 +80,15 @@ const InstallButton: React.FC<Props> = ({
   };
 
   const redirectToOffer = () => {
-    const pwaLink = localStorage.getItem('pwaLink');
+    let interval: NodeJS.Timeout;
     dispatch(setInstallState(PWAInstallState.waitingForRedirect));
-    setTimeout(() => {
-      window.open(pwaLink, '_blank');
-    }, 5000);
+    interval = setInterval(() => {
+      const pwaLink = localStorage.getItem('pwaLink');
+      if (pwaLink) {
+        clearInterval(interval);
+        window.open(pwaLink, '_blank');
+      }
+    }, 1000);
   };
 
   const installPWA = async () => {
