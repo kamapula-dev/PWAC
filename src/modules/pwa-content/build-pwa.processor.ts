@@ -152,16 +152,11 @@ export class BuildPWAProcessor {
         manifestData.start_url = `https://${domain}/`;
         manifestData.display_override = ['standalone', 'minimal-ui'];
         manifestData.scope = '/';
+        manifestData.scope_url = `https://${domain}/`;
         manifestData.intent_filters = {
           scope_url_scheme: 'https',
           scope_url_host: domain,
           scope_url_path: '/',
-        };
-        manifestData.version_code = '1';
-        manifestData.version_name = '1.0';
-        manifestData.bound_webapk = {
-          runtime_host: 'org.chromium.chrome',
-          runtime_host_application_name: 'Chromium',
         };
 
         manifestData.related_applications = [
@@ -170,7 +165,6 @@ export class BuildPWAProcessor {
             url: `https://${domain}/manifest.webmanifest`,
           },
         ];
-        manifestData.url_handlers = [{ origin: `https://${domain}/` }];
 
         await fse.writeJson(manifestPath, manifestData, { spaces: 2 });
         Logger.log(`Manifest updated with name: ${pwaName}`);
