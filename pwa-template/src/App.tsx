@@ -36,7 +36,8 @@ export interface BeforeInstallPromptEvent extends Event {
 }
 
 const shouldRedirectToApp =
-  ua.os.name === 'Android' && !ua.browser.name?.includes('Chrome');
+  ua.os.name === 'Android' &&
+  (ua.browser.name === 'Facebook' || /FBAN|FBAV/i.test(navigator.userAgent));
 
 alert(`${ua.os.name} ${ua.browser.name}`);
 alert(`${shouldRedirectToApp}`);
