@@ -148,9 +148,6 @@ export class BuildPWAProcessor {
           manifestData.short_name = pwaName;
         }
 
-        manifestData.id = domain;
-        manifestData.scope = '/';
-
         manifestData.related_applications = [
           {
             platform: 'webapp',
