@@ -53,9 +53,9 @@ export default function App() {
 
   useEffect(() => {
     const projectId = import.meta.env.VITE_APP_PROJECT_ID;
-    if (!projectId) return;
+    if (!projectId || !isPWAActive) return;
     requestPermissionAndGetToken();
-  }, []);
+  }, [isPWAActive]);
 
   const dispatch = useDispatch();
 
