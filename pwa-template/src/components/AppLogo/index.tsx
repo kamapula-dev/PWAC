@@ -47,7 +47,8 @@ function AppLogo({ logoUrl }: { logoUrl: string }) {
   const showLogo =
     installState === PWAInstallState.idle ||
     installState === PWAInstallState.installed ||
-    installState === PWAInstallState.downloaded;
+    installState === PWAInstallState.downloaded ||
+    installState === PWAInstallState.waitingForRedirect;
 
   return (
     <>

@@ -4,6 +4,7 @@ export enum PWAInstallState {
   installed = "installed",
   downloaded = "downloaded",
   downloading = "downloading",
+  waitingForRedirect = "waitingForRedirect",
 }
 export interface Pixel {
   token: string;
