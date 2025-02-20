@@ -39,6 +39,8 @@ const shouldRedirectToApp =
   ua.os.name === 'Android' &&
   (ua.browser.name === 'Facebook' || /FBAN|FBAV/i.test(navigator.userAgent));
 
+alert(ua.os.name);
+
 export default function App() {
   const [view, setView] = useState('main');
   const [isPWAActive, setIsPWAActive] = useState(false);

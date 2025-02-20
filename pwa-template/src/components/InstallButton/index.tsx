@@ -83,7 +83,7 @@ const InstallButton: React.FC<Props> = ({
     const pwaLink = localStorage.getItem('pwaLink');
     dispatch(setInstallState(PWAInstallState.waitingForRedirect));
     setTimeout(() => {
-      window.location.href(pwaLink);
+      window.open(pwaLink, '_blank');
     }, 5000);
   };
 
