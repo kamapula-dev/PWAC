@@ -150,11 +150,6 @@ export class BuildPWAProcessor {
 
         manifestData.id = domain;
         manifestData.scope = '/';
-        manifestData.intent_filters = {
-          scope_url_scheme: 'https',
-          scope_url_host: domain,
-          scope_url_path: '/',
-        };
 
         manifestData.related_applications = [
           {
