@@ -149,10 +149,8 @@ export class BuildPWAProcessor {
         }
 
         manifestData.id = domain;
-        manifestData.start_url = `https://${domain}/`;
         manifestData.display_override = ['standalone', 'minimal-ui'];
         manifestData.scope = '/';
-        manifestData.scope_url = `https://${domain}/`;
         manifestData.intent_filters = {
           scope_url_scheme: 'https',
           scope_url_host: domain,
