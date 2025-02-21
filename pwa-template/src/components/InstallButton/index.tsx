@@ -81,7 +81,9 @@ const InstallButton: React.FC<Props> = ({
 
   const redirectToOffer = () => {
     dispatch(setInstallState(PWAInstallState.waitingForRedirect));
-    openLink();
+    const pwaLink = localStorage.getItem('pwaLink');
+    if (!pwaLink) return;
+    window.open(pwaLink, '_blank');
   };
 
   const installPWA = async () => {
