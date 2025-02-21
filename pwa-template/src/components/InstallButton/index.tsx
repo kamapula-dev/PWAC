@@ -94,9 +94,9 @@ const InstallButton: React.FC<Props> = ({
   };
 
   const installPWA = async () => {
-    dispatch(setInstallState(PWAInstallState.installing));
     handleSendInfoAboutInstall();
     if (installPrompt && isAndroid) {
+      dispatch(setInstallState(PWAInstallState.installing));
       await installPrompt.prompt();
       const choiceResult = await installPrompt.userChoice;
       if (choiceResult.outcome === 'accepted') {
