@@ -23,7 +23,6 @@ import {
 } from './Redux/feat/InstallSlice.tsx';
 import { RootState } from './Redux/store/store.tsx';
 import { UAParser } from 'ua-parser-js';
-// import { requestPermissionAndGetToken } from './firebaseNotification.ts';
 
 const parser = new UAParser();
 const ua = parser.getResult();
@@ -50,12 +49,6 @@ export default function App() {
   const installState = useSelector((state: RootState) =>
     getInstallState(state.install),
   );
-
-  // useEffect(() => {
-  //   const projectId = import.meta.env.VITE_APP_PROJECT_ID;
-  //   if (!projectId || !isPWAActive) return;
-  //   requestPermissionAndGetToken();
-  // }, [isPWAActive]);
 
   const dispatch = useDispatch();
 
