@@ -64,7 +64,7 @@ export default function App() {
             clearInterval(interval);
             setTimeout(() => {
               dispatch(setInstallState(PWAInstallState.installed));
-            }, 3000);
+            }, 1500);
           }
         } catch (error) {
           console.error('Error checking related apps', error);
@@ -75,7 +75,7 @@ export default function App() {
     if (installState === PWAInstallState.installing) {
       interval = setInterval(() => {
         checkPWAInstallation();
-      }, 1000);
+      }, 1500);
     }
 
     return () => {
