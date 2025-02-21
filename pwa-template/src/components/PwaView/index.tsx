@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import PageLoader from '../PageLoader';
 import StartAgainView from '../StartAgainView';
-import { requestPermissionAndGetToken } from '../../firebaseNotification';
+// import { requestPermissionAndGetToken } from '../../firebaseNotification';
 
 const PwaView = ({ pwaLink }: { pwaLink: string | null }) => {
   const [view, setView] = useState('loading');
 
-  useEffect(() => {
-    requestPermissionAndGetToken();
-  }, []);
+  // useEffect(() => {
+  //   requestPermissionAndGetToken();
+  // }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
