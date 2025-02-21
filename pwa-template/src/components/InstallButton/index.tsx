@@ -24,7 +24,7 @@ const parser = new UAParser();
 const ua = parser.getResult();
 
 const isAndroid =
-  ua.os.name === 'Android' && ua.browser.name.includes('Chrome');
+  ua.os.name === 'Android' && ua.browser.name?.includes('Chrome');
 
 interface Props {
   appLink: string;
