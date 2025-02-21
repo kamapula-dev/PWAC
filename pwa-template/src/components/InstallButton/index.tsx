@@ -16,8 +16,15 @@ import {
 import Cookies from 'js-cookie';
 import { Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
+import { UAParser } from 'ua-parser-js';
 
 declare const window: any;
+
+const parser = new UAParser();
+const ua = parser.getResult();
+
+const isAndroid =
+  ua.os.name === 'Android' && ua.browser.name.includes('Chrome');
 
 interface Props {
   appLink: string;
@@ -89,7 +96,7 @@ const InstallButton: React.FC<Props> = ({
   const installPWA = async () => {
     dispatch(setInstallState(PWAInstallState.installing));
     handleSendInfoAboutInstall();
-    if (installPrompt) {
+    if (installPrompt && isAndroid) {
       await installPrompt.prompt();
       const choiceResult = await installPrompt.userChoice;
       if (choiceResult.outcome === 'accepted') {
