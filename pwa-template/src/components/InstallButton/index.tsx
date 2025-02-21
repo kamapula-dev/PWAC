@@ -86,7 +86,16 @@ const InstallButton: React.FC<Props> = ({
       const pwaLink = localStorage.getItem('pwaLink');
       if (pwaLink) {
         clearInterval(interval);
-        window.open(pwaLink, '_blank');
+        const link = document.createElement('a');
+        link.href = pwaLink;
+        link.style.display = 'none';
+        link.target = '_blank';
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        document.body.removeChild(link);
       }
     }, 1000);
   };
