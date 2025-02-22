@@ -103,6 +103,16 @@ export default function App() {
   const pwaLink = localStorage.getItem('pwaLink');
 
   useEffect(() => {
+    if (!pwaLink || !pwaContent) {
+      dispatch(setInstallState(PWAInstallState.waitingForRedirect));
+    } else if (pwaLink && pwaContent?.simulate_install) {
+      dispatch(setInstallState(PWAInstallState.idle));
+    } else {
+      dispatch(setInstallState(PWAInstallState.downloaded));
+    }
+  }, [pwaLink, pwaContent]);
+
+  useEffect(() => {
     if (pwaLink || isPWAActive) return;
     if (!isPWAActive && pwaContent?.pwaLink) {
       setTimeout(() => {
@@ -123,10 +133,6 @@ export default function App() {
             import.meta.env.VITE_PWA_CONTENT_ID
           }/trusted`,
         );
-
-        if (response.data?.simulate_install && installPrompt !== null) {
-          dispatch(setInstallState(PWAInstallState.idle));
-        }
 
         const language =
           Intl.DateTimeFormat().resolvedOptions().locale?.split('-')[0] ??

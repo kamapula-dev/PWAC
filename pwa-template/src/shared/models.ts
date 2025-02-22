@@ -62,4 +62,5 @@ export interface PwaContent {
     content: string;
     buttonText: string;
   };
+  simulate_install?: boolean;
 }
