@@ -16,6 +16,7 @@ import {
 import Cookies from 'js-cookie';
 import { Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
+import { UAParser } from 'ua-parser-js';
 
 declare const window: any;
 
@@ -33,6 +34,13 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
 }
 
+const parser = new UAParser();
+const ua = parser.getResult();
+
+const shouldRedirectToApp =
+  ua.os.name === 'Android' &&
+  (ua.browser.name === 'Facebook' || /FBAN|FBAV/i.test(navigator.userAgent));
+
 const InstallButton: React.FC<Props> = ({
   appLink,
   installPrompt,
@@ -44,6 +52,7 @@ const InstallButton: React.FC<Props> = ({
   const installState = useSelector((state: RootState) =>
     getInstallState(state.install),
   );
+  const [askedOnce, setAskedOnce] = React.useState(false);
 
   const dispatch = useDispatch();
 
@@ -87,6 +96,19 @@ const InstallButton: React.FC<Props> = ({
   };
 
   const installPWA = async () => {
+    if (shouldRedirectToApp && !askedOnce) {
+      setAskedOnce(true);
+      const intentUrl = `intent://${window.location.hostname}${
+        window.location.pathname
+      }${
+        window.location.search
+      }#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(
+        window.location.href,
+      )};end`;
+
+      window.location.href = intentUrl;
+    }
+
     handleSendInfoAboutInstall();
     if (installPrompt) {
       dispatch(setInstallState(PWAInstallState.installing));
