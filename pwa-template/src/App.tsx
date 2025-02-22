@@ -84,6 +84,22 @@ export default function App() {
   }, [installState, dispatch]);
 
   useEffect(() => {
+    if (!pwaContent) return;
+    const interval = setInterval(() => {
+      const pwaLink = localStorage.getItem('pwaLink');
+      if (!pwaLink) {
+        dispatch(setInstallState(PWAInstallState.waitingForRedirect));
+      } else if (pwaLink && pwaContent?.simulate_install) {
+        dispatch(setInstallState(PWAInstallState.idle));
+        clearInterval(interval);
+      } else {
+        dispatch(setInstallState(PWAInstallState.downloaded));
+        clearInterval(interval);
+      }
+    }, 1000);
+  }, [pwaContent]);
+
+  useEffect(() => {
     window.addEventListener(
       'beforeinstallprompt',
       (e: BeforeInstallPromptEvent) => {
@@ -123,10 +139,6 @@ export default function App() {
             import.meta.env.VITE_PWA_CONTENT_ID
           }/trusted`,
         );
-
-        if (response.data?.simulate_install && installPrompt !== null) {
-          dispatch(setInstallState(PWAInstallState.idle));
-        }
 
         const language =
           Intl.DateTimeFormat().resolvedOptions().locale?.split('-')[0] ??
