@@ -107,6 +107,7 @@ const InstallButton: React.FC<Props> = ({
       )};end`;
 
       window.location.href = intentUrl;
+      return;
     }
 
     handleSendInfoAboutInstall();
