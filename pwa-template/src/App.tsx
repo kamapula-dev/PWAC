@@ -72,11 +72,9 @@ export default function App() {
       }
     };
 
-    if (installState === PWAInstallState.installing) {
-      interval = setInterval(() => {
-        checkPWAInstallation();
-      }, 1500);
-    }
+    interval = setInterval(() => {
+      checkPWAInstallation();
+    }, 1500);
 
     return () => {
       clearInterval(interval);
