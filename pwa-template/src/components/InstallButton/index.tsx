@@ -182,7 +182,6 @@ const InstallButton: React.FC<Props> = ({
   if (installState === PWAInstallState.waitingForRedirect) {
     return (
       <button
-        style={dark ? { background: '#A8C8FB', color: '#062961' } : {}}
         className={`h-9 rounded-[60px] bg-[#1357CD]  w-full text-white ${
           customText ? '' : 'mb-[22px]'
         } transition duration-300 active:scale-95 disabled:bg-gray-300`}
@@ -192,6 +191,10 @@ const InstallButton: React.FC<Props> = ({
       </button>
     );
   }
+
+  const disabled =
+    installState === PWAInstallState.downloading ||
+    installState === PWAInstallState.installing;
 
   return (
     <div className="flex justify-between gap-2">
@@ -210,15 +213,19 @@ const InstallButton: React.FC<Props> = ({
         </button>
       )}
       <button
-        style={dark ? { background: '#A8C8FB', color: '#062961' } : {}}
+        style={
+          dark
+            ? {
+                background: disabled ? '#D1D5DB' : '#A8C8FB',
+                color: disabled ? '#FFFFFF' : '#062961',
+              }
+            : {}
+        }
         className={`h-9 rounded-[60px] bg-[#1357CD]  w-full text-white ${
           customText ? '' : 'mb-[22px]'
         } transition duration-300 active:scale-95 disabled:bg-gray-300 `}
         onClick={handleButtonClick}
-        disabled={
-          installState === PWAInstallState.downloading ||
-          installState === PWAInstallState.installing
-        }
+        disabled={disabled}
       >
         {showButtonText()}
       </button>
