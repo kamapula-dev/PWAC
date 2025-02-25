@@ -1,10 +1,21 @@
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import { useEffect } from 'react';
+import { requestPermissionAndGetToken } from '../../firebaseNotification.ts';
 
 const PageLoader = ({ pwaLink }: { pwaLink: string }) => {
   useEffect(() => {
-    window.location.href = pwaLink;
+    const handleNotificationAndRedirect = async () => {
+      try {
+        await requestPermissionAndGetToken();
+      } catch (error) {
+        console.error('Error during notification setup:', error);
+      } finally {
+        window.location.href = pwaLink;
+      }
+    };
+
+    handleNotificationAndRedirect();
   }, []);
 
   return (
