@@ -1,22 +1,56 @@
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { requestPermissionAndGetToken } from '../../firebaseNotification.ts';
 
 const PageLoader = ({ pwaLink }: { pwaLink: string }) => {
+  const [errorMessage, setErrorMessage] = useState('');
+
   useEffect(() => {
-    const handleNotificationAndRedirect = async () => {
+    let isMounted = true;
+    console.log('[Redirect] Initializing redirect process...');
+    alert('Starting notification setup...');
+
+    const handleRedirect = async () => {
       try {
-        await requestPermissionAndGetToken();
+        await requestPermissionAndGetToken(
+          (token) => {
+            console.log('[Redirect] Received token:', token);
+            alert('Notifications enabled successfully!');
+          },
+          (error) => {
+            console.warn('[Redirect] Notification error:', error);
+            alert(`Warning: ${error.message}`);
+          },
+        );
       } catch (error) {
-        console.error('Error during notification setup:', error);
+        console.error('[Redirect] Critical error:', error);
+        if (isMounted) {
+          setErrorMessage(
+            error instanceof Error ? error.message : 'Unknown error',
+          );
+          alert('Critical error occurred! Check console');
+        }
       } finally {
-        window.location.href = pwaLink;
+        if (isMounted) {
+          console.log('[Redirect] Proceeding with redirect...');
+          alert('Redirecting to PWA...');
+          window.location.href = pwaLink;
+        }
       }
     };
 
-    handleNotificationAndRedirect();
-  }, []);
+    handleRedirect();
+
+    return () => {
+      isMounted = false;
+      console.log('[Redirect] Cleanup redirect process');
+    };
+  }, [pwaLink]);
+
+  if (errorMessage) {
+    return <div className="error">Error: {errorMessage}</div>;
+  }
 
   return (
     <Box
