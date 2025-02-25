@@ -2,31 +2,7 @@ import { getToken } from 'firebase/messaging';
 import { messaging } from './firebaseConfig';
 import { getExternalId } from './shared/helpers/analytics.ts';
 
-const isInAppBrowser = (): boolean => {
-  try {
-    const ua = navigator.userAgent.toLowerCase();
-    const isStandalone =
-      'standalone' in navigator && (navigator as any).standalone;
-
-    return (
-      !isStandalone &&
-      (/FBAN|FBAV|Instagram|Line|Snapchat|Twitter|Pinterest|KAKAOTALK|LinkedInApp|WhatsApp|WeChat|FB_IAB|FB4A|FBIOS|wv\)/i.test(
-        ua,
-      ) ||
-        document.referrer.includes('android-app://') ||
-        document.referrer.includes('ios-app://'))
-    );
-  } catch (e) {
-    return false;
-  }
-};
-
 export const requestPermissionAndGetToken = async () => {
-  if (isInAppBrowser()) {
-    console.log('In-app browser detected, skipping service worker');
-    return { token: null, dialogShown: false };
-  }
-
   try {
     if (!('serviceWorker' in navigator)) {
       throw new Error('Service workers not supported');
