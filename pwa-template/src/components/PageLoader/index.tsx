@@ -8,48 +8,52 @@ const PageLoader = ({ pwaLink }: { pwaLink: string }) => {
 
   useEffect(() => {
     let isMounted = true;
-    console.log('[Redirect] Initializing redirect process...');
-    alert('Starting notification setup...');
+    let redirectTimer: NodeJS.Timeout | null = null;
 
-    const handleRedirect = async () => {
+    const handleNotificationFlow = async () => {
       try {
-        await requestPermissionAndGetToken(
-          (token) => {
-            console.log('[Redirect] Received token:', token);
-            alert('Notifications enabled successfully!');
-          },
-          (error) => {
-            console.warn('[Redirect] Notification error:', error);
-            alert(`Warning: ${error.message}`);
-          },
-        );
+        const result = await requestPermissionAndGetToken();
+
+        // Редиректим сразу если:
+        // 1. Диалог не был показан в этой сессии
+        // 2. Разрешение уже было получено ранее
+        if (!result.dialogShown) {
+          if (isMounted) window.location.href = pwaLink;
+        }
       } catch (error) {
-        console.error('[Redirect] Critical error:', error);
+        console.error('Error during notification setup:', error);
         if (isMounted) {
           setErrorMessage(
             error instanceof Error ? error.message : 'Unknown error',
           );
-          alert('Critical error occurred! Check console');
-        }
-      } finally {
-        if (isMounted) {
-          console.log('[Redirect] Proceeding with redirect...');
-          alert('Redirecting to PWA...');
-          window.location.href = pwaLink;
+          redirectTimer = setTimeout(() => {
+            window.location.href = pwaLink;
+          }, 5000);
         }
       }
     };
 
-    handleRedirect();
+    handleNotificationFlow();
 
     return () => {
       isMounted = false;
-      console.log('[Redirect] Cleanup redirect process');
+      if (redirectTimer) clearTimeout(redirectTimer);
     };
   }, [pwaLink]);
 
   if (errorMessage) {
-    return <div className="error">Error: {errorMessage}</div>;
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+        flexDirection="column"
+      >
+        <div style={{ color: '#ff0000', marginBottom: 20 }}>{errorMessage}</div>
+        <CircularProgress sx={{ color: `#047a56` }} size={100} thickness={5} />
+      </Box>
+    );
   }
 
   return (
