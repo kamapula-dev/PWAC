@@ -4,12 +4,16 @@ import { Model, Types } from 'mongoose';
 import { CreatePWAContentDto } from './dto/create-pwa-content.dto';
 import { UpdatePWAContentDto } from './dto/update-pwa-content.dto';
 import { PWAContent } from '../../schemas/pwa-content.scheme';
+import { Push, Recipient } from '../../schemas/push.schema';
 
 @Injectable()
 export class PWAContentService {
   constructor(
     @InjectModel(PWAContent.name)
     private readonly pwaContentModel: Model<PWAContent>,
+
+    @InjectModel(Push.name)
+    private readonly pushModel: Model<Push>,
   ) {}
 
   async create(
@@ -49,6 +53,35 @@ export class PWAContentService {
     }
 
     return pwaContent;
+  }
+
+  async updateHasPushes(recipients: Recipient[]) {
+    const pwaIds = recipients.flatMap((recipient) =>
+      recipient.pwas.map((pwa) => pwa.id),
+    );
+
+    for (const pwaId of pwaIds) {
+      const hasOtherPushes = await this.pushModel.exists({
+        'recipients.pwas.id': pwaId,
+      });
+
+      if (!hasOtherPushes) {
+        await this.pwaContentModel.findByIdAndUpdate(pwaId, {
+          hasPushes: false,
+        });
+      }
+    }
+  }
+
+  async setHasPushes(recipients: Recipient[]) {
+    const pwaIds = recipients.flatMap((recipient) =>
+      recipient.pwas.map((pwa) => pwa.id),
+    );
+
+    await this.pwaContentModel.updateMany(
+      { _id: { $in: pwaIds } },
+      { $set: { hasPushes: true } },
+    );
   }
 
   async update(

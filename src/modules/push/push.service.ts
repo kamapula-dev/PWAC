@@ -8,6 +8,7 @@ import { PWAExternalMapping } from '../../schemas/pwa-external-mapping.scheme';
 import { PWAEventLog } from '../../schemas/pwa-event-log.scheme';
 import { FirebaseService } from '../firebase/firebase.service';
 import { PushDto } from './dto/push.dto';
+import { PWAContentService } from '../pwa-content/pwa-content.service';
 
 @Injectable()
 export class PushService {
@@ -19,6 +20,7 @@ export class PushService {
     private readonly pwaEventLogModel: Model<PWAEventLog>,
     private readonly firebasePushService: FirebaseService,
     @InjectQueue('pushQueue') private readonly pushQueue: Queue,
+    private readonly pwaContentService: PWAContentService,
   ) {}
 
   async create(dto: PushDto, userId: string): Promise<Push> {
@@ -27,6 +29,8 @@ export class PushService {
       user: new Types.ObjectId(userId),
     });
     const savedPush = await created.save();
+
+    await this.pwaContentService.setHasPushes(savedPush.recipients);
 
     if (savedPush.active && savedPush.delay && savedPush.delay > 0) {
       await this.schedulePush(savedPush._id.toString(), savedPush.delay);
@@ -54,9 +58,13 @@ export class PushService {
 
   async delete(id: string): Promise<{ success: boolean }> {
     const deleted = await this.pushModel.findByIdAndDelete(id);
+
     if (!deleted) {
       throw new NotFoundException(`Push with id "${id}" not found`);
     }
+
+    await this.pwaContentService.updateHasPushes(deleted.recipients);
+
     return { success: true };
   }
 

@@ -8,6 +8,7 @@ import { PWAEventLogModule } from '../pwa-event-log/pwa-event-log.module';
 import { PWAExternalMappingModule } from '../pwa-external-mapping/pwa-external-mapping.module';
 import { BullModule } from '@nestjs/bull';
 import { PushQueueProcessor } from './push-queue.processor';
+import { PWAContentModule } from '../pwa-content/pwa-content.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { PushQueueProcessor } from './push-queue.processor';
     FirebaseModule,
     forwardRef(() => PWAEventLogModule),
     PWAExternalMappingModule,
+    PWAContentModule,
   ],
   controllers: [PushController],
   providers: [PushService, PushQueueProcessor],
