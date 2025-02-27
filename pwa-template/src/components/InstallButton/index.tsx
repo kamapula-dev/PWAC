@@ -12,6 +12,7 @@ import {
   buildAppLink,
   getExternalId,
   logEvent,
+  sendEventWithCAPI,
 } from '../../shared/helpers/analytics.ts';
 import Cookies from 'js-cookie';
 import { Spin } from 'antd';
@@ -73,7 +74,9 @@ const InstallButton: React.FC<Props> = ({
             ({ triggerEvent }) => triggerEvent === eventName,
           );
 
-          if (event) {
+          if (pixel.pixelId && pixel.token && event) {
+            sendEventWithCAPI(pixel.pixelId, pixel.token, event.sentEvent);
+          } else if (event) {
             leadEvent = eventName;
             window.fbq('track', pixel.pixelId, event.sentEvent);
           }

@@ -1,5 +1,72 @@
 import { v4 as uuidv4 } from 'uuid';
 import Cookies from 'js-cookie';
+import { Sha256 } from '@aws-crypto/sha256-js';
+
+async function hashData(data?: string) {
+  if (data) {
+    const hash = new Sha256();
+    hash.update(data.trim().toLowerCase());
+    const result = await hash.digest();
+    return Buffer.from(result).toString('hex');
+  } else {
+    return undefined;
+  }
+}
+
+export async function sendEventWithCAPI(
+  pixelId: string,
+  accessToken: string,
+  event: string,
+) {
+  try {
+    const url = `https://graph.facebook.com/v16.0/${pixelId}/events?access_token=${accessToken}`;
+    const json = localStorage.getItem('userData');
+    const userData = JSON.parse(json || '') as Record<string, string>;
+
+    if (userData) {
+      const data = {
+        data: [
+          {
+            event_name: event,
+            event_time: Math.floor(Date.now() / 1000),
+            user_data: {
+              external_id: userData.externalId,
+              client_ip_address: userData.ip,
+              client_user_agent: userData.userAgent,
+              em: [await hashData(userData.email)],
+              ph: [await hashData(userData.phone)],
+              fbp: userData.fbp,
+              fbc: userData.fbc,
+              country: [await hashData(userData.country)],
+              fn: [await hashData(userData.firstName)],
+              ln: [await hashData(userData.lastName)],
+              db: [await hashData(userData.dob)],
+            },
+          },
+        ],
+      };
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        console.error(
+          'Failed to send event via Facebook CAPI:',
+          await response.text(),
+        );
+      } else {
+        console.log('Event via CAPI was successfully sent.');
+      }
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
 
 function generateRandomEmail() {
   const randomString = Math.random().toString(36).substring(2, 8);
@@ -225,6 +292,7 @@ export async function trackExternalId(pwaId: string) {
   const externalId = getExternalId();
 
   try {
+    const userData: Record<string, string | undefined> = {};
     const { firstName, lastName } = generateRandomName();
     const { ip, country } = await getIPInfo();
     const language =
@@ -232,28 +300,33 @@ export async function trackExternalId(pwaId: string) {
       window.navigator.language ??
       navigator.language ??
       'en';
+    const phone = generateRandomPhoneNumber();
+    const email = generateRandomEmail();
+    const dob = generateRandomBirthdate();
+
+    userData.externalId = externalId;
+    userData.pwaContentId = pwaId;
+    userData.domain = window.location.hostname;
+    userData.ip = ip;
+    userData.country = country;
+    userData.language = language;
+    userData.firstName = firstName;
+    userData.lastName = lastName;
+    userData.phone = phone;
+    userData.email = email;
+    userData.dob = dob;
+    userData.userAgent = navigator.userAgent;
+    userData.fbp = Cookies.get('_fbp');
+    userData.fbc = Cookies.get('_fbc');
+
+    localStorage.setItem('userData', JSON.stringify(userData));
 
     const response = await fetch('https://pwac.world/pwa-external-mapping', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        externalId: externalId,
-        pwaContentId: pwaId,
-        domain: window.location.hostname,
-        ip: ip,
-        country: country,
-        language: language,
-        firstName: firstName,
-        lastName: lastName,
-        phone: generateRandomPhoneNumber(),
-        email: generateRandomEmail(),
-        dob: generateRandomBirthdate(),
-        userAgent: navigator.userAgent,
-        fbp: Cookies.get('_fbp'),
-        fbc: Cookies.get('_fbc'),
-      }),
+      body: JSON.stringify(userData),
     });
 
     if (!response.ok) {

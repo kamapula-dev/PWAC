@@ -12,6 +12,7 @@ import {
   buildAppLink,
   getExternalId,
   logEvent,
+  sendEventWithCAPI,
   trackExternalId,
 } from './shared/helpers/analytics.ts';
 import ModalMenu from './components/ModalMenu/ModalMenu.tsx';
@@ -217,7 +218,9 @@ export default function App() {
               ({ triggerEvent }) => triggerEvent === eventName,
             );
 
-            if (event) {
+            if (pixel.pixelId && pixel.token && event) {
+              sendEventWithCAPI(pixel.pixelId, pixel.token, event.sentEvent);
+            } else if (event) {
               viewContentEvent = eventName;
               window.fbq('track', pixel.pixelId, event.sentEvent);
             }
