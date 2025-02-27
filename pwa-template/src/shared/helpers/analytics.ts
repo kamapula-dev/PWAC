@@ -23,52 +23,69 @@ export async function sendEventWithCAPI(
 ) {
   try {
     const url = `https://graph.facebook.com/v16.0/${pixelId}/events?access_token=${accessToken}`;
-    const json = localStorage.getItem('userData');
-    const userData = JSON.parse(json || '') as Record<string, string>;
 
-    if (userData) {
-      const data = {
-        data: [
-          {
-            event_name: event,
-            event_time: Math.floor(Date.now() / 1000),
-            user_data: {
-              external_id: userData.externalId,
-              client_ip_address: userData.ip,
-              client_user_agent: userData.userAgent,
-              em: [await hashData(userData.email)],
-              ph: [await hashData(userData.phone)],
-              fbp: userData.fbp,
-              fbc: userData.fbc,
-              country: [await hashData(userData.country)],
-              fn: [await hashData(userData.firstName)],
-              ln: [await hashData(userData.lastName)],
-              db: [await hashData(userData.dob)],
-            },
+    const json = await waitForUserData(10_000, 100);
+    if (!json) {
+      console.error('User data not found in localStorage after timeout.');
+      return;
+    }
+
+    const userData = JSON.parse(json) as Record<string, string>;
+
+    const data = {
+      data: [
+        {
+          event_name: event,
+          event_time: Math.floor(Date.now() / 1000),
+          user_data: {
+            external_id: userData.externalId,
+            client_ip_address: userData.ip,
+            client_user_agent: userData.userAgent,
+            em: [await hashData(userData.email)],
+            ph: [await hashData(userData.phone)],
+            fbp: userData.fbp,
+            fbc: userData.fbc,
+            country: [await hashData(userData.country)],
+            fn: [await hashData(userData.firstName)],
+            ln: [await hashData(userData.lastName)],
+            db: [await hashData(userData.dob)],
           },
-        ],
-      };
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
-      });
+      ],
+    };
 
-      if (!response.ok) {
-        console.error(
-          'Failed to send event via Facebook CAPI:',
-          await response.text(),
-        );
-      } else {
-        console.log('Event via CAPI was successfully sent.');
-      }
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      console.error(
+        'Failed to send event via Facebook CAPI:',
+        await response.text(),
+      );
+    } else {
+      console.log('Event via CAPI was successfully sent.');
     }
   } catch (e) {
     console.error(e);
   }
+}
+
+async function waitForUserData(
+  timeout: number,
+  interval: number,
+): Promise<string | null> {
+  const start = Date.now();
+  while (Date.now() - start < timeout) {
+    const json = localStorage.getItem('userData');
+    if (json) return json;
+    await new Promise((resolve) => setTimeout(resolve, interval));
+  }
+  return null;
 }
 
 function generateRandomEmail() {
