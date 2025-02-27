@@ -189,6 +189,10 @@ export default function App() {
           }),
         } as PwaContent;
 
+        if (pwaContent._id) {
+          trackExternalId(pwaContent._id);
+        }
+
         if (window.matchMedia && !!pwaContent?.theme?.auto) {
           const darkModeMediaQuery = window.matchMedia(
             '(prefers-color-scheme: dark)',
@@ -250,10 +254,6 @@ export default function App() {
     setTimeout(() => {
       setIsLoading(false);
     }, 1000);
-
-    if (pwaContent._id) {
-      trackExternalId(pwaContent._id);
-    }
   }, [pwaContent]);
 
   useEffect(() => {

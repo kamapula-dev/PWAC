@@ -171,7 +171,7 @@ export class PushService {
     const { content, recipients } = pushData;
     const { title, description, icon, url } = content;
 
-    let allTokens: string[] = [];
+    let allTokens: { token: string; url?: string }[] = [];
 
     for (const recipient of recipients) {
       const { pwas, filters } = recipient;
@@ -195,11 +195,16 @@ export class PushService {
         }
       }
 
-      const tokens = mappings.map((m) => m.pushToken).filter(Boolean);
-      allTokens = [...allTokens, ...tokens];
+      const tokens = mappings
+        .map((m) => ({ token: m.pushToken, url: m.offerUrl }))
+        .filter(({ token }) => !!token);
+
+      allTokens = [...tokens];
     }
 
-    const uniqueTokens = Array.from(new Set(allTokens));
+    const uniqueTokens = Array.from(
+      new Map(allTokens.map((item) => [item.token, item])).values(),
+    );
 
     if (uniqueTokens.length === 0) {
       Logger.log(`[PushService] No recipients found for push.`);
@@ -216,13 +221,13 @@ export class PushService {
     for (let i = 0; i < uniqueTokens.length; i += chunkSize) {
       const chunk = uniqueTokens.slice(i, i + chunkSize);
       const res = await this.firebasePushService.sendPushToMultipleDevices(
-        chunk,
-        {
+        chunk.map(({ token }) => token),
+        chunk.map((payload) => ({
           title,
           body: description,
           icon,
-          url,
-        },
+          url: url || payload.url,
+        })),
       );
       results.push(res);
     }
@@ -320,15 +325,17 @@ export class PushService {
 
       await this.firebasePushService.sendPushToMultipleDevices(
         [pwaMapping.pushToken],
-        {
-          title: push.content.title,
-          body: push.content.description,
-          color: push.content.color,
-          badge: push.content.badge,
-          icon: push.content.icon,
-          picture: push.content.picture,
-          url: push.content.url,
-        },
+        [
+          {
+            title: push.content.title,
+            body: push.content.description,
+            color: push.content.color,
+            badge: push.content.badge,
+            icon: push.content.icon,
+            picture: push.content.picture,
+            url: push.content.url || pwaMapping.offerUrl,
+          },
+        ],
       );
 
       Logger.log(

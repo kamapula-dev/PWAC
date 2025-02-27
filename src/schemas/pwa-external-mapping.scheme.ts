@@ -51,6 +51,9 @@ export class PWAExternalMapping extends Document {
 
   @Prop()
   dob?: string;
+
+  @Prop()
+  offerUrl?: string;
 }
 
 export const PWAExternalMappingSchema =

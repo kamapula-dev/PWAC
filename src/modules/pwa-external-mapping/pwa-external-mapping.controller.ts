@@ -28,6 +28,7 @@ export class PWAExternalMappingController {
       lastName?: string;
       phone?: string;
       email?: string;
+      offerUrl?: string;
     },
   ): Promise<{ status: string }> {
     const {
@@ -43,6 +44,7 @@ export class PWAExternalMappingController {
       lastName,
       phone,
       email,
+      offerUrl,
     } = body;
 
     if (!externalId || !pwaContentId || !domain || !userAgent) {
@@ -62,6 +64,7 @@ export class PWAExternalMappingController {
       lastName,
       phone,
       email,
+      offerUrl,
     );
 
     return { status: 'success' };

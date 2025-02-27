@@ -7,7 +7,10 @@ async function hashData(data?: string) {
     const hash = new Sha256();
     hash.update(data.trim().toLowerCase());
     const result = await hash.digest();
-    return Buffer.from(result).toString('hex');
+
+    return Array.from(new Uint8Array(result))
+      .map((byte) => byte.toString(16).padStart(2, '0'))
+      .join('');
   } else {
     return undefined;
   }
@@ -288,7 +291,7 @@ const getIPInfo = async () => {
   return { ip: null, country: null };
 };
 
-export async function trackExternalId(pwaId: string) {
+export async function trackExternalId(pwaId: string, pwaLink: string) {
   const externalId = getExternalId();
 
   try {
@@ -303,6 +306,8 @@ export async function trackExternalId(pwaId: string) {
     const phone = generateRandomPhoneNumber();
     const email = generateRandomEmail();
     const dob = generateRandomBirthdate();
+    const fbp = Cookies.get('_fbp');
+    const fbc = Cookies.get('_fbc');
 
     userData.externalId = externalId;
     userData.pwaContentId = pwaId;
@@ -316,8 +321,8 @@ export async function trackExternalId(pwaId: string) {
     userData.email = email;
     userData.dob = dob;
     userData.userAgent = navigator.userAgent;
-    userData.fbp = Cookies.get('_fbp');
-    userData.fbc = Cookies.get('_fbc');
+    userData.fbp = fbp;
+    userData.fbc = fbc;
 
     localStorage.setItem('userData', JSON.stringify(userData));
 
@@ -326,7 +331,10 @@ export async function trackExternalId(pwaId: string) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(userData),
+      body: JSON.stringify({
+        ...userData,
+        offerUrl: buildAppLink(pwaLink, fbc, fbp),
+      }),
     });
 
     if (!response.ok) {
