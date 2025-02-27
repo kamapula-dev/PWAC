@@ -46,10 +46,7 @@ export class PWAContentService {
   }
 
   async findOneTrusted(id: string): Promise<PWAContent> {
-    const pwaContent = await this.pwaContentModel
-      .findOne({ _id: id })
-      .lean()
-      .exec();
+    const pwaContent = await this.pwaContentModel.findOne({ _id: id }).exec();
 
     if (!pwaContent) {
       throw new NotFoundException(`PWA Content with ID "${id}" not found.`);
@@ -59,10 +56,9 @@ export class PWAContentService {
       'recipients.pwas.id': id,
     });
 
-    return {
-      ...pwaContent,
-      hasPushes: !!hasPushes,
-    };
+    pwaContent.hasPushes = !!hasPushes;
+
+    return pwaContent;
   }
 
   async update(
