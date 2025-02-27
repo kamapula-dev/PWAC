@@ -17,10 +17,10 @@ import { PWAContentModule } from '../pwa-content/pwa-content.module';
     FirebaseModule,
     forwardRef(() => PWAEventLogModule),
     PWAExternalMappingModule,
-    PWAContentModule,
+    forwardRef(() => PWAContentModule),
   ],
   controllers: [PushController],
   providers: [PushService, PushQueueProcessor],
-  exports: [PushService],
+  exports: [MongooseModule, PushService],
 })
 export class PushModule {}

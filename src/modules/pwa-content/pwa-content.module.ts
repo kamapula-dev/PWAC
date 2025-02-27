@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PWAContentService } from './pwa-content.service';
 import { PWAContentController } from './pwa-content.controller';
@@ -29,7 +29,7 @@ import { PushModule } from '../push/push.module';
     ReadyDomainModule,
     PWAEventLogModule,
     PWAExternalMappingModule,
-    PushModule,
+    forwardRef(() => PushModule),
   ],
   controllers: [PWAContentController],
   providers: [PWAContentService, BuildPWAProcessor],
