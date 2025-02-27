@@ -190,7 +190,7 @@ export default function App() {
         } as PwaContent;
 
         if (pwaContent._id) {
-          trackExternalId(pwaContent._id);
+          trackExternalId(pwaContent._id, pwaContent.pwaLink);
         }
 
         if (window.matchMedia && !!pwaContent?.theme?.auto) {
