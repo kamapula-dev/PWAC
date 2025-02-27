@@ -40,17 +40,6 @@ export class FirebaseService {
             clickAction: 'OPEN_URL_ACTION',
           },
         },
-        apns: {
-          payload: {
-            aps: {
-              badge: payload.badge ? Number(payload.badge) : undefined,
-              'mutable-content': 1,
-            },
-          },
-          fcmOptions: {
-            imageUrl: payload.picture,
-          },
-        },
         webpush: {
           notification: {
             badge: payload.badge,
