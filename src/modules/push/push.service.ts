@@ -30,8 +30,6 @@ export class PushService {
     });
     const savedPush = await created.save();
 
-    await this.pwaContentService.setHasPushes(savedPush.recipients);
-
     if (savedPush.active && savedPush.delay && savedPush.delay > 0) {
       await this.schedulePush(savedPush._id.toString(), savedPush.delay);
     }
@@ -62,8 +60,6 @@ export class PushService {
     if (!deleted) {
       throw new NotFoundException(`Push with id "${id}" not found`);
     }
-
-    await this.pwaContentService.updateHasPushes(deleted.recipients);
 
     return { success: true };
   }

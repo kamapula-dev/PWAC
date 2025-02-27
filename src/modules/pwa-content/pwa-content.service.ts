@@ -52,36 +52,11 @@ export class PWAContentService {
       throw new NotFoundException(`PWA Content with ID "${id}" not found.`);
     }
 
-    return pwaContent;
-  }
+    const hasPushes = await this.pushModel.exists({
+      'recipients.pwas.id': id,
+    });
 
-  async updateHasPushes(recipients: Recipient[]) {
-    const pwaIds = recipients.flatMap((recipient) =>
-      recipient.pwas.map((pwa) => pwa.id),
-    );
-
-    for (const pwaId of pwaIds) {
-      const hasOtherPushes = await this.pushModel.exists({
-        'recipients.pwas.id': pwaId,
-      });
-
-      if (!hasOtherPushes) {
-        await this.pwaContentModel.findByIdAndUpdate(pwaId, {
-          hasPushes: false,
-        });
-      }
-    }
-  }
-
-  async setHasPushes(recipients: Recipient[]) {
-    const pwaIds = recipients.flatMap((recipient) =>
-      recipient.pwas.map((pwa) => pwa.id),
-    );
-
-    await this.pwaContentModel.updateMany(
-      { _id: { $in: pwaIds } },
-      { $set: { hasPushes: true } },
-    );
+    return { ...pwaContent, hasPushes: !!hasPushes } as PWAContent;
   }
 
   async update(
