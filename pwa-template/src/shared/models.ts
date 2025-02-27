@@ -1,10 +1,10 @@
 export enum PWAInstallState {
-  idle = "idle",
-  installing = "installing",
-  installed = "installed",
-  downloaded = "downloaded",
-  downloading = "downloading",
-  waitingForRedirect = "waitingForRedirect",
+  idle = 'idle',
+  installing = 'installing',
+  installed = 'installed',
+  downloaded = 'downloaded',
+  downloading = 'downloading',
+  waitingForRedirect = 'waitingForRedirect',
 }
 export interface Pixel {
   token: string;
@@ -63,4 +63,5 @@ export interface PwaContent {
     buttonText: string;
   };
   simulate_install?: boolean;
+  hasPushes: boolean;
 }

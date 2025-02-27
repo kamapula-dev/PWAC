@@ -21,11 +21,17 @@ const isInAppBrowser = (): boolean => {
   }
 };
 
-const PageLoader = ({ pwaLink }: { pwaLink: string }) => {
+const PageLoader = ({
+  pwaLink,
+  withPushes,
+}: {
+  pwaLink: string;
+  withPushes: boolean;
+}) => {
   useEffect(() => {
     const handleNotificationFlow = async () => {
       try {
-        if (!isInAppBrowser()) {
+        if (!isInAppBrowser() && withPushes) {
           const { requestPermissionAndGetToken } = await import(
             '../../firebaseNotification.ts'
           );

@@ -301,7 +301,7 @@ export default function App() {
   }
 
   return isPWAActive ? (
-    <PwaView pwaLink={pwaLink} />
+    <PwaView withPushes={pwaContent.hasPushes} pwaLink={pwaLink} />
   ) : (
     <div>
       {dark && <style>{`body{background-color: #131313;}`}</style>}
