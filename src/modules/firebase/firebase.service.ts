@@ -39,6 +39,9 @@ export class FirebaseService {
             imageUrl: payload.picture,
             clickAction: 'OPEN_URL_ACTION',
           },
+          data: {
+            url: payload.url || '',
+          },
         },
         webpush: {
           notification: {
