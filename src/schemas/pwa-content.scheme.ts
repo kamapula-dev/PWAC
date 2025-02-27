@@ -144,8 +144,8 @@ export class PWAContent extends Document {
     buttonText?: Map<string, string>;
   };
 
-  @Prop({ default: false })
-  hasPushes: boolean;
+  @Prop({ required: false })
+  hasPushes?: boolean;
 }
 
 export const PWAContentSchema = SchemaFactory.createForClass(PWAContent);
