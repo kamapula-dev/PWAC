@@ -8,7 +8,6 @@ import { PWAExternalMapping } from '../../schemas/pwa-external-mapping.scheme';
 import { PWAEventLog } from '../../schemas/pwa-event-log.scheme';
 import { FirebaseService } from '../firebase/firebase.service';
 import { PushDto } from './dto/push.dto';
-import { PWAContentService } from '../pwa-content/pwa-content.service';
 
 @Injectable()
 export class PushService {
@@ -20,7 +19,6 @@ export class PushService {
     private readonly pwaEventLogModel: Model<PWAEventLog>,
     private readonly firebasePushService: FirebaseService,
     @InjectQueue('pushQueue') private readonly pushQueue: Queue,
-    private readonly pwaContentService: PWAContentService,
   ) {}
 
   async create(dto: PushDto, userId: string): Promise<Push> {
@@ -28,13 +26,7 @@ export class PushService {
       ...dto,
       user: new Types.ObjectId(userId),
     });
-    const savedPush = await created.save();
-
-    if (savedPush.active && savedPush.delay && savedPush.delay > 0) {
-      await this.schedulePush(savedPush._id.toString(), savedPush.delay);
-    }
-
-    return savedPush;
+    return created.save();
   }
 
   async update(id: string, dto: Partial<PushDto>): Promise<Push> {
@@ -45,10 +37,6 @@ export class PushService {
 
     if (!updated) {
       throw new NotFoundException(`Push with id "${id}" not found`);
-    }
-
-    if (updated.active && updated.delay && updated.delay > 0) {
-      await this.schedulePush(updated._id.toString(), updated.delay);
     }
 
     return updated;
@@ -169,8 +157,6 @@ export class PushService {
 
   async sendPushViaFirebase(pushData: Push) {
     const { content, recipients } = pushData;
-    const { title, description, icon, url } = content;
-
     let allTokens: { token: string; url?: string }[] = [];
 
     for (const recipient of recipients) {
@@ -223,10 +209,13 @@ export class PushService {
       const res = await this.firebasePushService.sendPushToMultipleDevices(
         chunk.map(({ token }) => token),
         chunk.map((payload) => ({
-          title,
-          body: description,
-          icon,
-          url: url || payload.url,
+          title: content.title,
+          body: content.description,
+          color: content.color,
+          badge: content.badge,
+          icon: content.icon,
+          picture: content.picture,
+          url: content.url || payload.url,
         })),
       );
       results.push(res);

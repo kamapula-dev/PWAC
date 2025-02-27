@@ -9,7 +9,7 @@ export class FirebaseService {
 
   async sendPushToMultipleDevices(
     tokens: string[],
-    payload: {
+    payloads: {
       title: string;
       body: string;
       color?: string;
@@ -19,13 +19,14 @@ export class FirebaseService {
       url?: string;
     }[],
   ) {
-    if (!tokens.length) {
-      return { success: false, message: 'No tokens provided' };
+    if (tokens.length !== payloads.length) {
+      return { success: false, message: 'Tokens and payloads count mismatch' };
     }
 
-    const messages: admin.messaging.MulticastMessage[] = payload.map(
-      (payload) => ({
-        tokens,
+    const messages: admin.messaging.Message[] = tokens.map((token, index) => {
+      const payload = payloads[index];
+      return {
+        token,
         notification: {
           title: payload.title,
           body: payload.body,
@@ -36,6 +37,7 @@ export class FirebaseService {
             color: payload.color,
             icon: payload.icon,
             imageUrl: payload.picture,
+            clickAction: 'OPEN_URL_ACTION',
           },
         },
         apns: {
@@ -56,25 +58,27 @@ export class FirebaseService {
             image: payload.picture,
           },
           data: {
-            click_action: payload.url || '',
+            url: payload.url || '',
           },
         },
         data: {
-          click_action: payload.url || '',
+          url: payload.url || '',
         },
-      }),
-    );
+      };
+    });
 
     try {
-      const responses = await Promise.all(
-        messages.map((message) =>
-          this.firebaseApp.messaging().sendEachForMulticast(message),
-        ),
-      );
-
-      return { success: true, responses };
+      const response = await this.firebaseApp.messaging().sendEach(messages);
+      return {
+        success: true,
+        response: {
+          successCount: response.successCount,
+          failureCount: response.failureCount,
+          responses: response.responses,
+        },
+      };
     } catch (error) {
-      console.error('Error sending multicast push:', error);
+      console.error('Error sending pushes:', error);
       return { success: false, error };
     }
   }
