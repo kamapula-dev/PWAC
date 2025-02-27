@@ -56,7 +56,7 @@ export class PWAContentService {
       'recipients.pwas.id': id,
     });
 
-    return { ...pwaContent, hasPushes: !!hasPushes } as PWAContent;
+    return { ...pwaContent.toObject(), hasPushes: !!hasPushes } as PWAContent;
   }
 
   async update(
