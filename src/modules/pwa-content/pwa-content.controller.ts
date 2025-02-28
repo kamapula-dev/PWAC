@@ -32,6 +32,7 @@ import { PWAEventLogService } from '../pwa-event-log/pwa-event-log.service';
 import { PWAExternalMappingService } from '../pwa-external-mapping/pwa-external-mapping.service';
 import { LANGUAGES, SUPPORTED_IMAGES } from './consts';
 import { PushService } from '../push/push.service';
+import { translateFields } from '../../services/languages';
 
 @Controller('pwa-content')
 export class PWAContentController {
@@ -88,53 +89,66 @@ export class PWAContentController {
 
     createPWAContentDto.appIcon = processAppIcon(appIcon);
 
-    const translateFields = async (
-      field: Map<deepl.LanguageCode, string> | undefined,
-      fieldName: string,
-    ) => {
-      if (field) {
-        const initialText = Object.values(field)[0];
-        await Promise.all(
-          actualLanguages.map(async (lang) => {
-            const translatedText = await this.translator.translateText(
-              initialText,
-              null,
-              lang,
-            );
-            const languageKey = lang.split('-')[0];
-            field[languageKey] = Array.isArray(translatedText)
-              ? translatedText[0].text
-              : translatedText.text;
-          }),
-        );
-      } else {
-        Logger.warn(`Field "${fieldName}" is not defined in the DTO.`);
-      }
-    };
-
     await Promise.all([
-      translateFields(createPWAContentDto.fullDescription, 'fullDescription'),
-      translateFields(createPWAContentDto.shortDescription, 'shortDescription'),
-      translateFields(createPWAContentDto.countOfDownloads, 'countOfDownloads'),
+      translateFields(
+        createPWAContentDto.fullDescription,
+        'fullDescription',
+        actualLanguages,
+        this.translator,
+      ),
+      translateFields(
+        createPWAContentDto.shortDescription,
+        'shortDescription',
+        actualLanguages,
+        this.translator,
+      ),
+      translateFields(
+        createPWAContentDto.countOfDownloads,
+        'countOfDownloads',
+        actualLanguages,
+        this.translator,
+      ),
     ]);
 
     if (createPWAContentDto.reviews) {
       for (const review of createPWAContentDto.reviews) {
         await Promise.all([
-          translateFields(review.reviewText, 'reviewText'),
-          translateFields(review.devResponse, 'devResponse'),
+          translateFields(
+            review.reviewText,
+            'reviewText',
+            actualLanguages,
+            this.translator,
+          ),
+          translateFields(
+            review.devResponse,
+            'devResponse',
+            actualLanguages,
+            this.translator,
+          ),
         ]);
       }
     }
 
     if (createPWAContentDto.customModal) {
       await Promise.all([
-        translateFields(createPWAContentDto.customModal.content, 'content'),
+        translateFields(
+          createPWAContentDto.customModal.content,
+          'content',
+          actualLanguages,
+          this.translator,
+        ),
         translateFields(
           createPWAContentDto.customModal.buttonText,
           'buttonText',
+          actualLanguages,
+          this.translator,
         ),
-        translateFields(createPWAContentDto.customModal.title, 'title'),
+        translateFields(
+          createPWAContentDto.customModal.title,
+          'title',
+          actualLanguages,
+          this.translator,
+        ),
       ]);
     }
 

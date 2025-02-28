@@ -157,7 +157,7 @@ export class PushService {
 
   async sendPushViaFirebase(pushData: Push) {
     const { content, recipients } = pushData;
-    let allTokens: { token: string; url?: string }[] = [];
+    let allTokens: { token: string; url?: string; language?: string }[] = [];
 
     for (const recipient of recipients) {
       const { pwas, filters } = recipient;
@@ -182,7 +182,11 @@ export class PushService {
       }
 
       const tokens = mappings
-        .map((m) => ({ token: m.pushToken, url: m.offerUrl }))
+        .map((m) => ({
+          token: m.pushToken,
+          url: m.offerUrl,
+          language: m.language || 'en',
+        }))
         .filter(({ token }) => !!token);
 
       allTokens = [...tokens];
@@ -209,8 +213,8 @@ export class PushService {
       const res = await this.firebasePushService.sendPushToMultipleDevices(
         chunk.map(({ token }) => token),
         chunk.map((payload) => ({
-          title: content.title,
-          body: content.description,
+          title: content.title[payload.language],
+          body: content.description[payload.language],
           color: content.color,
           badge: content.badge,
           icon: content.icon,
@@ -316,8 +320,8 @@ export class PushService {
         [pwaMapping.pushToken],
         [
           {
-            title: push.content.title,
-            body: push.content.description,
+            title: push.content.title[pwaMapping.language || 'en'],
+            body: push.content.description[pwaMapping.language || 'en'],
             color: push.content.color,
             badge: push.content.badge,
             icon: push.content.icon,

@@ -20,10 +20,10 @@ export class PushContent {
   languages?: (deepl.TargetLanguageCode | 'all')[];
 
   @Prop()
-  title: string;
+  title: Map<string, string>;
 
   @Prop()
-  description: string;
+  description: Map<string, string>;
 
   @Prop()
   badge: string;

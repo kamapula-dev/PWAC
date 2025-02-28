@@ -7,10 +7,12 @@ import {
   IsString,
   ValidateNested,
   IsArray,
+  IsObject,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { SendToType } from '../../../schemas/push.schema';
 import { PwaEvent } from '../../../schemas/pixel-event.scheme';
+import * as deepl from 'deepl-node';
 
 class PushContentDto {
   @IsOptional()
@@ -23,12 +25,12 @@ class PushContentDto {
   languages?: string[];
 
   @IsNotEmpty()
-  @IsString()
-  title: string;
+  @IsObject()
+  title: Map<deepl.TargetLanguageCode, string>;
 
   @IsNotEmpty()
-  @IsString()
-  description: string;
+  @IsObject()
+  description: Map<deepl.TargetLanguageCode, string>;
 
   @IsNotEmpty()
   @IsString()

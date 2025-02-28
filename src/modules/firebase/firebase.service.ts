@@ -36,19 +36,12 @@ export class FirebaseService {
             badge: payload.badge,
             image: payload.picture,
             data: {
-              url: payload.url || '/',
+              url: payload.url,
             },
-            actions: [
-              {
-                action: 'open',
-                title: 'Open',
-              },
-            ],
           },
         },
         data: {
-          url: payload.url || '/',
-          click_action: 'OPEN_URL',
+          url: payload.url,
         },
       };
     });

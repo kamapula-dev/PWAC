@@ -131,40 +131,52 @@ export class BuildPWAProcessor {
             
             const messaging = firebase.messaging();
             
+            self.addEventListener('push', event => {
+              event.waitUntil(fetch('/api/keep-alive')); // Заглушка
+            });
+            
             messaging.onBackgroundMessage((payload) => {
-            console.log('Received background message:', payload);
+              console.log('[Service Worker] Received message:', payload);
+              
+              const notificationOptions = {
+                body: payload.notification.body,
+                icon: payload.notification.icon,
+                badge: payload.notification.badge,
+                image: payload.notification.picture,
+                data: {
+                  url: payload.data.url || '/'
+                }
+              };
             
-            const notificationTitle = payload.notification.title;
-            const notificationOptions = {
-              body: payload.notification.body,
-              icon: payload.notification.icon,
-              badge: payload.notification.badge,
-              image: payload.notification.picture,
-              data: payload.data,
-              actions: payload.notification.actions
-            };
-          
-            return self.registration.showNotification(
-              notificationTitle, 
-              notificationOptions
-            );
-          });
-          
-          self.addEventListener('notificationclick', (event) => {
-            event.notification.close();
+              return self.registration.showNotification(
+                payload.notification.title, 
+                notificationOptions
+              );
+            });
             
-            const url = event.notification.data.url || '/';
-            event.waitUntil(
-              clients.matchAll({type: 'window'})
-                .then(windowClients => {
-                  const client = windowClients.find(c => c.url === url);
-                  if (client) {
-                    return client.navigate(url).then(client => client.focus());
-                  }
-                  return clients.openWindow(url);
-                })
-            );
-          });
+            self.addEventListener('notificationclick', event => {
+              event.notification.close();
+              
+              const urlToOpen = new URL(
+                event.notification.data.url || '/', 
+                self.location.origin
+              ).href;
+            
+              event.waitUntil(
+                clients.matchAll({type: 'window', includeUncontrolled: true})
+                  .then(windowClients => {
+                    const client = windowClients.find(c => 
+                      c.url === urlToOpen && 'focus' in c
+                    );
+                    
+                    if (client) {
+                      return client.focus();
+                    }
+                    
+                    return clients.openWindow(urlToOpen);
+                  })
+              );
+            });
         `;
         await fse.writeFile(serviceWorkerPath, serviceWorkerContent);
       } catch (error) {
