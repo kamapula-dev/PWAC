@@ -52,11 +52,14 @@ export class PushService {
     return { success: true };
   }
 
-  async schedulePush(pushId: string, delaySeconds: number) {
+  async schedulePush(pushId: string, delaySeconds: number, externalId: string) {
     Logger.log(
       `[PushService] Scheduling push (ID=${pushId}) with delay=${delaySeconds}s`,
     );
-    await this.pushQueue.add({ pushId }, { delay: delaySeconds * 1000 });
+    await this.pushQueue.add(
+      { pushId, externalId },
+      { delay: delaySeconds * 1000 },
+    );
   }
 
   async findAll(params: {
@@ -155,7 +158,7 @@ export class PushService {
     return duplicatedPush.save();
   }
 
-  async sendPushViaFirebase(pushData: Push) {
+  async sendPushViaFirebase(pushData: Push, externalId?: string) {
     const { content, recipients } = pushData;
     let allTokens: { token: string; url?: string; language?: string }[] = [];
 
@@ -165,6 +168,7 @@ export class PushService {
       let mappings = await this.mappingModel.find({
         pwaContentId: { $in: pwas.map((pwa) => pwa.id) },
         pushToken: { $exists: true, $ne: '' },
+        ...(externalId && { externalId }),
       });
 
       for (const filter of filters) {
@@ -259,6 +263,7 @@ export class PushService {
     const activePushes = await this.pushModel.find({
       active: true,
       triggerEvent: eventLog.event,
+      'recipients.pwas.id': eventLog.pwaContentId,
     });
 
     for (const push of activePushes) {
@@ -312,7 +317,11 @@ export class PushService {
       }
 
       if (push.delay > 0) {
-        await this.schedulePush(push._id.toString(), push.delay);
+        await this.schedulePush(
+          push._id.toString(),
+          push.delay,
+          eventLog.externalId,
+        );
         continue;
       }
 

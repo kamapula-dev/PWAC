@@ -117,56 +117,52 @@ export class BuildPWAProcessor {
           'firebase-messaging-sw.js',
         );
         const serviceWorkerContent = `
-            importScripts("https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js");
-            importScripts("https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js");
-            
-            firebase.initializeApp({
-              apiKey: "AIzaSyDrnHccHsbP1qexi0TPW0wt5dw95QB6SYQ",
-              authDomain: "pwac-f4fa7.firebaseapp.com",
-              projectId: "pwac-f4fa7",
-              storageBucket: "pwac-f4fa7.firebasestorage.app",
-              messagingSenderId: "1082672576795",
-              appId: "1:1082672576795:web:da0be39788c3431bd4bbbe"
-            });
-            
-            const messaging = firebase.messaging();
-            
-            messaging.onBackgroundMessage((payload) => {
-            console.log("Received background message:", payload);
+            self.addEventListener('push', function(event) {
+            if (!event.data) return;
           
-            const url = payload.data?.url || payload.fcmOptions?.link || '/';
+            const payload = event.data.json();
+            console.log('Push Received:', payload);
           
             const notificationOptions = {
               body: payload.notification.body,
               icon: payload.notification.icon,
               badge: payload.notification.badge,
-              image: payload.notification.image
+              image: payload.notification.image,
+              data: {
+                url: payload.data?.url || '/'
+              }
             };
           
-            self.registration.showNotification(payload.notification.title, notificationOptions);
-            self.notificationData = self.notificationData || {};
-            self.notificationData[payload.notification.title] = url;
+            event.waitUntil(
+              self.registration.showNotification(
+                payload.notification.title,
+                notificationOptions
+              )
+            );
           });
           
-          self.addEventListener('notificationclick', (event) => {
+          self.addEventListener('notificationclick', function(event) {
             event.notification.close();
             
-            console.log('Notification clicked:', event.notification);
-            console.log('Notification data:', event.notification.data);
+            const url = event.notification.data.url || '/';
+            console.log('Opening URL:', url);
           
-            const url = event.notification.data?.url || self.notificationData?.[event.notification.title] || '/';
-                    
             event.waitUntil(
-              clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
-                for (const client of windowClients) {
-                  if (client.url === url && 'focus' in client) {
+              clients.matchAll({type: 'window', includeUncontrolled: true})
+                .then(windowClients => {
+                  const client = windowClients.find(client => 
+                    client.url === url && 'focus' in client
+                  );
+                  
+                  if (client) {
                     return client.focus();
                   }
-                }
-                return clients.openWindow(url);
-              }).catch((error) => {
-                console.error('Error handling notification click:', error);
-              })
+                  return clients.openWindow(url);
+                })
+                .catch(error => {
+                  console.error('Open window error:', error);
+                  return clients.openWindow(url);
+                })
             );
           });
         `;

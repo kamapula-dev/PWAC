@@ -9,7 +9,7 @@ export class PushQueueProcessor {
 
   @Process()
   async handlePushJob(job: Job) {
-    const { pushId } = job.data;
+    const { pushId, externalId } = job.data;
     Logger.log(`[PushQueueProcessor] Processing pushId=${pushId}`);
 
     const pushData = await this.pushService.findOne(pushId);
@@ -26,12 +26,15 @@ export class PushQueueProcessor {
     }
 
     Logger.log(
-      `[PushQueueProcessor] Sending push from queue for pushId=${pushId}`,
+      `[PushQueueProcessor] Sending push from queue for pushId=${pushId}${externalId ? `, externalId: ${externalId}` : ''}`,
     );
-    const result = await this.pushService.sendPushViaFirebase(pushData);
+    const result = await this.pushService.sendPushViaFirebase(
+      pushData,
+      externalId,
+    );
 
     Logger.log(
-      `[PushQueueProcessor] Push job completed for pushId=${pushId}`,
+      `[PushQueueProcessor] Push job completed for pushId=${pushId}${externalId ? `, externalId: ${externalId}` : ''}`,
       JSON.stringify(result),
     );
   }

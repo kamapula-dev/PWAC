@@ -12,11 +12,10 @@ export class FirebaseService {
     payloads: {
       title: string;
       body: string;
-      color?: string;
-      badge?: string;
       icon?: string;
+      badge?: string;
       picture?: string;
-      url?: string;
+      url: string;
     }[],
   ) {
     if (tokens.length !== payloads.length) {
@@ -26,33 +25,24 @@ export class FirebaseService {
     const messages: admin.messaging.Message[] = tokens.map((token, index) => {
       const payload = payloads[index];
 
-      const iconUrl = `${payload.icon}?${Date.now()}`;
-      const badgeUrl = `${payload.badge}?${Date.now()}`;
-      const imageUrl = payload.picture
-        ? `${payload.picture}?${Date.now()}`
-        : undefined;
-
       return {
         token,
-        webpush: {
-          notification: {
-            title: payload.title,
-            body: payload.body,
-            icon: iconUrl,
-            badge: badgeUrl,
-            image: imageUrl,
-            requireInteraction: true,
-            data: { url: payload.url },
-          },
-          fcmOptions: {
-            link: payload.url,
-          },
-          data: {
-            url: payload.url,
-          },
+        notification: {
+          title: payload.title,
+          body: payload.body,
+          imageUrl: payload.picture,
         },
         data: {
           url: payload.url,
+          icon: payload.icon,
+          badge: payload.badge,
+        },
+        android: {
+          notification: {
+            color: '#2196F3',
+            icon: 'ic_stat_notification',
+            clickAction: 'OPEN_URL',
+          },
         },
       };
     });
@@ -64,11 +54,10 @@ export class FirebaseService {
         response: {
           successCount: response.successCount,
           failureCount: response.failureCount,
-          responses: response.responses,
         },
       };
     } catch (error) {
-      console.error('PWA Push Error:', error);
+      console.error('Error sending pushes:', error);
       return { success: false, error };
     }
   }
