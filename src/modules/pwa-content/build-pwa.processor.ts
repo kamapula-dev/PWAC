@@ -132,45 +132,41 @@ export class BuildPWAProcessor {
             const messaging = firebase.messaging();
             
             messaging.onBackgroundMessage((payload) => {
-            console.log('[Firebase] Received background message', payload);
+            console.log("Received background message:", payload);
+          
+            const url = payload.data?.url || payload.fcmOptions?.link || '/';
           
             const notificationOptions = {
               body: payload.notification.body,
               icon: payload.notification.icon,
               badge: payload.notification.badge,
-              image: payload.notification.image,
-              data: {
-                url: payload.notification.data.url || payload.fcmOptions.link
-              },
-              vibrate: [200, 100, 200],
-              timestamp: Date.now()
+              image: payload.notification.image
             };
           
-            return self.registration.showNotification(
-              payload.notification.title,
-              notificationOptions
-            );
+            self.registration.showNotification(payload.notification.title, notificationOptions);
+            self.notificationData = self.notificationData || {};
+            self.notificationData[payload.notification.title] = url;
           });
           
           self.addEventListener('notificationclick', (event) => {
             event.notification.close();
             
-            const url = event.notification.data.url || '/';
-            const targetUrl = new URL(url, self.location.origin).href;
+            console.log('Notification clicked:', event.notification);
+            console.log('Notification data:', event.notification.data);
           
+            const url = event.notification.data?.url || self.notificationData?.[event.notification.title] || '/';
+                    
             event.waitUntil(
-              clients.matchAll({type: 'window', includeUncontrolled: true})
-                .then(windowClients => {
-                  const client = windowClients.find(c => 
-                    c.url === targetUrl && 'focus' in c
-                  );
-                  
-                  if (client) {
+              clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+                for (const client of windowClients) {
+                  if (client.url === url && 'focus' in client) {
                     return client.focus();
                   }
-                  
-                  return clients.openWindow(targetUrl);
-                })
+                }
+                return clients.openWindow(url);
+              }).catch((error) => {
+                console.error('Error handling notification click:', error);
+              })
             );
           });
         `;

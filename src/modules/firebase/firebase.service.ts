@@ -42,13 +42,17 @@ export class FirebaseService {
             badge: badgeUrl,
             image: imageUrl,
             requireInteraction: true,
-            data: {
-              url: payload.url,
-            },
+            data: { url: payload.url },
           },
           fcmOptions: {
             link: payload.url,
           },
+          data: {
+            url: payload.url,
+          },
+        },
+        data: {
+          url: payload.url,
         },
       };
     });
