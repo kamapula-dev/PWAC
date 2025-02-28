@@ -12,6 +12,7 @@ export class FirebaseService {
     payloads: {
       title: string;
       body: string;
+      color?: string;
       icon?: string;
       badge?: string;
       picture?: string;
@@ -39,7 +40,7 @@ export class FirebaseService {
         },
         android: {
           notification: {
-            color: '#2196F3',
+            color: payload.color,
             icon: 'ic_stat_notification',
             clickAction: 'OPEN_URL',
           },
