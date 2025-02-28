@@ -23,10 +23,14 @@ export class FirebaseService {
       return { success: false, message: 'Tokens and payloads count mismatch' };
     }
 
-    console.log(JSON.stringify(payloads, null, 2));
-
     const messages: admin.messaging.Message[] = tokens.map((token, index) => {
       const payload = payloads[index];
+
+      const iconUrl = `${payload.icon}?${Date.now()}`;
+      const badgeUrl = `${payload.badge}?${Date.now()}`;
+      const imageUrl = payload.picture
+        ? `${payload.picture}?${Date.now()}`
+        : undefined;
 
       return {
         token,
@@ -34,16 +38,17 @@ export class FirebaseService {
           notification: {
             title: payload.title,
             body: payload.body,
-            icon: payload.icon,
-            badge: payload.badge,
-            image: payload.picture,
+            icon: iconUrl,
+            badge: badgeUrl,
+            image: imageUrl,
+            requireInteraction: true,
             data: {
               url: payload.url,
             },
           },
-        },
-        data: {
-          url: payload.url,
+          fcmOptions: {
+            link: payload.url,
+          },
         },
       };
     });

@@ -213,8 +213,8 @@ export class PushService {
       const res = await this.firebasePushService.sendPushToMultipleDevices(
         chunk.map(({ token }) => token),
         chunk.map((payload) => ({
-          title: content.title[payload.language],
-          body: content.description[payload.language],
+          title: content.title.get(payload.language),
+          body: content.description.get(payload.language),
           color: content.color,
           badge: content.badge,
           icon: content.icon,
@@ -320,11 +320,12 @@ export class PushService {
         [pwaMapping.pushToken],
         [
           {
-            title:
-              push.content.title[pwaMapping.language || 'originalLanguage'],
-            body: push.content.description[
-              pwaMapping.language || 'originalLanguage'
-            ],
+            title: push.content.title.get(
+              pwaMapping.language || 'originalLanguage',
+            ),
+            body: push.content.description.get(
+              pwaMapping.language || 'originalLanguage',
+            ),
             color: push.content.color,
             badge: push.content.badge,
             icon: push.content.icon,

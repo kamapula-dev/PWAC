@@ -131,52 +131,48 @@ export class BuildPWAProcessor {
             
             const messaging = firebase.messaging();
             
-            self.addEventListener('push', event => {
-              event.waitUntil(fetch('/api/keep-alive')); // Заглушка
-            });
-            
             messaging.onBackgroundMessage((payload) => {
-              console.log('[Service Worker] Received message:', payload);
-              
-              const notificationOptions = {
-                body: payload.notification.body,
-                icon: payload.notification.icon,
-                badge: payload.notification.badge,
-                image: payload.notification.picture,
-                data: {
-                  url: payload.data.url || '/'
-                }
-              };
+            console.log('[Firebase] Received background message', payload);
+          
+            const notificationOptions = {
+              body: payload.notification.body,
+              icon: payload.notification.icon,
+              badge: payload.notification.badge,
+              image: payload.notification.image,
+              data: {
+                url: payload.notification.data.url || payload.fcmOptions.link
+              },
+              vibrate: [200, 100, 200],
+              timestamp: Date.now()
+            };
+          
+            return self.registration.showNotification(
+              payload.notification.title,
+              notificationOptions
+            );
+          });
+          
+          self.addEventListener('notificationclick', (event) => {
+            event.notification.close();
             
-              return self.registration.showNotification(
-                payload.notification.title, 
-                notificationOptions
-              );
-            });
-            
-            self.addEventListener('notificationclick', event => {
-              event.notification.close();
-              
-              const urlToOpen = new URL(
-                event.notification.data.url || '/', 
-                self.location.origin
-              ).href;
-            
-              event.waitUntil(
-                clients.matchAll({type: 'window', includeUncontrolled: true})
-                  .then(windowClients => {
-                    const client = windowClients.find(c => 
-                      c.url === urlToOpen && 'focus' in c
-                    );
-                    
-                    if (client) {
-                      return client.focus();
-                    }
-                    
-                    return clients.openWindow(urlToOpen);
-                  })
-              );
-            });
+            const url = event.notification.data.url || '/';
+            const targetUrl = new URL(url, self.location.origin).href;
+          
+            event.waitUntil(
+              clients.matchAll({type: 'window', includeUncontrolled: true})
+                .then(windowClients => {
+                  const client = windowClients.find(c => 
+                    c.url === targetUrl && 'focus' in c
+                  );
+                  
+                  if (client) {
+                    return client.focus();
+                  }
+                  
+                  return clients.openWindow(targetUrl);
+                })
+            );
+          });
         `;
         await fse.writeFile(serviceWorkerPath, serviceWorkerContent);
       } catch (error) {
