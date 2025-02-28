@@ -318,10 +318,9 @@ export class BuildPWAProcessor {
           ${pixelArrayString}.forEach((item) => {
             if(item.pixelId) {
               fbq('init', item.pixelId);
+              fbq('track', 'PageView');
             }
           });
-          
-          fbq("track", "PageView");
       </script>`;
   }
 
