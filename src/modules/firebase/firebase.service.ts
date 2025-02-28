@@ -32,18 +32,14 @@ export class FirebaseService {
           title: payload.title,
           body: payload.body,
           imageUrl: payload.picture,
+          icon: payload.icon,
+          badge: payload.badge,
         },
         data: {
           url: payload.url,
           icon: payload.icon,
           badge: payload.badge,
-        },
-        android: {
-          notification: {
-            color: payload.color,
-            icon: 'ic_stat_notification',
-            clickAction: 'OPEN_URL',
-          },
+          image: payload.picture,
         },
       };
     });
