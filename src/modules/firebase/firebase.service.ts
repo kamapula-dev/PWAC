@@ -32,8 +32,6 @@ export class FirebaseService {
           title: payload.title,
           body: payload.body,
           imageUrl: payload.picture,
-          icon: payload.icon,
-          badge: payload.badge,
         },
         data: {
           url: payload.url,
@@ -57,6 +55,7 @@ export class FirebaseService {
         response: {
           successCount: response.successCount,
           failureCount: response.failureCount,
+          response: response,
         },
       };
     } catch (error) {
