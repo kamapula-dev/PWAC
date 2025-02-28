@@ -25,36 +25,30 @@ export class FirebaseService {
 
     const messages: admin.messaging.Message[] = tokens.map((token, index) => {
       const payload = payloads[index];
+
       return {
         token,
-        notification: {
-          title: payload.title,
-          body: payload.body,
-          imageUrl: payload.picture,
-        },
-        android: {
-          notification: {
-            color: payload.color,
-            icon: payload.icon,
-            imageUrl: payload.picture,
-            clickAction: 'OPEN_URL_ACTION',
-          },
-          data: {
-            url: payload.url || '',
-          },
-        },
         webpush: {
           notification: {
-            badge: payload.badge,
+            title: payload.title,
+            body: payload.body,
             icon: payload.icon,
+            badge: payload.badge,
             image: payload.picture,
-          },
-          data: {
-            url: payload.url || '',
+            data: {
+              url: payload.url || '/',
+            },
+            actions: [
+              {
+                action: 'open',
+                title: 'Open',
+              },
+            ],
           },
         },
         data: {
-          url: payload.url || '',
+          url: payload.url || '/',
+          click_action: 'OPEN_URL',
         },
       };
     });
@@ -70,7 +64,7 @@ export class FirebaseService {
         },
       };
     } catch (error) {
-      console.error('Error sending pushes:', error);
+      console.error('PWA Push Error:', error);
       return { success: false, error };
     }
   }

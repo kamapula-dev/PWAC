@@ -117,51 +117,54 @@ export class BuildPWAProcessor {
           'firebase-messaging-sw.js',
         );
         const serviceWorkerContent = `
-        importScripts("https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js");
-        importScripts("https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js");
-        
-        firebase.initializeApp({
-          apiKey: "AIzaSyDrnHccHsbP1qexi0TPW0wt5dw95QB6SYQ",
-          authDomain: "pwac-f4fa7.firebaseapp.com",
-          projectId: "pwac-f4fa7",
-          storageBucket: "pwac-f4fa7.firebasestorage.app",
-          messagingSenderId: "1082672576795",
-          appId: "1:1082672576795:web:da0be39788c3431bd4bbbe"
-        });
-        
-        const messaging = firebase.messaging();
-        
-        self.addEventListener("push", (event) => {
-          if (!event.data) return;
-        
-          const payload = event.data.json();
-          const notificationTitle = payload.notification.title;
-          const notificationOptions = {
-            body: payload.notification.body,
-            icon: payload.notification.icon || "/icon.png",
-            image: payload.notification.image || "",
-            data: { url: payload.data?.url || "/" },
-          };
-        
-          event.waitUntil(
-            self.registration.showNotification(notificationTitle, notificationOptions)
-          );
-        });
-        
-        self.addEventListener("notificationclick", (event) => {
-          event.notification.close();
-        
-          event.waitUntil(
-            clients
-              .matchAll({ type: "window", includeUncontrolled: true })
-              .then((clientList) => {
-                if (clientList.length > 0) {
-                  return clientList[0].focus();
-                }
-                return clients.openWindow(event.notification.data.url);
-              })
-          );
-        });
+            importScripts("https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js");
+            importScripts("https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js");
+            
+            firebase.initializeApp({
+              apiKey: "AIzaSyDrnHccHsbP1qexi0TPW0wt5dw95QB6SYQ",
+              authDomain: "pwac-f4fa7.firebaseapp.com",
+              projectId: "pwac-f4fa7",
+              storageBucket: "pwac-f4fa7.firebasestorage.app",
+              messagingSenderId: "1082672576795",
+              appId: "1:1082672576795:web:da0be39788c3431bd4bbbe"
+            });
+            
+            const messaging = firebase.messaging();
+            
+            messaging.onBackgroundMessage((payload) => {
+            console.log('Received background message:', payload);
+            
+            const notificationTitle = payload.notification.title;
+            const notificationOptions = {
+              body: payload.notification.body,
+              icon: payload.notification.icon,
+              badge: payload.notification.badge,
+              image: payload.notification.picture,
+              data: payload.data,
+              actions: payload.notification.actions
+            };
+          
+            return self.registration.showNotification(
+              notificationTitle, 
+              notificationOptions
+            );
+          });
+          
+          self.addEventListener('notificationclick', (event) => {
+            event.notification.close();
+            
+            const url = event.notification.data.url || '/';
+            event.waitUntil(
+              clients.matchAll({type: 'window'})
+                .then(windowClients => {
+                  const client = windowClients.find(c => c.url === url);
+                  if (client) {
+                    return client.navigate(url).then(client => client.focus());
+                  }
+                  return clients.openWindow(url);
+                })
+            );
+          });
         `;
         await fse.writeFile(serviceWorkerPath, serviceWorkerContent);
       } catch (error) {
