@@ -320,6 +320,8 @@ export class BuildPWAProcessor {
               fbq('init', item.pixelId);
             }
           });
+          
+          fbq("track", "PageView");
       </script>`;
   }
 
