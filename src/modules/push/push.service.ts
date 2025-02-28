@@ -185,7 +185,7 @@ export class PushService {
         .map((m) => ({
           token: m.pushToken,
           url: m.offerUrl,
-          language: m.language || 'en',
+          language: m.language || 'originalLanguage',
         }))
         .filter(({ token }) => !!token);
 
@@ -320,8 +320,11 @@ export class PushService {
         [pwaMapping.pushToken],
         [
           {
-            title: push.content.title[pwaMapping.language || 'en'],
-            body: push.content.description[pwaMapping.language || 'en'],
+            title:
+              push.content.title[pwaMapping.language || 'originalLanguage'],
+            body: push.content.description[
+              pwaMapping.language || 'originalLanguage'
+            ],
             color: push.content.color,
             badge: push.content.badge,
             icon: push.content.icon,

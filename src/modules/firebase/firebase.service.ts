@@ -23,6 +23,8 @@ export class FirebaseService {
       return { success: false, message: 'Tokens and payloads count mismatch' };
     }
 
+    console.log(JSON.stringify(payloads, null, 2));
+
     const messages: admin.messaging.Message[] = tokens.map((token, index) => {
       const payload = payloads[index];
 
