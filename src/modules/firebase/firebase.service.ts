@@ -39,7 +39,13 @@ export class FirebaseService {
           url: payload.url,
           icon: payload.icon,
           badge: payload.badge,
-          image: payload.picture,
+        },
+        android: {
+          notification: {
+            color: payload.color,
+            icon: 'ic_stat_notification',
+            clickAction: 'OPEN_URL',
+          },
         },
       };
     });
