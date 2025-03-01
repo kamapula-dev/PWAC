@@ -142,6 +142,7 @@ const ModalMenu = ({
           pixel={pwaContent?.pixel}
           appLink="/"
           installPrompt={installPrompt}
+          withPushes={pwaContent.hasPushes}
         />
       </div>
     </Modal>

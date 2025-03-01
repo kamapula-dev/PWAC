@@ -183,6 +183,7 @@ const MainView: React.FC<Props> = ({
           pixel={pwaContent?.pixel}
           appLink="/"
           installPrompt={installPrompt}
+          withPushes={pwaContent.hasPushes}
         />
         <ContentSlider pwaContent={pwaContent} />
         <div className="mb-4">

@@ -2,13 +2,7 @@ import { useEffect, useState } from 'react';
 import PageLoader from '../PageLoader';
 import StartAgainView from '../StartAgainView';
 
-const PwaView = ({
-  pwaLink,
-  withPushes,
-}: {
-  pwaLink: string | null;
-  withPushes: boolean;
-}) => {
+const PwaView = ({ pwaLink }: { pwaLink: string | null }) => {
   const [view, setView] = useState('loading');
 
   useEffect(() => {
@@ -22,7 +16,7 @@ const PwaView = ({
   if (!pwaLink) return <></>;
 
   return view === 'loading' ? (
-    <PageLoader withPushes={withPushes} pwaLink={pwaLink} />
+    <PageLoader pwaLink={pwaLink} />
   ) : (
     <StartAgainView pwaLink={pwaLink} />
   );

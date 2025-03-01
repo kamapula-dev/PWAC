@@ -54,6 +54,7 @@ export default function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    // eslint-disable-next-line prefer-const
     let interval: NodeJS.Timeout;
     const checkPWAInstallation = async () => {
       if ('getInstalledRelatedApps' in navigator) {
@@ -304,7 +305,7 @@ export default function App() {
   }
 
   return isPWAActive ? (
-    <PwaView withPushes={pwaContent.hasPushes} pwaLink={pwaLink} />
+    <PwaView pwaLink={pwaLink} />
   ) : (
     <div>
       {dark && <style>{`body{background-color: #131313;}`}</style>}

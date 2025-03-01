@@ -19,6 +19,24 @@ import { Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { UAParser } from 'ua-parser-js';
 
+const isInAppBrowser = (): boolean => {
+  try {
+    const ua = navigator.userAgent.toLowerCase();
+    const isStandalone = 'standalone' in navigator && navigator.standalone;
+
+    return (
+      !isStandalone &&
+      (/FBAN|FBAV|Instagram|Line|Snapchat|Twitter|Pinterest|KAKAOTALK|LinkedInApp|WhatsApp|WeChat|FB_IAB|FB4A|FBIOS|wv\)/i.test(
+        ua,
+      ) ||
+        document.referrer.includes('android-app://') ||
+        document.referrer.includes('ios-app://'))
+    );
+  } catch (e) {
+    return false;
+  }
+};
+
 declare const window: any;
 
 interface Props {
@@ -28,6 +46,7 @@ interface Props {
   pixel?: [Pixel];
   id?: string;
   customText?: string;
+  withPushes: boolean;
 }
 
 interface BeforeInstallPromptEvent extends Event {
@@ -49,6 +68,7 @@ const InstallButton: React.FC<Props> = ({
   pixel,
   id,
   customText,
+  withPushes,
 }) => {
   const installState = useSelector((state: RootState) =>
     getInstallState(state.install),
@@ -102,6 +122,7 @@ const InstallButton: React.FC<Props> = ({
   };
 
   const installPWA = async () => {
+    // Redirect to app if user is on Android and in Facebook browser
     if (shouldRedirectToApp && !askedOnce) {
       setAskedOnce(true);
       const intentUrl = `intent://${window.location.hostname}${
@@ -116,7 +137,6 @@ const InstallButton: React.FC<Props> = ({
       return;
     }
 
-    handleSendInfoAboutInstall();
     if (installPrompt) {
       dispatch(setInstallState(PWAInstallState.installing));
       await installPrompt.prompt();
@@ -125,10 +145,24 @@ const InstallButton: React.FC<Props> = ({
         setTimeout(() => {
           dispatch(setInstallState(PWAInstallState.installed));
         }, 40000);
+        try {
+          if (!isInAppBrowser() && withPushes) {
+            const { requestPermissionAndGetToken } = await import(
+              '../../firebaseNotification.ts'
+            );
+            await requestPermissionAndGetToken();
+          }
+        } catch (error) {
+          console.error('Error during notification setup:', error);
+        } finally {
+          handleSendInfoAboutInstall();
+        }
       } else {
+        handleSendInfoAboutInstall();
         redirectToOffer();
       }
     } else {
+      handleSendInfoAboutInstall();
       redirectToOffer();
     }
   };
