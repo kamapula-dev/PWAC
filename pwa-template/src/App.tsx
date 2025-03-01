@@ -74,9 +74,9 @@ export default function App() {
             } catch (error) {
               console.error('Error during notification setup:', error);
             }
-            setTimeout(() => {
-              dispatch(setInstallState(PWAInstallState.installed));
-            }, 1500);
+            handleSendInfoAboutInstall();
+
+            dispatch(setInstallState(PWAInstallState.installed));
           }
         } catch (error) {
           console.error('Error checking related apps', error);
@@ -127,6 +127,39 @@ export default function App() {
   }, []);
 
   const pwaLink = localStorage.getItem('pwaLink');
+
+  const handleSendInfoAboutInstall = () => {
+    if (window.fbq) {
+      if (pwaContent?.pixel?.length) {
+        const eventName = 'Install';
+        let leadEvent;
+
+        pwaContent?.pixel.forEach((pixel) => {
+          const event = pixel.events.find(
+            ({ triggerEvent }) => triggerEvent === eventName,
+          );
+
+          if (pixel.pixelId && pixel.token && event) {
+            sendEventWithCAPI(pixel.pixelId, pixel.token, event.sentEvent);
+          } else if (event) {
+            leadEvent = eventName;
+            window.fbq('track', pixel.pixelId, event.sentEvent);
+          }
+        });
+
+        if (leadEvent && pwaContent._id) {
+          logEvent(
+            pwaContent._id,
+            window.location.hostname,
+            leadEvent,
+            getExternalId(),
+          );
+        }
+      } else {
+        window.fbq('track', 'Lead');
+      }
+    }
+  };
 
   useEffect(() => {
     if (pwaLink || isPWAActive) return;

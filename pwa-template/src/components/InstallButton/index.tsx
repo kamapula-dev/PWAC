@@ -117,8 +117,6 @@ const InstallButton: React.FC<Props> = ({
       return;
     }
 
-    handleSendInfoAboutInstall();
-
     if (installPrompt) {
       dispatch(setInstallState(PWAInstallState.installing));
       await installPrompt.prompt();
@@ -128,9 +126,11 @@ const InstallButton: React.FC<Props> = ({
           dispatch(setInstallState(PWAInstallState.installed));
         }, 40000);
       } else {
+        handleSendInfoAboutInstall();
         redirectToOffer();
       }
     } else {
+      handleSendInfoAboutInstall();
       redirectToOffer();
     }
   };
