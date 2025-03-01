@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import {
@@ -18,24 +18,6 @@ import Cookies from 'js-cookie';
 import { Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { UAParser } from 'ua-parser-js';
-
-const isInAppBrowser = (): boolean => {
-  try {
-    const ua = navigator.userAgent.toLowerCase();
-    const isStandalone = 'standalone' in navigator && navigator.standalone;
-
-    return (
-      !isStandalone &&
-      (/FBAN|FBAV|Instagram|Line|Snapchat|Twitter|Pinterest|KAKAOTALK|LinkedInApp|WhatsApp|WeChat|FB_IAB|FB4A|FBIOS|wv\)/i.test(
-        ua,
-      ) ||
-        document.referrer.includes('android-app://') ||
-        document.referrer.includes('ios-app://'))
-    );
-  } catch (e) {
-    return false;
-  }
-};
 
 declare const window: any;
 
@@ -82,6 +64,28 @@ const InstallButton: React.FC<Props> = ({
   const downloadPWA = () => {
     dispatch(setInstallState(PWAInstallState.downloading));
   };
+
+  useEffect(() => {
+    const handlePushNotification = async () => {
+      try {
+        if (withPushes) {
+          const { requestPermissionAndGetToken } = await import(
+            '../../firebaseNotification.ts'
+          );
+          await requestPermissionAndGetToken();
+        }
+      } catch (error) {
+        console.error('Error during notification setup:', error);
+      } finally {
+        handleSendInfoAboutInstall();
+      }
+    };
+
+    window.addEventListener('appinstalled', handlePushNotification);
+    return () => {
+      window.removeEventListener('appinstalled', handlePushNotification);
+    };
+  }, []);
 
   const handleSendInfoAboutInstall = () => {
     if (window.fbq) {
@@ -145,18 +149,6 @@ const InstallButton: React.FC<Props> = ({
         setTimeout(() => {
           dispatch(setInstallState(PWAInstallState.installed));
         }, 40000);
-        try {
-          if (!isInAppBrowser() && withPushes) {
-            const { requestPermissionAndGetToken } = await import(
-              '../../firebaseNotification.ts'
-            );
-            await requestPermissionAndGetToken();
-          }
-        } catch (error) {
-          console.error('Error during notification setup:', error);
-        } finally {
-          handleSendInfoAboutInstall();
-        }
       } else {
         handleSendInfoAboutInstall();
         redirectToOffer();
