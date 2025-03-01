@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useIntl } from 'react-intl';
 import {
@@ -28,7 +28,6 @@ interface Props {
   pixel?: [Pixel];
   id?: string;
   customText?: string;
-  withPushes: boolean;
 }
 
 interface BeforeInstallPromptEvent extends Event {
@@ -50,7 +49,6 @@ const InstallButton: React.FC<Props> = ({
   pixel,
   id,
   customText,
-  withPushes,
 }) => {
   const installState = useSelector((state: RootState) =>
     getInstallState(state.install),
@@ -64,28 +62,6 @@ const InstallButton: React.FC<Props> = ({
   const downloadPWA = () => {
     dispatch(setInstallState(PWAInstallState.downloading));
   };
-
-  useEffect(() => {
-    const handlePushNotification = async () => {
-      try {
-        if (withPushes) {
-          const { requestPermissionAndGetToken } = await import(
-            '../../firebaseNotification.ts'
-          );
-          await requestPermissionAndGetToken();
-        }
-      } catch (error) {
-        console.error('Error during notification setup:', error);
-      } finally {
-        handleSendInfoAboutInstall();
-      }
-    };
-
-    window.addEventListener('appinstalled', handlePushNotification);
-    return () => {
-      window.removeEventListener('appinstalled', handlePushNotification);
-    };
-  }, []);
 
   const handleSendInfoAboutInstall = () => {
     if (window.fbq) {
@@ -141,6 +117,8 @@ const InstallButton: React.FC<Props> = ({
       return;
     }
 
+    handleSendInfoAboutInstall();
+
     if (installPrompt) {
       dispatch(setInstallState(PWAInstallState.installing));
       await installPrompt.prompt();
@@ -150,11 +128,9 @@ const InstallButton: React.FC<Props> = ({
           dispatch(setInstallState(PWAInstallState.installed));
         }, 40000);
       } else {
-        handleSendInfoAboutInstall();
         redirectToOffer();
       }
     } else {
-      handleSendInfoAboutInstall();
       redirectToOffer();
     }
   };

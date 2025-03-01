@@ -64,6 +64,16 @@ export default function App() {
           ).getInstalledRelatedApps();
           if (relatedApps.length > 0) {
             clearInterval(interval);
+            try {
+              if (pwaContent?.hasPushes) {
+                const { requestPermissionAndGetToken } = await import(
+                  './firebaseNotification.ts'
+                );
+                await requestPermissionAndGetToken();
+              }
+            } catch (error) {
+              console.error('Error during notification setup:', error);
+            }
             setTimeout(() => {
               dispatch(setInstallState(PWAInstallState.installed));
             }, 1500);
