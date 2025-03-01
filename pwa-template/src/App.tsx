@@ -143,9 +143,10 @@ export default function App() {
           if (pixel.pixelId && pixel.token && event) {
             sendEventWithCAPI(pixel.pixelId, pixel.token, event.sentEvent);
           } else if (event) {
-            leadEvent = eventName;
             window.fbq('track', pixel.pixelId, event.sentEvent);
           }
+
+          leadEvent = eventName;
         });
 
         if (leadEvent && pwaContent._id) {
@@ -270,10 +271,12 @@ export default function App() {
             if (pixel.pixelId && pixel.token && event) {
               sendEventWithCAPI(pixel.pixelId, pixel.token, event.sentEvent);
             } else if (event) {
-              viewContentEvent = eventName;
               window.fbq('track', pixel.pixelId, event.sentEvent);
             }
+
+            viewContentEvent = eventName;
           });
+
           if (viewContentEvent && pwaContent._id) {
             logEvent(
               pwaContent._id,
