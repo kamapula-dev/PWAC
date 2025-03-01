@@ -55,6 +55,7 @@ export default function App() {
 
   useEffect(() => {
     // eslint-disable-next-line prefer-const
+    if (installState !== PWAInstallState.installing) return;
     let interval: NodeJS.Timeout;
     const checkPWAInstallation = async () => {
       if ('getInstalledRelatedApps' in navigator) {
