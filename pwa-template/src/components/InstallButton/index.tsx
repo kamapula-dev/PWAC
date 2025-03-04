@@ -148,11 +148,12 @@ const InstallButton: React.FC<Props> = ({
       } catch (error) {
         console.error('Error during notification setup:', error);
       }
-      handleSendInfoAboutInstall();
 
       await installPrompt.prompt();
       const choiceResult = await installPrompt.userChoice;
       if (choiceResult.outcome === 'accepted') {
+        handleSendInfoAboutInstall();
+
         dispatch(setInstallState(PWAInstallState.installing));
         setTimeout(() => {
           dispatch(setInstallState(PWAInstallState.installed));
