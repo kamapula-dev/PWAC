@@ -1,19 +1,13 @@
-import { useEffect, useState } from 'react';
-import PageLoader from '../PageLoader';
-import StartAgainView from '../StartAgainView';
+import { useEffect, useState } from "react";
+import PageLoader from "../PageLoader";
+import StartAgainView from "../StartAgainView";
 
-const PwaView = ({
-  pwaLink,
-  withPushes,
-}: {
-  pwaLink: string | null;
-  withPushes: boolean;
-}) => {
-  const [view, setView] = useState('loading');
+const PwaView = ({ pwaLink }: { pwaLink: string | null }) => {
+  const [view, setView] = useState("loading");
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setView('button');
+      setView("button");
     }, 15000);
 
     return () => clearTimeout(timer);
@@ -21,8 +15,8 @@ const PwaView = ({
 
   if (!pwaLink) return <></>;
 
-  return view === 'loading' ? (
-    <PageLoader withPushes={withPushes} pwaLink={pwaLink} />
+  return view === "loading" ? (
+    <PageLoader pwaLink={pwaLink} />
   ) : (
     <StartAgainView pwaLink={pwaLink} />
   );
