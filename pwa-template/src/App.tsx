@@ -85,6 +85,7 @@ export default function App() {
   };
 
   useEffect(() => {
+    if (installState !== PWAInstallState.installing) return;
     let interval: NodeJS.Timeout;
     const checkPWAInstallation = async () => {
       if ("getInstalledRelatedApps" in navigator) {
