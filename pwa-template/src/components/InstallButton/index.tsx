@@ -67,7 +67,6 @@ const InstallButton: React.FC<Props> = ({
     if (window.fbq) {
       if (pixel?.length) {
         const eventName = 'Install';
-        let leadEvent;
 
         pixel.forEach((pixel) => {
           const event = pixel.events.find(
@@ -77,17 +76,16 @@ const InstallButton: React.FC<Props> = ({
           if (pixel.pixelId && pixel.token && event) {
             sendEventWithCAPI(pixel.pixelId, pixel.token, event.sentEvent);
           } else if (event) {
-            leadEvent = eventName;
             window.fbq('track', pixel.pixelId, event.sentEvent);
           }
         });
-
-        if (leadEvent && id) {
-          logEvent(id, window.location.hostname, leadEvent, getExternalId());
-        }
       } else {
         window.fbq('track', 'Lead');
       }
+    }
+
+    if (id) {
+      logEvent(id, window.location.hostname, 'Install', getExternalId());
     }
   };
 

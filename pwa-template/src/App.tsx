@@ -215,7 +215,6 @@ export default function App() {
 
         if (window.fbq && pwaContent?.pixel?.length) {
           const eventName = 'OpenPage';
-          let viewContentEvent;
 
           pwaContent.pixel.forEach((pixel) => {
             const event = pixel.events.find(
@@ -225,18 +224,18 @@ export default function App() {
             if (pixel.pixelId && pixel.token && event) {
               sendEventWithCAPI(pixel.pixelId, pixel.token, event.sentEvent);
             } else if (event) {
-              viewContentEvent = eventName;
               window.fbq('track', pixel.pixelId, event.sentEvent);
             }
           });
-          if (viewContentEvent && pwaContent._id) {
-            logEvent(
-              pwaContent._id,
-              window.location.hostname,
-              viewContentEvent,
-              getExternalId(),
-            );
-          }
+        }
+
+        if (pwaContent?._id) {
+          logEvent(
+            pwaContent._id,
+            window.location.hostname,
+            'OpenPage',
+            getExternalId(),
+          );
         }
 
         setPwaContent(pwaContent);
