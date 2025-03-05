@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OpenAI } from 'openai';
 import { Language } from '../languages/dto/languages.dto';
@@ -253,7 +253,7 @@ export class ChatGptService {
           },
           {
             role: 'user',
-            content: `Translate exactly and literally the following text to ${targetLang} without any explanations, additions or modifications: "${text}"`,
+            content: `Translate exactly and literally the following text to ${targetLang} without any explanations, additions or modifications: ${text}`,
           },
         ],
       });
@@ -261,6 +261,27 @@ export class ChatGptService {
       return { text: completion.choices[0]?.message?.content?.trim() };
     } catch (error) {
       throw new BadRequestException(`Translation failed: ${error.message}`);
+    }
+  }
+
+  async translateFields(
+    field: Map<Language, string> | undefined,
+    fieldName: string,
+    actualLanguages: Language[],
+  ): Promise<void> {
+    if (field) {
+      const initialText = Object.values(field)[0];
+      await Promise.all(
+        actualLanguages.map(async (lang) => {
+          const translatedText = await this.translateText(initialText, lang);
+          const languageKey = lang.split('-')[0];
+          field[languageKey] = Array.isArray(translatedText)
+            ? translatedText[0].text
+            : translatedText.text;
+        }),
+      );
+    } else {
+      Logger.warn(`Field "${fieldName}" is not defined in the DTO.`);
     }
   }
 }

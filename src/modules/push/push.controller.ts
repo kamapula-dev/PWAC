@@ -16,7 +16,6 @@ import { Push } from '../../schemas/push.schema';
 import { PushDto } from './dto/push.dto';
 import { ConfigService } from '@nestjs/config';
 import { LANGUAGES } from '../pwa-content/consts';
-import { translateFields } from '../../services/languages';
 import { ChatGptService } from '../chat-gpt/chat-gpt.service';
 import { Language } from '../languages/dto/languages.dto';
 
@@ -33,20 +32,20 @@ export class PushController {
   async createPush(@Body() dto: PushDto, @Request() req): Promise<Push> {
     const userId = req.user._id;
     const languages = dto.content.languages;
-    const actualLanguages = languages.includes('all') ? LANGUAGES : languages;
+    const actualLanguages = languages.includes('all')
+      ? LANGUAGES
+      : (languages as Language[]);
 
     await Promise.all([
-      translateFields(
+      this.chatGPTService.translateFields(
         dto.content.title,
         'title',
-        actualLanguages as Language[],
-        this.chatGPTService.translateText,
+        actualLanguages,
       ),
-      translateFields(
+      this.chatGPTService.translateFields(
         dto.content.description,
         'description',
-        actualLanguages as Language[],
-        this.chatGPTService.translateText,
+        actualLanguages,
       ),
     ]);
 
@@ -65,17 +64,15 @@ export class PushController {
       : (languages as Language[]);
 
     await Promise.all([
-      translateFields(
+      this.chatGPTService.translateFields(
         dto.content.title,
         'title',
         actualLanguages,
-        this.chatGPTService.translateText,
       ),
-      translateFields(
+      this.chatGPTService.translateFields(
         dto.content.description,
         'description',
         actualLanguages,
-        this.chatGPTService.translateText,
       ),
     ]);
 

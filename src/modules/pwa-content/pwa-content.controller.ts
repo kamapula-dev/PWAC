@@ -30,7 +30,6 @@ import { PWAEventLogService } from '../pwa-event-log/pwa-event-log.service';
 import { PWAExternalMappingService } from '../pwa-external-mapping/pwa-external-mapping.service';
 import { LANGUAGES, SUPPORTED_IMAGES } from './consts';
 import { PushService } from '../push/push.service';
-import { translateFields } from '../../services/languages';
 import { ChatGptService } from '../chat-gpt/chat-gpt.service';
 import { Language } from '../languages/dto/languages.dto';
 
@@ -84,40 +83,35 @@ export class PWAContentController {
     createPWAContentDto.appIcon = processAppIcon(appIcon);
 
     await Promise.all([
-      translateFields(
+      this.chatGPTService.translateFields(
         createPWAContentDto.fullDescription,
         'fullDescription',
         actualLanguages,
-        this.chatGPTService.translateText,
       ),
-      translateFields(
+      this.chatGPTService.translateFields(
         createPWAContentDto.shortDescription,
         'shortDescription',
         actualLanguages,
-        this.chatGPTService.translateText,
       ),
-      translateFields(
+      this.chatGPTService.translateFields(
         createPWAContentDto.countOfDownloads,
         'countOfDownloads',
         actualLanguages,
-        this.chatGPTService.translateText,
       ),
     ]);
 
     if (createPWAContentDto.reviews) {
       for (const review of createPWAContentDto.reviews) {
         await Promise.all([
-          translateFields(
+          this.chatGPTService.translateFields(
             review.reviewText,
             'reviewText',
             actualLanguages,
-            this.chatGPTService.translateText,
           ),
-          translateFields(
+          this.chatGPTService.translateFields(
             review.devResponse,
             'devResponse',
             actualLanguages,
-            this.chatGPTService.translateText,
           ),
         ]);
       }
@@ -125,23 +119,20 @@ export class PWAContentController {
 
     if (createPWAContentDto.customModal) {
       await Promise.all([
-        translateFields(
+        this.chatGPTService.translateFields(
           createPWAContentDto.customModal.content,
           'content',
           actualLanguages,
-          this.chatGPTService.translateText,
         ),
-        translateFields(
+        this.chatGPTService.translateFields(
           createPWAContentDto.customModal.buttonText,
           'buttonText',
           actualLanguages,
-          this.chatGPTService.translateText,
         ),
-        translateFields(
+        this.chatGPTService.translateFields(
           createPWAContentDto.customModal.title,
           'title',
           actualLanguages,
-          this.chatGPTService.translateText,
         ),
       ]);
     }
