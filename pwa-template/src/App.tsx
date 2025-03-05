@@ -41,6 +41,7 @@ const shouldRedirectToApp =
 
 export default function App() {
   const [view, setView] = useState("main");
+  const [checkedPwaInstall, setCheckedPwaInstall] = useState(false);
   const [isPWAActive, setIsPWAActive] = useState(false);
   const [pwaContent, setPwaContent] = useState<PwaContent | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -85,7 +86,6 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (installState !== PWAInstallState.installing) return;
     let interval: NodeJS.Timeout;
     const checkPWAInstallation = async () => {
       if ("getInstalledRelatedApps" in navigator) {
@@ -93,7 +93,8 @@ export default function App() {
           const relatedApps = await (
             navigator as any
           ).getInstalledRelatedApps();
-          if (relatedApps.length > 0) {
+          if (relatedApps.length > 0 && !checkedPwaInstall) {
+            setCheckedPwaInstall(true);
             try {
               const { requestPermissionAndGetToken } = await import(
                 "./firebaseNotification.ts"
