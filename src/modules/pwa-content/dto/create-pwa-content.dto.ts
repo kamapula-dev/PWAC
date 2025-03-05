@@ -12,8 +12,8 @@ import {
   IsObject,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import * as deepl from 'deepl-node';
 import { FacebookEvent, PwaEvent } from '../../../schemas/pixel-event.scheme';
+import { Language } from '../../languages/dto/languages.dto';
 
 export class PixelEventDto {
   @IsEnum(PwaEvent, { message: 'Invalid triggerEvent value' })
@@ -44,15 +44,15 @@ export class CustomModalDto {
 
   @IsOptional()
   @IsObject()
-  title?: Map<deepl.TargetLanguageCode, string>;
+  title?: Map<Language, string>;
 
   @IsOptional()
   @IsObject()
-  content?: Map<deepl.TargetLanguageCode, string>;
+  content?: Map<Language, string>;
 
   @IsOptional()
   @IsObject()
-  buttonText?: Map<deepl.TargetLanguageCode, string>;
+  buttonText?: Map<Language, string>;
 }
 
 export class ThemeDto {
@@ -94,7 +94,7 @@ export class ReviewDto {
 
   @IsOptional()
   @IsObject()
-  devResponse?: Map<deepl.TargetLanguageCode, string>;
+  devResponse?: Map<Language, string>;
 
   @IsOptional()
   @IsString()
@@ -102,7 +102,7 @@ export class ReviewDto {
 
   @IsOptional()
   @IsObject()
-  reviewText?: Map<deepl.TargetLanguageCode, string>;
+  reviewText?: Map<Language, string>;
 
   @IsString()
   reviewDate: string;
@@ -125,7 +125,7 @@ export class CreatePWAContentDto {
 
   @IsOptional()
   @IsObject()
-  countOfDownloads?: Map<deepl.TargetLanguageCode, string>;
+  countOfDownloads?: Map<Language, string>;
 
   @IsString()
   countOfReviews: string;
@@ -177,11 +177,11 @@ export class CreatePWAContentDto {
 
   @IsOptional()
   @IsObject()
-  shortDescription?: Map<deepl.TargetLanguageCode, string>;
+  shortDescription?: Map<Language, string>;
 
   @IsOptional()
   @IsObject()
-  fullDescription?: Map<deepl.TargetLanguageCode, string>;
+  fullDescription?: Map<Language, string>;
 
   @IsString()
   countOfReviewsFull: string;
@@ -199,7 +199,7 @@ export class CreatePWAContentDto {
 
   @IsArray()
   @Type(() => String)
-  languages: (deepl.TargetLanguageCode | 'all')[];
+  languages: (Language | 'all')[];
 
   @IsArray()
   @ValidateNested({ each: true })

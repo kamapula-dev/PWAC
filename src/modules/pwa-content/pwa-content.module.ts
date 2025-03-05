@@ -13,6 +13,7 @@ import { ReadyDomainModule } from '../ready-domain/ready-domain.module';
 import { PWAEventLogModule } from '../pwa-event-log/pwa-event-log.module';
 import { PWAExternalMappingModule } from '../pwa-external-mapping/pwa-external-mapping.module';
 import { PushModule } from '../push/push.module';
+import { ChatGptModule } from '../chat-gpt/chat-gpt.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { PushModule } from '../push/push.module';
     ReadyDomainModule,
     PWAEventLogModule,
     PWAExternalMappingModule,
+    ChatGptModule,
     forwardRef(() => PushModule),
   ],
   controllers: [PWAContentController],

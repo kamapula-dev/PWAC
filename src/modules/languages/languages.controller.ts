@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { LanguagesService } from './languages.service';
-import * as deepl from 'deepl-node';
+import { Language } from './dto/languages.dto';
 
 @Controller('languages')
 export class LanguagesController {
@@ -8,7 +8,7 @@ export class LanguagesController {
 
   @Get(':language')
   async getLanguages(
-    @Param('language') language: deepl.TargetLanguageCode,
+    @Param('language') language: Language,
   ): Promise<Record<string, string>> {
     return await this.pwaContentService.getLanguages(language);
   }

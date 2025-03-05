@@ -9,6 +9,7 @@ import { PWAExternalMappingModule } from '../pwa-external-mapping/pwa-external-m
 import { BullModule } from '@nestjs/bull';
 import { PushQueueProcessor } from './push-queue.processor';
 import { PWAContentModule } from '../pwa-content/pwa-content.module';
+import { ChatGptModule } from '../chat-gpt/chat-gpt.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { PWAContentModule } from '../pwa-content/pwa-content.module';
     FirebaseModule,
     forwardRef(() => PWAEventLogModule),
     PWAExternalMappingModule,
+    ChatGptModule,
     forwardRef(() => PWAContentModule),
   ],
   controllers: [PushController],

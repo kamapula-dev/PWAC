@@ -11,7 +11,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { MediaDto, ReviewDto } from './create-pwa-content.dto';
-import * as deepl from 'deepl-node';
+import { Language } from '../../languages/dto/languages.dto';
 
 export class UpdatePWAContentDto {
   @IsOptional()
@@ -85,10 +85,10 @@ export class UpdatePWAContentDto {
 
   @IsOptional()
   @IsObject()
-  shortDescription?: Map<deepl.TargetLanguageCode, string>;
+  shortDescription?: Map<Language, string>;
 
   @IsOptional()
-  fullDescription?: Map<deepl.TargetLanguageCode, string>;
+  fullDescription?: Map<Language, string>;
 
   @IsOptional()
   @IsString()
@@ -108,7 +108,7 @@ export class UpdatePWAContentDto {
   @IsOptional()
   @IsArray()
   @Type(() => String)
-  languages?: (deepl.TargetLanguageCode | 'all')[];
+  languages?: (Language | 'all')[];
 
   @IsOptional()
   @IsArray()

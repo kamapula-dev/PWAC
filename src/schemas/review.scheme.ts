@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { PWAContent } from './pwa-content.scheme';
-import * as deepl from 'deepl-node';
+import { Language } from '../modules/languages/dto/languages.dto';
 
 const AVAILABLE_COLORS = [
   '#0098A7',
@@ -45,7 +45,7 @@ export class Review extends Document {
   reviewAuthorRating: number;
 
   @Prop()
-  devResponse: Map<deepl.TargetLanguageCode, string>;
+  devResponse: Map<Language, string>;
 
   @Prop({
     required: true,
@@ -56,7 +56,7 @@ export class Review extends Document {
   reviewIconColor: string;
 
   @Prop({ required: true })
-  reviewText: Map<deepl.TargetLanguageCode, string>;
+  reviewText: Map<Language, string>;
 
   @Prop({ required: true })
   reviewDate: string;

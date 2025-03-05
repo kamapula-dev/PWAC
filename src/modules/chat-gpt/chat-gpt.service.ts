@@ -1,9 +1,10 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OpenAI } from 'openai';
+import { Language } from '../languages/dto/languages.dto';
 
 @Injectable()
-export class ContentGenerationService {
+export class ChatGptService {
   private readonly openai: OpenAI;
 
   constructor(private readonly configService: ConfigService) {
@@ -236,5 +237,30 @@ export class ContentGenerationService {
         ],
       ),
     };
+  }
+
+  async translateText(
+    text: string,
+    targetLang: Language,
+  ): Promise<{ text: string }> {
+    try {
+      const completion = await this.openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a professional translator.',
+          },
+          {
+            role: 'user',
+            content: `Translate exactly and literally the following text to ${targetLang} without any explanations, additions or modifications: "${text}"`,
+          },
+        ],
+      });
+
+      return { text: completion.choices[0]?.message?.content?.trim() };
+    } catch (error) {
+      throw new BadRequestException(`Translation failed: ${error.message}`);
+    }
   }
 }

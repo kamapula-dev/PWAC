@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import * as deepl from 'deepl-node';
 import { Pixel, PixelSchema } from './pixel.scheme';
 import { Review, ReviewSchema } from './review.scheme';
 import { Media, MediaSchema } from './media.scheme';
+import { Language } from '../modules/languages/dto/languages.dto';
 
 @Schema({ timestamps: true })
 export class PWAContent extends Document {
@@ -77,7 +77,7 @@ export class PWAContent extends Document {
   fullDescription: Map<string, string>;
 
   @Prop()
-  languages?: (deepl.TargetLanguageCode | 'all')[];
+  languages?: (Language | 'all')[];
 
   @Prop({ required: true })
   countOfReviewsFull: string;

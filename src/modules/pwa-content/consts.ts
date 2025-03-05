@@ -1,6 +1,6 @@
-import * as deepl from 'deepl-node';
+import { Language } from '../languages/dto/languages.dto';
 
-export const LANGUAGES: deepl.TargetLanguageCode[] = [
+export const LANGUAGES: Language[] = [
   'ar',
   'bg',
   'cs',

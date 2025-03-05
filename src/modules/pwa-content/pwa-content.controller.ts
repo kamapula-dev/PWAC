@@ -20,10 +20,8 @@ import { UpdatePWAContentDto } from './dto/update-pwa-content.dto';
 import { PWAContent } from '../../schemas/pwa-content.scheme';
 import { AuthGuard } from '@nestjs/passport';
 import { MediaService } from '../media/media.service';
-import { ConfigService } from '@nestjs/config';
 import { UserService } from '../user/user.service';
 import { Queue } from 'bull';
-import * as deepl from 'deepl-node';
 import { DomainManagementService } from '../domain-managemant/domain-management.service';
 import { DomainMappingService } from '../domain-mapping/domain-mapping.service';
 import { ReadyDomainService } from '../ready-domain/ready-domain.service';
@@ -33,14 +31,14 @@ import { PWAExternalMappingService } from '../pwa-external-mapping/pwa-external-
 import { LANGUAGES, SUPPORTED_IMAGES } from './consts';
 import { PushService } from '../push/push.service';
 import { translateFields } from '../../services/languages';
+import { ChatGptService } from '../chat-gpt/chat-gpt.service';
+import { Language } from '../languages/dto/languages.dto';
 
 @Controller('pwa-content')
 export class PWAContentController {
-  private readonly translator: deepl.Translator;
   constructor(
     private readonly pwaContentService: PWAContentService,
     private readonly mediaService: MediaService,
-    private readonly configService: ConfigService,
     private readonly userService: UserService,
     private readonly domainManagementService: DomainManagementService,
     private readonly domainMappingService: DomainMappingService,
@@ -48,11 +46,9 @@ export class PWAContentController {
     private readonly pwaEventLogService: PWAEventLogService,
     private readonly pwaExternalMappingService: PWAExternalMappingService,
     private readonly pushService: PushService,
+    private readonly chatGPTService: ChatGptService,
     @InjectQueue('buildPWA') private readonly buildQueue: Queue,
-  ) {
-    const deeplApiKey = this.configService.get<string>('DEEPL_API_KEY');
-    this.translator = new deepl.Translator(deeplApiKey);
-  }
+  ) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Post()
@@ -62,11 +58,9 @@ export class PWAContentController {
   ): Promise<PWAContent> {
     const userId = req.user._id;
     const { languages, appIcon } = createPWAContentDto;
-    const actualLanguages: deepl.TargetLanguageCode[] = languages.includes(
-      'all',
-    )
+    const actualLanguages: Language[] = languages.includes('all')
       ? LANGUAGES
-      : (languages as deepl.TargetLanguageCode[]);
+      : (languages as Language[]);
 
     const processAppIcon = (icon: string): string => {
       if (!icon) {
@@ -94,19 +88,19 @@ export class PWAContentController {
         createPWAContentDto.fullDescription,
         'fullDescription',
         actualLanguages,
-        this.translator,
+        this.chatGPTService.translateText,
       ),
       translateFields(
         createPWAContentDto.shortDescription,
         'shortDescription',
         actualLanguages,
-        this.translator,
+        this.chatGPTService.translateText,
       ),
       translateFields(
         createPWAContentDto.countOfDownloads,
         'countOfDownloads',
         actualLanguages,
-        this.translator,
+        this.chatGPTService.translateText,
       ),
     ]);
 
@@ -117,13 +111,13 @@ export class PWAContentController {
             review.reviewText,
             'reviewText',
             actualLanguages,
-            this.translator,
+            this.chatGPTService.translateText,
           ),
           translateFields(
             review.devResponse,
             'devResponse',
             actualLanguages,
-            this.translator,
+            this.chatGPTService.translateText,
           ),
         ]);
       }
@@ -135,19 +129,19 @@ export class PWAContentController {
           createPWAContentDto.customModal.content,
           'content',
           actualLanguages,
-          this.translator,
+          this.chatGPTService.translateText,
         ),
         translateFields(
           createPWAContentDto.customModal.buttonText,
           'buttonText',
           actualLanguages,
-          this.translator,
+          this.chatGPTService.translateText,
         ),
         translateFields(
           createPWAContentDto.customModal.title,
           'title',
           actualLanguages,
-          this.translator,
+          this.chatGPTService.translateText,
         ),
       ]);
     }

@@ -9,51 +9,44 @@ import {
   Query,
   UseGuards,
   Request,
-  Logger,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { PushService } from './push.service';
 import { Push } from '../../schemas/push.schema';
 import { PushDto } from './dto/push.dto';
-import * as deepl from 'deepl-node';
 import { ConfigService } from '@nestjs/config';
 import { LANGUAGES } from '../pwa-content/consts';
 import { translateFields } from '../../services/languages';
+import { ChatGptService } from '../chat-gpt/chat-gpt.service';
+import { Language } from '../languages/dto/languages.dto';
 
 @Controller('push')
 export class PushController {
-  private readonly translator: deepl.Translator;
   constructor(
     private readonly pushService: PushService,
     private readonly configService: ConfigService,
-  ) {
-    const deeplApiKey = this.configService.get<string>('DEEPL_API_KEY');
-    this.translator = new deepl.Translator(deeplApiKey);
-  }
+    private readonly chatGPTService: ChatGptService,
+  ) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Post()
   async createPush(@Body() dto: PushDto, @Request() req): Promise<Push> {
     const userId = req.user._id;
     const languages = dto.content.languages;
-    const actualLanguages: deepl.TargetLanguageCode[] = languages.includes(
-      'all',
-    )
-      ? LANGUAGES
-      : (languages as deepl.TargetLanguageCode[]);
+    const actualLanguages = languages.includes('all') ? LANGUAGES : languages;
 
     await Promise.all([
       translateFields(
         dto.content.title,
         'title',
-        actualLanguages,
-        this.translator,
+        actualLanguages as Language[],
+        this.chatGPTService.translateText,
       ),
       translateFields(
         dto.content.description,
         'description',
-        actualLanguages,
-        this.translator,
+        actualLanguages as Language[],
+        this.chatGPTService.translateText,
       ),
     ]);
 
@@ -67,24 +60,22 @@ export class PushController {
     @Body() dto: Partial<PushDto>,
   ): Promise<Push> {
     const languages = dto.content.languages;
-    const actualLanguages: deepl.TargetLanguageCode[] = languages.includes(
-      'all',
-    )
+    const actualLanguages: Language[] = languages.includes('all')
       ? LANGUAGES
-      : (languages as deepl.TargetLanguageCode[]);
+      : (languages as Language[]);
 
     await Promise.all([
       translateFields(
         dto.content.title,
         'title',
         actualLanguages,
-        this.translator,
+        this.chatGPTService.translateText,
       ),
       translateFields(
         dto.content.description,
         'description',
         actualLanguages,
-        this.translator,
+        this.chatGPTService.translateText,
       ),
     ]);
 

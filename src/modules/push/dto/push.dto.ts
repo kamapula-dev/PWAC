@@ -12,7 +12,7 @@ import {
 import { Type } from 'class-transformer';
 import { SendToType } from '../../../schemas/push.schema';
 import { PwaEvent } from '../../../schemas/pixel-event.scheme';
-import * as deepl from 'deepl-node';
+import { Language } from '../../languages/dto/languages.dto';
 
 class PushContentDto {
   @IsOptional()
@@ -26,11 +26,11 @@ class PushContentDto {
 
   @IsNotEmpty()
   @IsObject()
-  title: Map<deepl.TargetLanguageCode, string>;
+  title: Map<Language, string>;
 
   @IsNotEmpty()
   @IsObject()
-  description: Map<deepl.TargetLanguageCode, string>;
+  description: Map<Language, string>;
 
   @IsNotEmpty()
   @IsString()

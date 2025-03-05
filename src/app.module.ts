@@ -11,7 +11,7 @@ import { BullModule } from '@nestjs/bull';
 import { DomainMappingModule } from './modules/domain-mapping/domain-mapping.module';
 import { DomainManagementModule } from './modules/domain-managemant/domain-management.module';
 import { LanguagesModule } from './modules/languages/languages.module';
-import { ContentGenerationModule } from './modules/content-generation/content-generation.module';
+import { ChatGptModule } from './modules/chat-gpt/chat-gpt.module';
 import { FacebookModule } from './modules/facebook/facebook.module';
 import { PostbackModule } from './modules/postback/postback.module';
 import { PWAEventLogModule } from './modules/pwa-event-log/pwa-event-log.module';
@@ -49,7 +49,7 @@ import { FirebaseModule } from './modules/firebase/firebase.module';
     MediaModule,
     PWAContentModule,
     LanguagesModule,
-    ContentGenerationModule,
+    ChatGptModule,
     PWAExternalMappingModule,
     PWAEventLogModule,
     PostbackModule,

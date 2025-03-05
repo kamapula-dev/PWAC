@@ -1,12 +1,10 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { ContentGenerationService } from './content-generation.service';
+import { ChatGptService } from './chat-gpt.service';
 import { AuthGuard } from '@nestjs/passport';
 
-@Controller('content-generation')
-export class ContentGenerationController {
-  constructor(
-    private readonly contentGenerationService: ContentGenerationService,
-  ) {}
+@Controller('chat-gpt')
+export class ChatGptController {
+  constructor(private readonly contentGenerationService: ChatGptService) {}
 
   @UseGuards(AuthGuard('jwt'))
   @Get('generate-review')

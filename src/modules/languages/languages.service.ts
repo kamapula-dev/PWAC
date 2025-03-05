@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import * as path from 'path';
 import { promises as fs } from 'fs';
-import * as deepl from 'deepl-node';
 import { Logger } from '@nestjs/common';
+import { Language } from './dto/languages.dto';
 
 @Injectable()
 export class LanguagesService {
@@ -17,9 +17,7 @@ export class LanguagesService {
     return JSON.parse(data);
   }
 
-  async getLanguages(
-    language: deepl.TargetLanguageCode,
-  ): Promise<Record<string, string>> {
+  async getLanguages(language: Language): Promise<Record<string, string>> {
     const filePath = path.join(this.languagesPath, `${language}.json`);
     const fallbackFilePath = path.join(this.languagesPath, 'en.json');
 

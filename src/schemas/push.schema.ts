@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { PwaEvent } from './pixel-event.scheme';
-import * as deepl from 'deepl-node';
+import { Language } from '../modules/languages/dto/languages.dto';
 
 export type PushDocument = Push & Document;
 
@@ -17,7 +17,7 @@ export class PushContent {
   color?: string;
 
   @Prop()
-  languages?: (deepl.TargetLanguageCode | 'all')[];
+  languages?: (Language | 'all')[];
 
   @Prop()
   title: Map<string, string>;
