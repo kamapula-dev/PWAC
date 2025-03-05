@@ -122,7 +122,7 @@ export default function App() {
     return () => {
       clearInterval(interval);
     };
-  }, [installState, dispatch]);
+  }, [installState, dispatch, checkedPwaInstall]);
 
   useEffect(() => {
     if (!pwaContent) return;
