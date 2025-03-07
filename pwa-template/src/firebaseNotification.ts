@@ -8,27 +8,18 @@ export const requestPermissionAndGetToken = async () => {
       throw new Error('Service workers not supported');
     }
 
-    const permission = await Notification.requestPermission();
-    const isDialogShown = permission !== 'default';
+    const pushToken = await getToken(messaging, {
+      vapidKey: import.meta.env.VITE_APP_VAPID_KEY,
+    });
 
-    if (permission === 'granted') {
-      const pushToken = await getToken(messaging, {
-        vapidKey: import.meta.env.VITE_APP_VAPID_KEY,
-      });
-
-      await fetch('https://pwac.world/pwa-external-mapping', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          externalId: getExternalId(),
-          pushToken,
-        }),
-      });
-
-      return { token: pushToken, dialogShown: isDialogShown };
-    }
-
-    return { token: null, dialogShown: isDialogShown };
+    await fetch('https://pwac.world/pwa-external-mapping', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        externalId: getExternalId(),
+        pushToken,
+      }),
+    });
   } catch (error) {
     console.error('[Notification] Error:', error);
     throw error;
