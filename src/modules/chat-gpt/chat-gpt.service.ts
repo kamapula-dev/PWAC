@@ -245,7 +245,7 @@ export class ChatGptService {
   ): Promise<{ text: string }> {
     try {
       const completion = await this.openai.chat.completions.create({
-        model: 'gpt-4o-mini',
+        model: 'gpt-3.5-turbo',
         messages: [
           {
             role: 'system',
@@ -257,6 +257,8 @@ export class ChatGptService {
           },
         ],
       });
+
+      console.log(completion, 'completion');
 
       return { text: completion.choices[0]?.message?.content?.trim() };
     } catch (error) {
