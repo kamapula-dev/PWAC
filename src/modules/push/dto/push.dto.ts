@@ -44,7 +44,7 @@ class PushContentDto {
   @IsString()
   picture: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   url: string;
 }
