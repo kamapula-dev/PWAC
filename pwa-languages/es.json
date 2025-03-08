@@ -71,5 +71,8 @@
   "apps": "Aplicaciones",
   "search": "Buscar",
   "books": "Libros",
-  "recommended": "Recomendado por"
+  "recommended": "Recomendado por",
+  "wasTheReviewHelpful": "¿Te resultó útil esta reseña?",
+  "yes": "Sí",
+  "no": "No"
 }

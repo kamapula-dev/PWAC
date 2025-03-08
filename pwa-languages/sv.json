@@ -71,5 +71,8 @@
   "apps": "Appar",
   "search": "Sök",
   "books": "Böcker",
-  "recommended": "Rekommenderat"
+  "recommended": "Rekommenderat",
+  "wasTheReviewHelpful": "Var den här recensionen hjälpsam?",
+  "yes": "Ja",
+  "no": "Nej"
 }

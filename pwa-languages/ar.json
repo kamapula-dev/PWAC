@@ -71,5 +71,8 @@
   "apps": "التطبيقات",
   "search": "بحث",
   "books": "الكتب",
-  "recommended": "مُوصى به من قِبَل"
+  "recommended": "مُوصى به من قِبَل",
+  "wasTheReviewHelpful": "هل كانت هذه المراجعة مفيدة؟",
+  "yes": "نعم",
+  "no": "لا"
 }

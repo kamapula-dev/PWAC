@@ -71,5 +71,8 @@
   "apps": "Aplikacje",
   "search": "Szukaj",
   "books": "Książki",
-  "recommended": "Polecane"
+  "recommended": "Polecane",
+  "wasTheReviewHelpful": "Czy ta recenzja była pomocna?",
+  "yes": "Tak",
+  "no": "Nie"
 }

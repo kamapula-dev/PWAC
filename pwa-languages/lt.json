@@ -71,5 +71,8 @@
   "apps": "Programėlės",
   "search": "Paieška",
   "books": "Knygos",
-  "recommended": "Rekomenduojama"
+  "recommended": "Rekomenduojama",
+  "wasTheReviewHelpful": "Questa recensione è stata utile?",
+  "yes": "Sì",
+  "no": "No"
 }

@@ -3,14 +3,21 @@ import ViewHeader from "../ViewHeader";
 import Review from "../Review";
 import { PwaContent } from "../../shared/models";
 import { motion } from "framer-motion";
+import { BeforeInstallPromptEvent } from "../../App";
 
 interface Props {
   setView: Dispatch<SetStateAction<string>>;
   pwaContent: PwaContent;
   dark: boolean;
+  installPrompt: BeforeInstallPromptEvent | null;
 }
 
-const ReviewsView: React.FC<Props> = ({ setView, pwaContent, dark }) => {
+const ReviewsView: React.FC<Props> = ({
+  setView,
+  pwaContent,
+  dark,
+  installPrompt,
+}) => {
   const slideVariants = {
     hidden: { x: "-100%", opacity: 0 },
     visible: { x: 0, opacity: 1 },
@@ -47,6 +54,8 @@ const ReviewsView: React.FC<Props> = ({ setView, pwaContent, dark }) => {
                 devResponse={review.devResponse}
                 developerName={pwaContent.developerName}
                 keepActualDateOfReviews={pwaContent.keepActualDateOfReviews}
+                installPrompt={installPrompt}
+                pwaContent={pwaContent}
               />
             );
           })}

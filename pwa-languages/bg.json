@@ -71,5 +71,8 @@
   "apps": "Приложения",
   "search": "Търсене",
   "books": "Книги",
-  "recommended": "Препоръчано"
+  "recommended": "Препоръчано",
+  "wasTheReviewHelpful": "Беше ли този отзив полезен?",
+  "yes": "Да",
+  "no": "Не"
 }

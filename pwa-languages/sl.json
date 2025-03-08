@@ -71,5 +71,8 @@
   "apps": "Aplikacije",
   "search": "Iskanje",
   "books": "Knjige",
-  "recommended": "Priporočeno"
+  "recommended": "Priporočeno",
+  "wasTheReviewHelpful": "Ali je bila ta ocena koristna?",
+  "yes": "Da",
+  "no": "Ne"
 }

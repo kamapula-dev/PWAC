@@ -67,5 +67,8 @@
   "dataCanNotBeDeleted": "Data cannot be deleted.",
   "noPaidContent": "No paid content.",
   "noAds": "No ads.",
-  "recommended": "Recommended by"
+  "recommended": "Recommended by",
+  "wasTheReviewHelpful": "Was this review helpful?",
+  "yes": "Yes",
+  "no": "No"
 }

@@ -71,5 +71,8 @@
   "apps": "Apps",
   "search": "Search",
   "books": "Books",
-  "recommended": "Recommended"
+  "recommended": "Recommended",
+  "wasTheReviewHelpful": "Was this review helpful?",
+  "yes": "Yes",
+  "no": "No"
 }

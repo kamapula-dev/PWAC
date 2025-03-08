@@ -71,5 +71,8 @@
   "apps": "Alkalmazások",
   "search": "Keresés",
   "books": "Könyvek",
-  "recommended": "Ajánlott"
+  "recommended": "Ajánlott",
+  "wasTheReviewHelpful": "Hasznos volt ez az értékelés?",
+  "yes": "Igen",
+  "no": "Nem"
 }

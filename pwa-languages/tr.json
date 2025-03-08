@@ -71,5 +71,8 @@
   "apps": "Uygulamalar",
   "search": "Arama",
   "books": "Kitaplar",
-  "recommended": "Önerilen"
+  "recommended": "Önerilen",
+  "wasTheReviewHelpful": "Bu inceleme faydalı oldu mu?",
+  "yes": "Evet",
+  "no": "Hayır"
 }

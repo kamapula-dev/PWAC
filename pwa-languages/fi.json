@@ -71,5 +71,8 @@
   "apps": "Sovellukset",
   "search": "Haku",
   "books": "Kirjat",
-  "recommended": "Suositellut"
+  "recommended": "Suositellut",
+  "wasTheReviewHelpful": "Oliko tämä arvostelu hyödyllinen?",
+  "yes": "Kyllä",
+  "no": "Ei"
 }
