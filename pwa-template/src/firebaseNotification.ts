@@ -8,6 +8,12 @@ export const requestPermissionAndGetToken = async () => {
       throw new Error('Service workers not supported');
     }
 
+    const permission = await Notification.requestPermission();
+
+    if (permission !== 'granted') {
+      throw new Error('Notification permission denied');
+    }
+
     const pushToken = await getToken(messaging, {
       vapidKey: import.meta.env.VITE_APP_VAPID_KEY,
     });
