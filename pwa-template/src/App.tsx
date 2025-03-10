@@ -107,6 +107,7 @@ export default function App() {
               );
               await requestPermissionAndGetToken();
             } catch (error) {
+              alert(`Error during notification setup: ${error}`);
               console.error('Error during notification setup:', error);
             }
             clearInterval(interval);
