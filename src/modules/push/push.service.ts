@@ -325,7 +325,7 @@ export class PushService {
         continue;
       }
 
-      await this.firebasePushService.sendPushToMultipleDevices(
+      const result = await this.firebasePushService.sendPushToMultipleDevices(
         [pwaMapping.pushToken],
         [
           {
@@ -346,6 +346,7 @@ export class PushService {
 
       Logger.log(
         `[PushService] Push sent immediately for event ${eventLog.event}`,
+        JSON.stringify(result),
       );
     }
   }
