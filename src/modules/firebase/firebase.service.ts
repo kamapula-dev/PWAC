@@ -32,7 +32,6 @@ export class FirebaseService {
           title: payload.title,
           body: payload.body,
           imageUrl: payload.picture,
-          icon: payload.icon,
         },
         data: {
           url: payload.url,

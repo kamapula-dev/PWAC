@@ -125,7 +125,7 @@ export class BuildPWAProcessor {
           
             const notificationOptions = {
               body: payload.notification.body,
-              icon: payload.notification.icon ,
+              icon: payload.data?.icon || '/' ,
               badge: payload.notification.badge,
               image: payload.notification.image,
               data: {
