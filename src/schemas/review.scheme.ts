@@ -48,12 +48,12 @@ export class Review extends Document {
   devResponse: Map<deepl.TargetLanguageCode, string>;
 
   @Prop({
-    required: true,
+    required: false,
     default: function () {
       return assignUniqueColor(this.$parent());
     },
   })
-  reviewIconColor: string;
+  reviewIconColor?: string;
 
   @Prop({ required: true })
   reviewText: Map<deepl.TargetLanguageCode, string>;
