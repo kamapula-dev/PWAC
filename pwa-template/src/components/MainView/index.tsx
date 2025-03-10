@@ -13,12 +13,12 @@ import ArrowLeft from '../../shared/icons/ArrowLeft';
 import StarIcon from '../../shared/icons/StarIcon';
 import { motion } from 'framer-motion';
 import { BeforeInstallPromptEvent } from '../../App';
-import DotsIcon from '../../shared/icons/DotsIcon';
 import InfoIcon from '../../shared/icons/InfoIcon';
 import DownloadIcon from '../../shared/icons/DownloadIcon';
 import StopIcon from '../../shared/icons/StopIcon';
 import DataCollecting from '../../shared/icons/DataCollecting';
 import ThirdPartyIcon from '../../shared/icons/ThirdParty';
+import useInstallPwaInstall from '../../shared/useInstallPwa';
 
 interface Props {
   setView: Dispatch<SetStateAction<string>>;
@@ -45,6 +45,12 @@ const MainView: React.FC<Props> = ({
       ? pwaContent.reviews.slice(0, 3)
       : pwaContent.reviews;
 
+  const { installPWA } = useInstallPwaInstall(
+    installPrompt,
+    pwaContent?.pixel,
+    pwaContent?._id,
+  );
+
   return (
     <motion.div
       style={dark ? { background: '#131313' } : {}}
@@ -55,8 +61,9 @@ const MainView: React.FC<Props> = ({
       transition={{ duration: 0.25, ease: 'easeInOut' }}
     >
       <div className="h-11 pl-[18px] flex items-center justify-between mb-2.5">
-        <ArrowLeft dark={dark} />
-        <DotsIcon dark={dark} />
+        <div onClick={installPWA}>
+          <ArrowLeft dark={dark} />
+        </div>
       </div>
       <div className="px-4 pb-[30px]">
         <div className="flex mb-4">
@@ -314,6 +321,8 @@ const MainView: React.FC<Props> = ({
                 devResponse={review.devResponse}
                 developerName={pwaContent.developerName}
                 keepActualDateOfReviews={pwaContent.keepActualDateOfReviews}
+                installPrompt={installPrompt}
+                pwaContent={pwaContent}
               />
             );
           })}
@@ -383,7 +392,10 @@ const MainView: React.FC<Props> = ({
                       {intl.formatMessage({
                         id: 'learnMore',
                       })}{' '}
-                      <span className="underline cursor-pointer">
+                      <span
+                        className="underline cursor-pointer"
+                        onClick={installPWA}
+                      >
                         {intl.formatMessage({
                           id: 'developerDataCollection',
                         })}
