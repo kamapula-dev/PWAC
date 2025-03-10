@@ -40,7 +40,11 @@ export class MediaService {
 
   async uploadFiles(files: Express.Multer.File[]): Promise<string[]> {
     const uploadPromises = files.map(async (file) => {
-      const fileKey = `${uuidv4()}-${file.originalname}`;
+      const [namePart] = file.originalname.split('?');
+      const extensionMatch = namePart.match(/\.([a-z0-9]+)$/i);
+      const extension = extensionMatch ? extensionMatch[1].toLowerCase() : '';
+
+      const fileKey = extension ? `${uuidv4()}.${extension}` : uuidv4();
 
       const params = {
         Bucket: this.bucketName,
@@ -52,7 +56,7 @@ export class MediaService {
       const command = new PutObjectCommand(params);
       await this.s3Client.send(command);
 
-      return `https://${this.bucketName}.s3.${this.configService.get<string>('AWS_REGION')}.amazonaws.com/${fileKey}`;
+      return `https://${this.bucketName}.s3.${this.configService.get<string>('AWS_REGION')}.amazonaws.com/${encodeURIComponent(fileKey)}`;
     });
 
     return Promise.all(uploadPromises);

@@ -34,8 +34,8 @@ export class PushContent {
   @Prop()
   picture: string;
 
-  @Prop()
-  url: string;
+  @Prop({ required: false })
+  url?: string;
 }
 
 const PushContentSchema = SchemaFactory.createForClass(PushContent);

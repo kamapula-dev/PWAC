@@ -32,6 +32,7 @@ export class FirebaseService {
           title: payload.title,
           body: payload.body,
           imageUrl: payload.picture,
+          icon: payload.icon,
         },
         data: {
           url: payload.url,
@@ -41,7 +42,7 @@ export class FirebaseService {
         android: {
           notification: {
             color: payload.color,
-            icon: 'ic_stat_notification',
+            icon: payload.icon || 'ic_stat_notification',
             clickAction: 'OPEN_URL',
           },
         },
