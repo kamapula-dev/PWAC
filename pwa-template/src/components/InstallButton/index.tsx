@@ -120,7 +120,6 @@ const InstallButton: React.FC<Props> = ({
       await installPrompt.prompt();
       const choiceResult = await installPrompt.userChoice;
       if (choiceResult.outcome === "accepted") {
-        handleSendInfoAboutInstall();
         setTimeout(() => {
           dispatch(setInstallState(PWAInstallState.installed));
         }, 15000);
