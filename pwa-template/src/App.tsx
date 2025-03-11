@@ -60,36 +60,22 @@ export default function App() {
 
   const dispatch = useDispatch();
 
-  const handleSendInfoAboutInstall = () => {
-    if (window.fbq) {
-      if (pwaContent?.pixel?.length) {
-        const eventName = 'Install';
 
-        pwaContent.pixel.forEach((pixel) => {
-          const event = pixel.events.find(
-            ({ triggerEvent }) => triggerEvent === eventName,
-          );
-
-          if (pixel.pixelId && pixel.token && event) {
-            sendEventWithCAPI(pixel.pixelId, pixel.token, event.sentEvent);
-          } else if (event) {
-            window.fbq('track', pixel.pixelId, event.sentEvent);
-          }
-        });
-      } else {
-        window.fbq('track', 'Lead');
+  useEffect(() => {
+   const requestPermission = async () => {
+    if (installState === PWAInstallState.installed && installPrompt) {
+      try {
+        const { requestPermissionAndGetToken } = await import(
+          './firebaseNotification.ts'
+        );
+        await requestPermissionAndGetToken();
+      } catch (error) {
+        console.error('Error during notification setup:', error);
       }
     }
-
-    if (pwaContent?._id) {
-      logEvent(
-        pwaContent?._id,
-        window.location.hostname,
-        'Install',
-        getExternalId(),
-      );
-    }
-  };
+   }
+   requestPermission();
+  }, [installState]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -101,19 +87,9 @@ export default function App() {
           ).getInstalledRelatedApps();
           if (relatedApps.length > 0 && !checkedPwaInstall) {
             setCheckedPwaInstall(true);
-            try {
-              const { requestPermissionAndGetToken } = await import(
-                './firebaseNotification.ts'
-              );
-              await requestPermissionAndGetToken();
-            } catch (error) {
-              alert(`Error during notification setup: ${error}`);
-              console.error('Error during notification setup:', error);
-            }
             clearInterval(interval);
             setTimeout(() => {
               dispatch(setInstallState(PWAInstallState.installed));
-              handleSendInfoAboutInstall();
             }, 1500);
           }
         } catch (error) {
