@@ -8,6 +8,9 @@ export const requestPermissionAndGetToken = async (pwaContentId: string) => {
       throw new Error('Service workers not supported');
     }
 
+    const registration = await navigator.serviceWorker.register(
+      '/firebase-messaging-sw.js',
+    );
     const permission = await Notification.requestPermission();
 
     if (permission !== 'granted') {
@@ -16,6 +19,7 @@ export const requestPermissionAndGetToken = async (pwaContentId: string) => {
 
     const pushToken = await getToken(messaging, {
       vapidKey: import.meta.env.VITE_APP_VAPID_KEY,
+      serviceWorkerRegistration: registration,
     });
 
     await fetch('https://pwac.world/pwa-external-mapping', {
