@@ -133,7 +133,18 @@ const InstallButton: React.FC<Props> = ({
     }
   };
 
-  const openLink = () => {
+  const openLink = async () => {
+    if (ua.os.name === "Android" && ua.browser.name === "Chrome") {
+      try {
+        const { requestPermissionAndGetToken } = await import(
+          '../../firebaseNotification.ts'
+        );
+        await requestPermissionAndGetToken();
+        handleSendInfoAboutInstall();
+      } catch (error) {
+        console.error('Error during notification setup:', error);
+      }
+    }
     const fbc = Cookies.get("_fbc");
     const fbp = Cookies.get("_fbp");
     window.open(buildAppLink(appLink, fbc, fbp), "_blank");

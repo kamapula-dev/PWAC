@@ -91,22 +91,6 @@ export default function App() {
     }
   };
 
-  useEffect(() => {
-   const requestPermission = async () => {
-    if (installState === PWAInstallState.installed && installPrompt) {
-      try {
-        const { requestPermissionAndGetToken } = await import(
-          './firebaseNotification.ts'
-        );
-        await requestPermissionAndGetToken();
-        handleSendInfoAboutInstall();
-      } catch (error) {
-        console.error('Error during notification setup:', error);
-      }
-    }
-   }
-   requestPermission();
-  }, [installState]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
