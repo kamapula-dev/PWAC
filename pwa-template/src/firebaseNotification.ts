@@ -31,12 +31,18 @@ export const requestPermissionAndGetToken = async (pwaContentId: string) => {
       }),
     });
 
-    await logEvent(
-      pwaContentId,
-      window.location.hostname,
-      'OpenPWA',
-      getExternalId(),
-    );
+    const isInstalled = localStorage.getItem('is_installed');
+
+    if (isInstalled !== 'true') {
+      await logEvent(
+        pwaContentId,
+        window.location.hostname,
+        'OpenPWA',
+        getExternalId(),
+      );
+
+      localStorage.setItem('is_installed', 'true');
+    }
   } catch (error) {
     console.error('[Notification] Error:', error);
     throw error;
