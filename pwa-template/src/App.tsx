@@ -60,38 +60,6 @@ export default function App() {
 
   const dispatch = useDispatch();
 
-  const handleSendInfoAboutInstall = () => {
-    if (window.fbq) {
-      if (pwaContent?.pixel?.length) {
-        const eventName = 'Install';
-
-        pwaContent.pixel.forEach((pixel) => {
-          const event = pixel.events.find(
-            ({ triggerEvent }) => triggerEvent === eventName,
-          );
-
-          if (pixel.pixelId && pixel.token && event) {
-            sendEventWithCAPI(pixel.pixelId, pixel.token, event.sentEvent);
-          } else if (event) {
-            window.fbq('track', pixel.pixelId, event.sentEvent);
-          }
-        });
-      } else {
-        window.fbq('track', 'Lead');
-      }
-    }
-
-    if (pwaContent?._id) {
-      logEvent(
-        pwaContent?._id,
-        window.location.hostname,
-        'Install',
-        getExternalId(),
-      );
-    }
-  };
-
-
   useEffect(() => {
     let interval: NodeJS.Timeout;
     const checkPWAInstallation = async () => {
@@ -348,7 +316,11 @@ export default function App() {
   }
 
   return isPWAActive ? (
-    <PwaView pwaLink={pwaLink} />
+    <PwaView
+      id={pwaContent._id}
+      hasPushes={pwaContent.hasPushes}
+      pwaLink={pwaLink}
+    />
   ) : (
     <div>
       {dark && <style>{`body{background-color: #131313;}`}</style>}

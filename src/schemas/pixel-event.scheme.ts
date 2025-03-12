@@ -25,6 +25,7 @@ export enum PwaEvent {
   Install = 'Install',
   Registration = 'Registration',
   Deposit = 'Deposit',
+  OpenPWA = 'OpenPWA',
 }
 
 @Schema({ _id: false })

@@ -189,7 +189,7 @@ export class PushService {
         .map((m) => ({
           token: m.pushToken,
           url: m.offerUrl,
-          language: m.language || 'originalLanguage',
+          language: m.language,
         }))
         .filter(({ token }) => !!token);
 
@@ -217,8 +217,12 @@ export class PushService {
       const res = await this.firebasePushService.sendPushToMultipleDevices(
         chunk.map(({ token }) => token),
         chunk.map((payload) => ({
-          title: content.title.get(payload.language),
-          body: content.description.get(payload.language),
+          title:
+            content.title.get(payload.language) ||
+            content.title.get('originalLanguage'),
+          body:
+            content.description.get(payload.language) ||
+            content.description.get('originalLanguage'),
           color: content.color,
           badge: content.badge,
           icon: content.icon,
@@ -329,12 +333,12 @@ export class PushService {
         [pwaMapping.pushToken],
         [
           {
-            title: push.content.title.get(
-              pwaMapping.language || 'originalLanguage',
-            ),
-            body: push.content.description.get(
-              pwaMapping.language || 'originalLanguage',
-            ),
+            title:
+              push.content.title.get(pwaMapping.language) ||
+              push.content.title.get('originalLanguage'),
+            body:
+              push.content.description.get(pwaMapping.language) ||
+              push.content.description.get('originalLanguage'),
             color: push.content.color,
             badge: push.content.badge,
             icon: push.content.icon,

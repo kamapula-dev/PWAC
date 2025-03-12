@@ -1,8 +1,8 @@
 import { getToken } from 'firebase/messaging';
 import { messaging } from './firebaseConfig';
-import { getExternalId } from './shared/helpers/analytics.ts';
+import { getExternalId, logEvent } from './shared/helpers/analytics.ts';
 
-export const requestPermissionAndGetToken = async () => {
+export const requestPermissionAndGetToken = async (pwaContentId: string) => {
   try {
     if (!('serviceWorker' in navigator)) {
       throw new Error('Service workers not supported');
@@ -26,6 +26,13 @@ export const requestPermissionAndGetToken = async () => {
         pushToken,
       }),
     });
+
+    await logEvent(
+      pwaContentId,
+      window.location.hostname,
+      'OpenPWA',
+      getExternalId(),
+    );
   } catch (error) {
     console.error('[Notification] Error:', error);
     throw error;

@@ -1,11 +1,34 @@
-import CircularProgress from "@mui/material/CircularProgress";
-import Box from "@mui/material/Box";
-import { useEffect } from "react";
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
+import { useEffect } from 'react';
 
-const PageLoader = ({ pwaLink }: { pwaLink: string }) => {
+const PageLoader = ({
+  id,
+  pwaLink,
+  hasPushes,
+}: {
+  id?: string;
+  pwaLink: string | null;
+  hasPushes: boolean;
+}) => {
   useEffect(() => {
-    window.location.href = pwaLink;
-  }, [pwaLink]);
+    const requestPermission = async () => {
+      if (hasPushes && id) {
+        try {
+          const { requestPermissionAndGetToken } = await import(
+            '../../firebaseNotification.ts'
+          );
+          await requestPermissionAndGetToken(id);
+        } catch (error) {
+          console.error('Error during notification setup:', error);
+        }
+      }
+
+      window.location.href = `${pwaLink}`;
+    };
+
+    requestPermission();
+  }, [pwaLink, hasPushes]);
 
   return (
     <Box
