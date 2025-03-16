@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import CircularProgress from "@mui/material/CircularProgress";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
@@ -14,41 +15,62 @@ function AppLogo({ logoUrl }: { logoUrl: string }) {
   const installState = useSelector((state: RootState) =>
     getInstallState(state.install)
   );
+  const fakeDownloadProgress = useSelector(
+    (state: RootState) => state.install.fakeDownloadProgress
+  ).split("%")[0];
   const dispatch = useDispatch();
 
   useEffect(() => {
     const fakeInstall = async () => {
       let progress = 0;
-      const startTime = Date.now();
+      const totalDuration = 17500;
+      const intervalTime = 1000;
+      const steps = totalDuration / intervalTime;
+      const increment = 100 / steps;
 
-      const interval = setInterval(() => {
-        const randomIncrement = Math.random() * (30 - 10) + 10;
-        progress += randomIncrement;
-        progress = Math.min(progress, 100);
-        progress = Math.floor(progress);
+      const interval = setInterval(async () => {
+        if ("getInstalledRelatedApps" in navigator) {
+          try {
+            const relatedApps = await (
+              navigator as any
+            ).getInstalledRelatedApps();
+            if (relatedApps.length > 0) {
+              clearInterval(interval);
+              dispatch(setFakeDownloadProgress(99));
 
-        dispatch(setFakeDownloadProgress(progress));
-        const elapsedTime = (Date.now() - startTime) / 1100;
-
-        if (progress >= 100 && elapsedTime >= 6) {
-          clearInterval(interval);
-          dispatch(setInstallState(PWAInstallState.downloaded));
+              setTimeout(() => {
+                dispatch(setFakeDownloadProgress(100));
+                dispatch(setInstallState(PWAInstallState.installed));
+              }, 3000);
+              return;
+            }
+          } catch (error) {
+            console.error("Error checking related apps", error);
+          }
         }
-      }, 1100);
+
+        progress += increment;
+        progress = Math.min(progress, 100);
+        dispatch(setFakeDownloadProgress(Math.floor(progress)));
+
+        if (progress >= 100) {
+          clearInterval(interval);
+          dispatch(setInstallState(PWAInstallState.installed));
+        }
+      }, intervalTime);
     };
-    if (installState === PWAInstallState.downloading) {
+
+    if (installState === PWAInstallState.installing) {
       fakeInstall();
     }
   }, [installState]);
 
   const showPermanentCircularProgress =
-    installState === PWAInstallState.downloading ||
-    installState === PWAInstallState.installing;
+    installState === PWAInstallState.installing ||
+    installState === PWAInstallState.waitingForRedirect;
   const showLogo =
     installState === PWAInstallState.idle ||
-    installState === PWAInstallState.installed ||
-    installState === PWAInstallState.downloaded ||
-    installState === PWAInstallState.waitingForRedirect;
+    installState === PWAInstallState.installed;
 
   return (
     <>
@@ -63,12 +85,17 @@ function AppLogo({ logoUrl }: { logoUrl: string }) {
           </div>
 
           <CircularProgress
-            disableShrink
-            size={58}
-            thickness={2}
+            value={+fakeDownloadProgress || 0}
+            variant={
+              installState === PWAInstallState.installing
+                ? "determinate"
+                : "indeterminate"
+            }
+            size={61}
+            thickness={3}
             sx={{
               position: "absolute",
-              color: "#00875F",
+              color: "#1357CD",
             }}
           />
         </div>

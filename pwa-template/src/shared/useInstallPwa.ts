@@ -59,7 +59,7 @@ const useInstallPwaInstall = (
     dispatch(setInstallState(PWAInstallState.waitingForRedirect));
     window.open(pwaLink, "_blank");
     setTimeout(() => {
-      dispatch(setInstallState(PWAInstallState.downloaded));
+      dispatch(setInstallState(PWAInstallState.installed));
     }, 1000);
   };
 
@@ -84,9 +84,7 @@ const useInstallPwaInstall = (
       await installPrompt.prompt();
       const choiceResult = await installPrompt.userChoice;
       if (choiceResult.outcome === "accepted") {
-        setTimeout(() => {
-          dispatch(setInstallState(PWAInstallState.installed));
-        }, 40000);
+        console.log("User accepted the A2HS prompt");
       } else {
         handleSendInfoAboutInstall();
         redirectToOffer();

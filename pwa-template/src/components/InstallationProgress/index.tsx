@@ -19,16 +19,16 @@ export default function InstallationProgress({
 }) {
   const intl = useIntl();
 
-  const isDownloading = useSelector(
+  const isInstalling = useSelector(
     (state: RootState) =>
-      getInstallState(state.install) === PWAInstallState.downloading
+      getInstallState(state.install) === PWAInstallState.installing
   );
 
   const fakeDownloadProgress = useSelector(
     (state: RootState) => state.install.fakeDownloadProgress
   );
 
-  return isDownloading ? (
+  return isInstalling ? (
     <div className="mt-1 flex flex-col gap-[3px] text-sm">
       <div style={dark ? { color: "#DFDFDF" } : {}} className="text-black">
         {fakeDownloadProgress}
