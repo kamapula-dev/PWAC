@@ -71,5 +71,6 @@
   "apps": "Rakendused",
   "search": "Otsing",
   "books": "Raamatud",
-  "recommended": "Soovitatud"
+  "recommended": "Soovitatud",
+  "wasTheReviewHelpful": "Kas see arvustus oli kasulik?"
 }

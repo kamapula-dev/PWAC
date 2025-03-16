@@ -71,5 +71,6 @@
   "apps": "Apps",
   "search": "Søg",
   "books": "Bøger",
-  "recommended": "Anbefalet"
+  "recommended": "Anbefalet",
+  "wasTheReviewHelpful": "Var denne anmeldelse nyttig?"
 }

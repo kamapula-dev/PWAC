@@ -71,5 +71,6 @@
   "apps": "Aplikasi",
   "search": "Pencarian",
   "books": "Buku",
-  "recommended": "Direkomendasikan oleh"
+  "recommended": "Direkomendasikan oleh",
+  "wasTheReviewHelpful": "Apakah ulasan ini membantu?"
 }

@@ -71,5 +71,6 @@
   "apps": "앱",
   "search": "검색",
   "books": "도서",
-  "recommended": "추천"
+  "recommended": "추천",
+  "wasTheReviewHelpful": "이 리뷰가 도움이 되었습니까?"
 }

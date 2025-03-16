@@ -71,5 +71,6 @@
   "apps": "App",
   "search": "Cerca",
   "books": "Libri",
-  "recommended": "Consigliato da"
+  "recommended": "Consigliato da",
+  "wasTheReviewHelpful": "Questa recensione è stata utile?"
 }

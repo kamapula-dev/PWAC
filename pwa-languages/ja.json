@@ -71,5 +71,6 @@
   "apps": "アプリ",
   "search": "検索",
   "books": "書籍",
-  "recommended": "おすすめ"
+  "recommended": "おすすめ",
+  "wasTheReviewHelpful": "このレビューは役に立ちましたか？"
 }

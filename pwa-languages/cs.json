@@ -71,5 +71,6 @@
   "apps": "Aplikace",
   "search": "Hledat",
   "books": "Knihy",
-  "recommended": "Doporučeno"
+  "recommended": "Doporučeno",
+  "wasTheReviewHelpful": "Byla tato recenze užitečná?"
 }

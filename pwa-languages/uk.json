@@ -71,5 +71,6 @@
   "apps": "Застосунки",
   "search": "Пошук",
   "books": "Книги",
-  "recommended": "Рекомендовано"
+  "recommended": "Рекомендовано",
+  "wasTheReviewHelpful": "Чи був цей відгук корисним?"
 }

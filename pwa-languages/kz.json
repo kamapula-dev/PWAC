@@ -71,5 +71,6 @@
   "apps": "Қосымшалар",
   "search": "Іздеу",
   "books": "Кітаптар",
-  "recommended": "Ұсынылған"
+  "recommended": "Ұсынылған",
+  "wasTheReviewHelpful": "Бұл пікір сізге көмекті болды ма?"
 }

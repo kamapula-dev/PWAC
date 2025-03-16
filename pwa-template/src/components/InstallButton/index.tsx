@@ -111,11 +111,11 @@ const InstallButton: React.FC<Props> = ({
     }
 
     if (installPrompt) {
-      dispatch(setInstallState(PWAInstallState.installing));
+
       await installPrompt.prompt();
       const choiceResult = await installPrompt.userChoice;
       if (choiceResult.outcome === "accepted") {
-        console.log("User accepted the A2HS prompt");
+        dispatch(setInstallState(PWAInstallState.installing));
       } else {
         dispatch(setInstallState(PWAInstallState.waitingForRedirect));
         handleSendInfoAboutInstall();

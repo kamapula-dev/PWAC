@@ -66,8 +66,7 @@ function AppLogo({ logoUrl }: { logoUrl: string }) {
   }, [installState]);
 
   const showPermanentCircularProgress =
-    installState === PWAInstallState.installing ||
-    installState === PWAInstallState.waitingForRedirect;
+    installState === PWAInstallState.installing 
   const showLogo =
     installState === PWAInstallState.idle ||
     installState === PWAInstallState.installed;
@@ -91,8 +90,8 @@ function AppLogo({ logoUrl }: { logoUrl: string }) {
                 ? "determinate"
                 : "indeterminate"
             }
-            size={61}
-            thickness={3}
+            size={60}
+            thickness={2}
             sx={{
               position: "absolute",
               color: "#1357CD",

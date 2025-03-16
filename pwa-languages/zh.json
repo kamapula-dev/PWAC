@@ -71,5 +71,6 @@
   "apps": "应用",
   "search": "搜索",
   "books": "书籍",
-  "recommended": "推荐"
+  "recommended": "推荐",
+  "wasTheReviewHelpful": "此评论是否有帮助？"
 }

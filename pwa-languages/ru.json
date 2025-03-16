@@ -71,5 +71,6 @@
   "apps": "Приложения",
   "search": "Поиск",
   "books": "Книги",
-  "recommended": "Рекомендовано"
+  "recommended": "Рекомендовано",
+  "wasTheReviewHelpful": "Этот отзыв был полезен?"
 }
