@@ -86,6 +86,33 @@ export default function App() {
   const pwaLink = localStorage.getItem("pwaLink");
 
   useEffect(() => {
+    const handleGlobalError = (
+      message: string | Event,
+      source?: string,
+      lineno?: number,
+      colno?: number,
+      error?: Error
+    ) => {
+      console.error("Global Error Caught:", {
+        message,
+        source,
+        lineno,
+        colno,
+        error,
+      });
+  
+  
+      alert(`Error: ${message} at ${source}:${lineno}:${colno}`);
+    };
+  
+    window.onerror = handleGlobalError;
+  
+    return () => {
+      window.onerror = null;
+    };
+  }, []);
+
+  useEffect(() => {
     if (pwaLink || isPWAActive) return;
     if (!isPWAActive && pwaContent?.pwaLink) {
       setTimeout(() => {
