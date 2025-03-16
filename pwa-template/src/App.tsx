@@ -86,7 +86,6 @@ export default function App() {
   const pwaLink = localStorage.getItem("pwaLink");
 
 
-
   useEffect(() => {
     if (pwaLink || isPWAActive) return;
     if (!isPWAActive && pwaContent?.pwaLink) {

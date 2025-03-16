@@ -17,7 +17,7 @@ function AppLogo({ logoUrl }: { logoUrl: string }) {
   );
   const fakeDownloadProgress = useSelector(
     (state: RootState) => state.install.fakeDownloadProgress
-  ).split("%")[0];
+  );
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -82,7 +82,7 @@ function AppLogo({ logoUrl }: { logoUrl: string }) {
           </div>
 
           <CircularProgress
-            value={+fakeDownloadProgress || 0}
+            value={+fakeDownloadProgress.split("%")[0] || 0}
             variant={
               installState === PWAInstallState.installing
                 ? "determinate"
