@@ -67,14 +67,11 @@ function AppLogo({ logoUrl }: { logoUrl: string }) {
 
   const showPermanentCircularProgress =
     installState === PWAInstallState.installing 
-  const showLogo =
-    installState === PWAInstallState.idle ||
-    installState === PWAInstallState.installed ||
-    installState === PWAInstallState.waitingForRedirect;
+
 
   return (
     <>
-      {showPermanentCircularProgress && (
+      {showPermanentCircularProgress ? (
         <div className="relative flex justify-center items-center w-[70px] h-[70px] mr-4">
           <div className="w-14 h-14 rounded-full overflow-hidden relative">
             <img
@@ -99,16 +96,13 @@ function AppLogo({ logoUrl }: { logoUrl: string }) {
             }}
           />
         </div>
-      )}
-      {showLogo && (
-        <div className="relative block overflow-hidden w-[70px] h-[70px] rounded-xl mr-5">
-          <img
-            src={logoUrl}
-            alt="App logo"
-            className="w-full h-full object-cover"
-          />
-        </div>
-      )}
+      ) : (<div className="relative block overflow-hidden w-[70px] h-[70px] rounded-xl mr-5">
+      <img
+        src={logoUrl}
+        alt="App logo"
+        className="w-full h-full object-cover"
+      />
+    </div>)}
     </>
   );
 }
