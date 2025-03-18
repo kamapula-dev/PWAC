@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types, ClientSession } from 'mongoose';
 import { Push, PushDocument } from '../../schemas/push.schema';
 import { PushService } from '../push/push.service';
-import { PWAExternalMapping } from 'src/schemas/pwa-external-mapping.scheme';
+import { PWAExternalMapping } from '../../schemas/pwa-external-mapping.scheme';
 
 @Injectable()
 export class SchedulerService {
@@ -17,84 +17,159 @@ export class SchedulerService {
     private mappingModel: Model<PWAExternalMapping>,
   ) {}
 
-  @Cron(CronExpression.EVERY_HOUR)
-  async schedulePendingPushes() {
+  @Cron(CronExpression.EVERY_MINUTE)
+  async handleScheduledPushes() {
     const now = new Date();
-    const nextTwoHours = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+    const timeWindowEnd = new Date(now.getTime() + 2 * 60 * 60 * 1000);
 
-    const upcomingPushes = await this.pushModel.find({
-      active: true,
-      schedules: {
-        $exists: true,
-        $not: { $size: 0 },
-        $elemMatch: { $gte: now, $lte: nextTwoHours },
-      },
-    });
+    try {
+      const candidates = await this.findEligiblePushes(now, timeWindowEnd);
+      await this.processPushes(candidates, now, timeWindowEnd);
+    } catch (error) {
+      this.logger.error(`Scheduling failed: ${error.message}`, error.stack);
+    }
+  }
 
-    await Promise.all(
-      upcomingPushes.map(async (push) => {
-        const pwaContentIds = push.recipients.reduce<string[]>(
-          (ids, recipient) => {
-            if (recipient.pwas?.length) {
-              return ids.concat(
-                recipient.pwas
-                  .map((pwa) => pwa.id)
-                  .filter((id): id is string => !!id),
-              );
-            }
-            return ids;
-          },
-          [],
-        );
+  private async findEligiblePushes(start: Date, end: Date) {
+    return this.pushModel
+      .find({
+        active: true,
+        schedules: {
+          $elemMatch: { $gte: start, $lte: end },
+        },
+      })
+      .lean()
+      .exec();
+  }
 
-        if (!pwaContentIds.length) {
-          this.logger.log(`No pwaContentIds for push ${push._id}`);
-          return;
-        }
+  private async processPushes(
+    pushes: Array<Record<string, unknown>>,
+    now: Date,
+    end: Date,
+  ) {
+    for (const rawPush of pushes) {
+      const session = await this.pushModel.startSession();
 
-        const mappings = await this.mappingModel.find({
-          pwaContentId: { $in: pwaContentIds },
-          pushToken: { $exists: true, $ne: '' },
+      try {
+        await session.withTransaction(async () => {
+          const pushId = new Types.ObjectId(rawPush._id as string);
+          const freshPush = await this.lockPushDocument(pushId, session);
+
+          if (!this.validatePush(freshPush)) return;
+
+          const schedules = this.extractValidSchedules(freshPush, now, end);
+          if (schedules.length === 0) return;
+
+          await this.processPushNotifications(freshPush, schedules, now);
+          await this.updatePushSchedules(freshPush, schedules, session);
         });
-
-        if (!mappings.length) {
-          this.logger.log(`No mappings for push ${push._id}`);
-          return;
-        }
-
-        const eligibleSchedules = push.schedules.filter(
-          (schedule) => schedule >= now && schedule <= nextTwoHours,
+      } catch (error) {
+        this.logger.error(
+          `Transaction failed for push ${rawPush._id}: ${error.message}`,
         );
+      } finally {
+        await session.endSession();
+      }
+    }
+  }
 
-        if (!eligibleSchedules.length) return;
+  private async lockPushDocument(
+    pushId: Types.ObjectId,
+    session: ClientSession,
+  ) {
+    return this.pushModel
+      .findById(pushId)
+      .session(session)
+      .select('+schedules')
+      .exec();
+  }
 
-        await Promise.all(
-          eligibleSchedules.map(async (schedule) => {
-            const delayMs = schedule.getTime() - now.getTime();
+  private validatePush(push: PushDocument | null): push is PushDocument {
+    return !!push?.active && !!push.schedules?.length;
+  }
 
-            if (delayMs < 0) return;
-
-            await Promise.all(
-              mappings.map(async (mapping) => {
-                await this.pushService.schedulePush(
-                  push._id.toString(),
-                  Math.ceil(delayMs / 1000),
-                  mapping.externalId,
-                );
-              }),
-            );
-          }),
-        );
-
-        const remainingSchedules = push.schedules.filter(
-          (s) => !eligibleSchedules.some((es) => es.getTime() === s.getTime()),
-        );
-
-        await this.pushModel.updateOne(
-          { _id: push._id },
-          { $set: { schedules: remainingSchedules } },
-        );
-      }),
+  private extractValidSchedules(
+    push: PushDocument,
+    start: Date,
+    end: Date,
+  ): Date[] {
+    return push.schedules.filter(
+      (s) => s >= start && s <= end && !isNaN(s.getTime()),
     );
+  }
+
+  private async processPushNotifications(
+    push: PushDocument,
+    schedules: Date[],
+    now: Date,
+  ) {
+    const pwaIds = this.extractPwaContentIds(push);
+    if (pwaIds.length === 0) {
+      this.logger.warn(`No valid PWA IDs for push ${push._id}`);
+      return;
+    }
+
+    const mappings = await this.findValidMappings(pwaIds);
+    if (mappings.length === 0) {
+      this.logger.warn(`No valid mappings for push ${push._id}`);
+      return;
+    }
+
+    for (const schedule of schedules) {
+      const delay = this.calculateSafeDelay(schedule, now);
+      if (delay <= 0) continue;
+
+      try {
+        await Promise.all(
+          mappings.map((mapping) =>
+            this.pushService.schedulePush(
+              push._id.toString(),
+              delay,
+              mapping.externalId,
+            ),
+          ),
+        );
+      } catch (error) {
+        this.logger.error(
+          `Failed to schedule push ${push._id}: ${error.message}`,
+        );
+      }
+    }
+  }
+
+  private extractPwaContentIds(push: PushDocument): string[] {
+    return push.recipients.flatMap(
+      (recipient) => recipient.pwas?.map((pwa) => pwa.id).filter(Boolean) || [],
+    );
+  }
+
+  private async findValidMappings(pwaIds: string[]) {
+    return this.mappingModel.find({
+      pwaContentId: { $in: pwaIds },
+      pushToken: { $exists: true, $ne: '' },
+    });
+  }
+
+  private calculateSafeDelay(schedule: Date, now: Date): number {
+    const delayMs = schedule.getTime() - now.getTime();
+    return Math.max(0, Math.ceil(delayMs / 1000));
+  }
+
+  private async updatePushSchedules(
+    push: PushDocument,
+    schedules: Date[],
+    session: ClientSession,
+  ) {
+    try {
+      await this.pushModel.updateOne(
+        { _id: push._id },
+        { $pullAll: { schedules } },
+        { session },
+      );
+      this.logger.log(`Schedules updated for push ${push._id}`);
+    } catch (error) {
+      this.logger.error(`Failed to update schedules: ${error.message}`);
+      throw error;
+    }
   }
 }
