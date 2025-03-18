@@ -78,7 +78,7 @@ export class Push {
   @Prop({ required: true })
   systemName: string;
 
-  @Prop({ default: false })
+  @Prop({ default: false, index: true })
   active: boolean;
 
   @Prop({ enum: PwaEvent, required: true })
@@ -86,6 +86,9 @@ export class Push {
 
   @Prop({ default: 0 })
   delay: number;
+
+  @Prop({ type: [Date], required: false, index: true })
+  schedules?: Date[];
 
   @Prop({ default: 0 })
   interval?: number;
@@ -96,7 +99,7 @@ export class Push {
   @Prop({ type: [RecipientSchema], default: [] })
   recipients: Recipient[];
 
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true, index: true })
   user: Types.ObjectId;
 }
 

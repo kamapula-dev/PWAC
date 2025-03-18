@@ -8,6 +8,7 @@ import {
   ValidateNested,
   IsArray,
   IsObject,
+  IsDate,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { SendToType } from '../../../schemas/push.schema';
@@ -95,6 +96,12 @@ export class PushDto {
   @IsOptional()
   @IsInt()
   delay?: number;
+
+  @IsOptional()
+  @IsArray()
+  @IsDate({ each: true })
+  @Type(() => Date)
+  schedules?: Date[];
 
   @IsOptional()
   @IsInt()

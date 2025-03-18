@@ -165,35 +165,40 @@ export class PushService {
     for (const recipient of recipients) {
       const { pwas, filters } = recipient;
 
-      let mappings = await this.mappingModel.find({
+      const mappings = await this.mappingModel.find({
         pwaContentId: { $in: pwas.map((pwa) => pwa.id) },
         pushToken: { $exists: true, $ne: '' },
         ...(externalId && { externalId }),
       });
 
+      let shouldSend = false;
+
       for (const filter of filters) {
-        const userHasEvent = await this.pwaEventLogModel.exists({
+        const userHasEvent = await this.pwaEventLogModel.countDocuments({
           event: filter.event,
+          ...(externalId && { externalId }),
         });
 
-        if (filter.sendTo === SendToType.with && !userHasEvent) {
-          continue;
-        }
-
-        if (filter.sendTo === SendToType.without && userHasEvent) {
-          continue;
+        if (
+          (filter.sendTo === SendToType.with && userHasEvent) ||
+          (filter.sendTo === SendToType.without && !userHasEvent) ||
+          filter.sendTo === SendToType.all
+        ) {
+          shouldSend = true;
+          break;
         }
       }
 
-      const tokens = mappings
-        .map((m) => ({
-          token: m.pushToken,
-          url: m.offerUrl,
-          language: m.language,
-        }))
-        .filter(({ token }) => !!token);
-
-      allTokens = [...tokens];
+      if (shouldSend) {
+        const tokens = mappings
+          .map((m) => ({
+            token: m.pushToken,
+            url: m.offerUrl,
+            language: m.language,
+          }))
+          .filter(({ token }) => !!token);
+        allTokens.push(...tokens);
+      }
     }
 
     const uniqueTokens = Array.from(
@@ -298,7 +303,7 @@ export class PushService {
 
       for (const recipient of matchingRecipients) {
         for (const filter of recipient.filters) {
-          const userHasEvent = await this.pwaEventLogModel.exists({
+          const userHasEvent = await this.pwaEventLogModel.countDocuments({
             externalId: eventLog.externalId,
             event: filter.event,
           });

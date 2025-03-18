@@ -18,6 +18,7 @@ import { PWAEventLogModule } from './modules/pwa-event-log/pwa-event-log.module'
 import { PWAExternalMappingModule } from './modules/pwa-external-mapping/pwa-external-mapping.module';
 import { PushModule } from './modules/push/push.module';
 import { FirebaseModule } from './modules/firebase/firebase.module';
+import { SchedulerModule } from './modules/scheduler/scheduler.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { FirebaseModule } from './modules/firebase/firebase.module';
     FacebookModule,
     PushModule,
     FirebaseModule,
+    SchedulerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
