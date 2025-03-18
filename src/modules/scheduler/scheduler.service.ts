@@ -17,17 +17,17 @@ export class SchedulerService {
     private mappingModel: Model<PWAExternalMapping>,
   ) {}
 
-  @Cron(CronExpression.EVERY_2_HOURS)
+  @Cron(CronExpression.EVERY_HOUR)
   async schedulePendingPushes() {
     const now = new Date();
-    const nextHour = new Date(now.getTime() + 60 * 60 * 1000);
+    const nextTwoHours = new Date(now.getTime() + 2 * 60 * 60 * 1000);
 
     const upcomingPushes = await this.pushModel.find({
       active: true,
       schedules: {
         $exists: true,
         $not: { $size: 0 },
-        $elemMatch: { $gte: now, $lte: nextHour },
+        $elemMatch: { $gte: now, $lte: nextTwoHours },
       },
     });
 
@@ -35,21 +35,20 @@ export class SchedulerService {
       upcomingPushes.map(async (push) => {
         const pwaContentIds = push.recipients.reduce<string[]>(
           (ids, recipient) => {
-            if (recipient.pwas && recipient.pwas.length) {
-              const validIds = recipient.pwas
-                .map((pwa) => pwa.id)
-                .filter((id) => !!id);
-              return ids.concat(validIds);
+            if (recipient.pwas?.length) {
+              return ids.concat(
+                recipient.pwas
+                  .map((pwa) => pwa.id)
+                  .filter((id): id is string => !!id),
+              );
             }
             return ids;
           },
           [],
         );
 
-        if (pwaContentIds.length === 0) {
-          this.logger.log(
-            `No pwaContentIds found for push ${push._id}. Skipping scheduling.`,
-          );
+        if (!pwaContentIds.length) {
+          this.logger.log(`No pwaContentIds for push ${push._id}`);
           return;
         }
 
@@ -58,35 +57,42 @@ export class SchedulerService {
           pushToken: { $exists: true, $ne: '' },
         });
 
-        if (mappings.length === 0) {
-          this.logger.log(
-            `No mapping with pushToken found for push ${push._id}. Skipping scheduling.`,
-          );
+        if (!mappings.length) {
+          this.logger.log(`No mappings for push ${push._id}`);
           return;
         }
 
         const eligibleSchedules = push.schedules.filter(
-          (schedule) => schedule >= now && schedule <= nextHour,
+          (schedule) => schedule >= now && schedule <= nextTwoHours,
         );
+
+        if (!eligibleSchedules.length) return;
 
         await Promise.all(
           eligibleSchedules.map(async (schedule) => {
             const delayMs = schedule.getTime() - now.getTime();
-            const delaySeconds = Math.ceil(delayMs / 1000);
+
+            if (delayMs < 0) return;
 
             await Promise.all(
               mappings.map(async (mapping) => {
-                this.logger.log(
-                  `Scheduling push (ID=${push._id}) for schedule ${schedule.toISOString()} with delay ${delaySeconds} seconds and externalId ${mapping.externalId}.`,
-                );
-                return this.pushService.schedulePush(
+                await this.pushService.schedulePush(
                   push._id.toString(),
-                  delaySeconds,
+                  Math.ceil(delayMs / 1000),
                   mapping.externalId,
                 );
               }),
             );
           }),
+        );
+
+        const remainingSchedules = push.schedules.filter(
+          (s) => !eligibleSchedules.some((es) => es.getTime() === s.getTime()),
+        );
+
+        await this.pushModel.updateOne(
+          { _id: push._id },
+          { $set: { schedules: remainingSchedules } },
         );
       }),
     );
