@@ -11,6 +11,8 @@ import { PushDto } from './dto/push.dto';
 
 @Injectable()
 export class PushService {
+  private readonly logger = new Logger(PushService.name);
+
   constructor(
     @InjectModel(Push.name) private readonly pushModel: Model<PushDocument>,
     @InjectModel(PWAExternalMapping.name)
@@ -53,8 +55,8 @@ export class PushService {
   }
 
   async schedulePush(pushId: string, delaySeconds: number, externalId: string) {
-    Logger.log(
-      `[PushService] Scheduling push (ID=${pushId}) with delay=${delaySeconds}s`,
+    this.logger.log(
+      `Scheduling push (ID=${pushId}) with delay=${delaySeconds}s`,
     );
     await this.pushQueue.add(
       { pushId, externalId },
@@ -103,7 +105,9 @@ export class PushService {
     const pushes = await this.pushModel.find({ user: objectId });
 
     if (!pushes.length) {
-      Logger.warn(`No pushes found for user "${userId}". Nothing to update.`);
+      this.logger.warn(
+        `No pushes found for user "${userId}". Nothing to update.`,
+      );
       return;
     }
 
@@ -125,7 +129,9 @@ export class PushService {
     const pushes = await this.pushModel.find({ user: objectId });
 
     if (!pushes.length) {
-      Logger.warn(`No pushes found for user "${userId}". Nothing to update.`);
+      this.logger.warn(
+        `No pushes found for user "${userId}". Nothing to update.`,
+      );
       return;
     }
 
@@ -206,13 +212,11 @@ export class PushService {
     );
 
     if (uniqueTokens.length === 0) {
-      Logger.log(`[PushService] No recipients found for push.`);
+      this.logger.log(`No recipients found for push.`);
       return { success: false, message: 'No recipients found' };
     }
 
-    Logger.log(
-      `[PushService] Sending push to ${uniqueTokens.length} recipients...`,
-    );
+    this.logger.log(`Sending push to ${uniqueTokens.length} recipients...`);
 
     const chunkSize = 500;
     const results = [];
@@ -252,21 +256,19 @@ export class PushService {
       throw new NotFoundException(`Push with ID ${pushId} not found`);
     }
 
-    Logger.log(
-      `[PushService] Manually triggering test push for pushId=${pushId}`,
-    );
+    this.logger.log(`Manually triggering test push for pushId=${pushId}`);
 
     const result = await this.sendPushViaFirebase(pushData);
 
-    Logger.log(
-      `[PushService] Test push completed for pushId=${pushId}`,
+    this.logger.log(
+      `Test push completed for pushId=${pushId}`,
       JSON.stringify(result),
     );
   }
 
   async handleNewEvent(eventLog: PWAEventLog): Promise<void> {
-    Logger.log(
-      `[PushService] New event detected: ${eventLog.event} for externalId: ${eventLog.externalId}`,
+    this.logger.log(
+      `New event detected: ${eventLog.event} for externalId: ${eventLog.externalId}`,
     );
 
     const activePushes = await this.pushModel.find({
@@ -281,9 +283,7 @@ export class PushService {
       );
 
       if (matchingRecipients.length === 0) {
-        Logger.log(
-          `[PushService] No matching recipients for event ${eventLog.event}`,
-        );
+        this.logger.log(`No matching recipients for event ${eventLog.event}`);
         continue;
       }
 
@@ -293,8 +293,8 @@ export class PushService {
       });
 
       if (!(pwaMapping && pwaMapping.pushToken)) {
-        Logger.log(
-          `[PushService] No push token found for externalId ${eventLog.externalId}`,
+        this.logger.log(
+          `No push token found for externalId ${eventLog.externalId}`,
         );
         continue;
       }
@@ -319,8 +319,8 @@ export class PushService {
       }
 
       if (!shouldSend) {
-        Logger.log(
-          `[PushService] Push not sent for event ${eventLog.event} due to filters`,
+        this.logger.log(
+          `Push not sent for event ${eventLog.event} due to filters`,
         );
         continue;
       }
@@ -353,8 +353,8 @@ export class PushService {
         ],
       );
 
-      Logger.log(
-        `[PushService] Push sent immediately for event ${eventLog.event}`,
+      this.logger.log(
+        `Push sent immediately for event ${eventLog.event}`,
         JSON.stringify(result),
       );
     }

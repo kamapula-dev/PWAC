@@ -5,36 +5,36 @@ import { Logger } from '@nestjs/common';
 
 @Processor('pushQueue')
 export class PushQueueProcessor {
+  private readonly logger = new Logger(PushQueueProcessor.name);
+
   constructor(private readonly pushService: PushService) {}
 
   @Process()
   async handlePushJob(job: Job) {
     const { pushId, externalId } = job.data;
-    Logger.log(`[PushQueueProcessor] Processing pushId=${pushId}`);
+    this.logger.log(`Processing pushId=${pushId}`);
 
     const pushData = await this.pushService.findOne(pushId);
     if (!pushData) {
-      Logger.warn(`[PushQueueProcessor] Push ID ${pushId} not found`);
+      this.logger.warn(`Push ID ${pushId} not found`);
       return;
     }
 
     if (!pushData.active) {
-      Logger.log(
-        `[PushQueueProcessor] Push ID ${pushId} is inactive. Skipping.`,
-      );
+      this.logger.log(`Push ID ${pushId} is inactive. Skipping.`);
       return;
     }
 
-    Logger.log(
-      `[PushQueueProcessor] Sending push from queue for pushId=${pushId}${externalId ? `, externalId: ${externalId}` : ''}`,
+    this.logger.log(
+      `Sending push from queue for pushId=${pushId}${externalId ? `, externalId: ${externalId}` : ''}`,
     );
     const result = await this.pushService.sendPushViaFirebase(
       pushData,
       externalId,
     );
 
-    Logger.log(
-      `[PushQueueProcessor] Push job completed for pushId=${pushId}${externalId ? `, externalId: ${externalId}` : ''}`,
+    this.logger.log(
+      `Push job completed for pushId=${pushId}${externalId ? `, externalId: ${externalId}` : ''}`,
       JSON.stringify(result),
     );
   }

@@ -21,6 +21,8 @@ const execAsync = promisify(exec);
 
 @Processor('buildPWA')
 export class BuildPWAProcessor {
+  private readonly logger = new Logger(BuildPWAProcessor.name);
+
   constructor(
     private readonly configService: ConfigService,
     private readonly mediaService: MediaService,
@@ -51,7 +53,7 @@ export class BuildPWAProcessor {
     let tempBuildFolder: string;
 
     try {
-      Logger.log(
+      this.logger.log(
         `Job started for PWA-content ID: ${pwaContentId}, User ID: ${userId}, Job ID: ${job.id}`,
       );
 
@@ -79,9 +81,12 @@ export class BuildPWAProcessor {
           VITE_APP_VAPID_KEY=${this.configService.get<string>('VITE_APP_VAPID_KEY')}
         `;
         await fse.writeFile(envFilePath, envContent);
-        Logger.log(`.env file created at ${envFilePath}`);
+        this.logger.log(`.env file created at ${envFilePath}`);
       } catch (error) {
-        Logger.error('Error during folder creation or file copying:', error);
+        this.logger.error(
+          'Error during folder creation or file copying:',
+          error,
+        );
         throw new Error('Failed to prepare build environment');
       }
 
@@ -168,7 +173,7 @@ export class BuildPWAProcessor {
         `;
         await fse.writeFile(serviceWorkerPath, serviceWorkerContent);
       } catch (error) {
-        Logger.error('Error creating public folder structure:', error);
+        this.logger.error('Error creating public folder structure:', error);
         throw new Error('Failed to create public folder structure');
       }
 
@@ -179,9 +184,9 @@ export class BuildPWAProcessor {
           `icon${path.extname(appIcon)}`,
         );
         await this.downloadImage(appIcon, tempIconPath);
-        Logger.log(`App icon downloaded to ${tempIconPath}`);
+        this.logger.log(`App icon downloaded to ${tempIconPath}`);
       } catch (error) {
-        Logger.error('Error downloading app icon:', error);
+        this.logger.error('Error downloading app icon:', error);
         throw new Error('Failed to download app icon');
       }
 
@@ -203,9 +208,9 @@ export class BuildPWAProcessor {
         ];
 
         await fse.writeJson(manifestPath, manifestData, { spaces: 2 });
-        Logger.log(`Manifest updated with name: ${pwaName}`);
+        this.logger.log(`Manifest updated with name: ${pwaName}`);
       } catch (error) {
-        Logger.error('Error updating manifest.json:', error);
+        this.logger.error('Error updating manifest.json:', error);
         throw new Error('Failed to update manifest.json');
       }
 
@@ -229,9 +234,9 @@ export class BuildPWAProcessor {
         indexHtml = indexHtml.replace('</head>', `${pixelScript}</head>`);
         await fse.writeFile(indexPath, indexHtml, 'utf-8');
 
-        Logger.log(`Index.html updated successfully`);
+        this.logger.log(`Index.html updated successfully`);
       } catch (error) {
-        Logger.error('Error updating index.html:', error);
+        this.logger.error('Error updating index.html:', error);
         throw new Error('Failed to update index.html');
       }
 
@@ -242,9 +247,9 @@ export class BuildPWAProcessor {
           tempBuildFolder,
         );
         await this.executeCommand('npm run build', tempBuildFolder);
-        Logger.log('Build completed successfully');
+        this.logger.log('Build completed successfully');
       } catch (error) {
-        Logger.error('Build process failed:', error);
+        this.logger.error('Build process failed:', error);
         throw new Error('Build process failed');
       }
 
@@ -257,18 +262,18 @@ export class BuildPWAProcessor {
           distFolderPath,
           pwaContentId,
         );
-        Logger.log(`Upload to S3 completed. Archive key: ${archiveKey}`);
+        this.logger.log(`Upload to S3 completed. Archive key: ${archiveKey}`);
       } catch (error) {
-        Logger.error('S3 upload failed:', error);
+        this.logger.error('S3 upload failed:', error);
         throw new Error('S3 upload failed');
       }
 
       // Cleanup
       try {
         await fse.remove(tempBuildFolder);
-        Logger.log(`Temporary directory cleaned: ${tempBuildFolder}`);
+        this.logger.log(`Temporary directory cleaned: ${tempBuildFolder}`);
       } catch (error) {
-        Logger.error('Cleanup failed:', error);
+        this.logger.error('Cleanup failed:', error);
       }
 
       // Domain handling and user updates
@@ -283,7 +288,7 @@ export class BuildPWAProcessor {
         gApiKey,
       );
 
-      Logger.log(
+      this.logger.log(
         `Job completed for PWA-content ID: ${pwaContentId}, User ID: ${userId}, Job ID: ${job.id}`,
       );
       return true;
@@ -445,7 +450,7 @@ export class BuildPWAProcessor {
     email: string,
     gApiKey: string,
   ): Promise<void> {
-    Logger.error(`Job failed: ${error.message}`, error.stack);
+    this.logger.error(`Job failed: ${error.message}`, error.stack);
 
     const isOwnDomainValuesPresent = email && gApiKey && domain;
 
@@ -541,10 +546,10 @@ export class BuildPWAProcessor {
   private async executeCommand(command: string, cwd: string): Promise<void> {
     try {
       const { stdout, stderr } = await execAsync(command, { cwd });
-      if (stderr) Logger.warn(`Command stderr: ${stderr}`);
-      Logger.log(`Command output: ${stdout}`);
+      if (stderr) this.logger.warn(`Command stderr: ${stderr}`);
+      this.logger.log(`Command output: ${stdout}`);
     } catch (error) {
-      Logger.error(`Command failed: ${error.stderr}`);
+      this.logger.error(`Command failed: ${error.stderr}`);
       throw new Error(`Command execution failed: ${error.message}`);
     }
   }

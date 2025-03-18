@@ -9,7 +9,6 @@ import {
   Query,
   UseGuards,
   Request,
-  Logger,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { PushService } from './push.service';

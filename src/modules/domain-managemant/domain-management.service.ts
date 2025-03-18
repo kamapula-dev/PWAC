@@ -9,6 +9,7 @@ import { PwaStatus } from '../../schemas/user.schema';
 
 @Injectable()
 export class DomainManagementService {
+  private readonly logger = new Logger(DomainManagementService.name);
   private CLOUDFLARE_API_BASE = 'https://api.cloudflare.com/client/v4';
 
   constructor(
@@ -88,7 +89,7 @@ export class DomainManagementService {
         this.getHeaders(email, gApiKey),
       );
 
-      Logger.log(JSON.stringify(response.data, null, 2));
+      this.logger.log(JSON.stringify(response.data, null, 2));
 
       if (response.data.success) {
         const zoneId = response.data.result.id;
@@ -113,7 +114,7 @@ export class DomainManagementService {
             this.getHeaders(email, gApiKey),
           );
 
-          Logger.log(JSON.stringify(dnsRecordResponse.data, null, 2));
+          this.logger.log(JSON.stringify(dnsRecordResponse.data, null, 2));
         } catch (dnsError) {
           if (
             dnsError.response?.data?.errors &&
@@ -121,12 +122,12 @@ export class DomainManagementService {
               (error: any) => error.code === 81058,
             )
           ) {
-            Logger.log('DNS record already exists, skipping creation.');
+            this.logger.log('DNS record already exists, skipping creation.');
           } else {
-            Logger.error('Error creating DNS record:', dnsError.message);
+            this.logger.error('Error creating DNS record:', dnsError.message);
 
             if (dnsError.response) {
-              Logger.error(
+              this.logger.error(
                 'DNS Error response data:',
                 JSON.stringify(dnsError.response.data, null, 2),
               );
@@ -161,10 +162,10 @@ export class DomainManagementService {
         );
       }
     } catch (error) {
-      Logger.error('Error adding domain:', error.message);
+      this.logger.error('Error adding domain:', error.message);
 
       if (error.response) {
-        Logger.error(
+        this.logger.error(
           'Response data:',
           JSON.stringify(error.response.data, null, 2),
         );
@@ -178,7 +179,7 @@ export class DomainManagementService {
   }
 
   private async deployWorker(
-    email,
+    email: string,
     gApiKey: string,
     accountId: string,
     domain: string,
@@ -188,7 +189,7 @@ export class DomainManagementService {
     try {
       const workerName = domain.replace(/\./g, '-');
 
-      Logger.log(`Deploying worker script for domain: ${domain}`);
+      this.logger.log(`Deploying worker script for domain: ${domain}`);
 
       const publishResponse = await axios.put(
         `${this.CLOUDFLARE_API_BASE}/accounts/${accountId}/workers/scripts/${workerName}`,
@@ -197,13 +198,13 @@ export class DomainManagementService {
       );
 
       if (publishResponse.status !== 200) {
-        Logger.error('Failed to deploy worker:', publishResponse.data);
+        this.logger.error('Failed to deploy worker:', publishResponse.data);
         throw new Error('Worker deployment failed');
       }
 
-      Logger.log(`Worker script ${workerName} deployed successfully.`);
+      this.logger.log(`Worker script ${workerName} deployed successfully.`);
 
-      Logger.log(`Mapping worker to domain: ${domain}`);
+      this.logger.log(`Mapping worker to domain: ${domain}`);
 
       const mapResponse = await axios.post(
         `${this.CLOUDFLARE_API_BASE}/zones/${zoneId}/workers/routes`,
@@ -214,16 +215,16 @@ export class DomainManagementService {
         this.getHeaders(email, gApiKey),
       );
 
-      Logger.log('Worker mapped successfully:', mapResponse.data);
+      this.logger.log('Worker mapped successfully:', mapResponse.data);
 
       if (mapResponse.status !== 200) {
-        Logger.error('Failed to map worker to domain:', mapResponse.data);
+        this.logger.error('Failed to map worker to domain:', mapResponse.data);
         throw new Error('Domain mapping failed');
       }
 
-      Logger.log(`Worker mapped to domain ${domain} successfully.`);
+      this.logger.log(`Worker mapped to domain ${domain} successfully.`);
     } catch (error) {
-      Logger.error(
+      this.logger.error(
         'Error deploying worker:',
         JSON.stringify(error.response?.data || error.message, null, 2),
       );
@@ -293,7 +294,9 @@ export class DomainManagementService {
 
       await Promise.all(deletePromises);
 
-      Logger.log(`All DNS records for zone ${zoneId} deleted successfully.`);
+      this.logger.log(
+        `All DNS records for zone ${zoneId} deleted successfully.`,
+      );
 
       const response = await axios.delete(
         `${this.CLOUDFLARE_API_BASE}/zones/${zoneId}`,
@@ -307,12 +310,12 @@ export class DomainManagementService {
         );
       }
 
-      Logger.log(`Zone ${zoneId} deleted successfully.`);
+      this.logger.log(`Zone ${zoneId} deleted successfully.`);
     } catch (error) {
-      Logger.error('Error deleting zone or DNS records:', error.message);
+      this.logger.error('Error deleting zone or DNS records:', error.message);
 
       if (error.response) {
-        Logger.error(
+        this.logger.error(
           'Response data:',
           JSON.stringify(error.response.data, null, 2),
         );
@@ -346,12 +349,12 @@ export class DomainManagementService {
         );
       }
 
-      Logger.log(`Worker ${workerName} deleted successfully.`);
+      this.logger.log(`Worker ${workerName} deleted successfully.`);
     } catch (error) {
-      Logger.error('Error deleting worker:', error.message);
+      this.logger.error('Error deleting worker:', error.message);
 
       if (error.response) {
-        Logger.error(
+        this.logger.error(
           'Response data:',
           JSON.stringify(error.response.data, null, 2),
         );
@@ -405,10 +408,10 @@ export class DomainManagementService {
         message: 'Domain can be added to Cloudflare without issues.',
       };
     } catch (error) {
-      Logger.error('Error checking domain addition:', error.message);
+      this.logger.error('Error checking domain addition:', error.message);
 
       if (error.response) {
-        Logger.error(
+        this.logger.error(
           'Response data:',
           JSON.stringify(error.response.data, null, 2),
         );
@@ -439,7 +442,7 @@ export class DomainManagementService {
 
       const zoneStatus = response.data.result.status;
 
-      Logger.log(`Zone status for ${existingPwa.zoneId}: ${zoneStatus}`);
+      this.logger.log(`Zone status for ${existingPwa.zoneId}: ${zoneStatus}`);
 
       if (zoneStatus === 'active') {
         await this.userService.updateUserPwaStatus(
@@ -451,10 +454,10 @@ export class DomainManagementService {
 
       return zoneStatus; // [active, pending, moved, deactivated]
     } catch (error) {
-      Logger.error('Error fetching zone status:', error.message);
+      this.logger.error('Error fetching zone status:', error.message);
 
       if (error.response) {
-        Logger.error(
+        this.logger.error(
           'Response data:',
           JSON.stringify(error.response.data, null, 2),
         );

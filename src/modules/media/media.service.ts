@@ -15,6 +15,7 @@ import { DeleteObjectCommand } from '@aws-sdk/client-s3';
 
 @Injectable()
 export class MediaService {
+  private readonly logger = new Logger(MediaService.name);
   private readonly s3Client: S3Client;
   private readonly bucketName: string;
 
@@ -108,7 +109,7 @@ export class MediaService {
       });
 
       await this.s3Client.send(command);
-      Logger.log(`File with key ${fileKey} deleted successfully from S3.`);
+      this.logger.log(`File with key ${fileKey} deleted successfully from S3.`);
     } catch (error) {
       throw new Error(`Error deleting file from S3`);
     }

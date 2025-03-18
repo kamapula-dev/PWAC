@@ -36,6 +36,7 @@ import { translateFields } from '../../services/languages';
 
 @Controller('pwa-content')
 export class PWAContentController {
+  private readonly logger = new Logger(PWAContentController.name);
   private readonly translator: deepl.Translator;
   constructor(
     private readonly pwaContentService: PWAContentService,
@@ -220,7 +221,7 @@ export class PWAContentController {
     const existingPwa = user.pwas.find((p) => p.pwaContentId === id);
 
     if (!existingPwa) {
-      Logger.warn(
+      this.logger.warn(
         `User PWA was not found for pwa content id: ${id}, deleted pwa content only.`,
       );
       await this.pwaContentService.remove(id, userId);
@@ -296,7 +297,7 @@ export class PWAContentController {
         throw new Error(`appIcon not found for PWA-content with id: ${id}`);
       }
 
-      Logger.log('Adding job to the queue job');
+      this.logger.log('Adding job to the queue job');
 
       const job = await this.buildQueue.add({
         appIcon: pwaContent.appIcon,
@@ -311,11 +312,11 @@ export class PWAContentController {
         ...(pwaContent?.pixel && { pixel: pwaContent.pixel }),
       });
 
-      Logger.log(`Job ${job.id} added to the queue`);
+      this.logger.log(`Job ${job.id} added to the queue`);
 
       res.json({ jobId: job.id });
     } catch (e) {
-      Logger.log(e, 'Failed to add job to the queue');
+      this.logger.log(e, 'Failed to add job to the queue');
       throw e;
     }
   }
@@ -338,7 +339,7 @@ export class PWAContentController {
 
       return this.mediaService.getSignedUrl(pwa.archiveKey);
     } catch (error) {
-      Logger.error(error);
+      this.logger.error(error);
       throw error;
     }
   }

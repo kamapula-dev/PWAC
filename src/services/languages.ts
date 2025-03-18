@@ -23,6 +23,6 @@ export const translateFields = async (
       }),
     );
   } else {
-    Logger.warn(`Field "${fieldName}" is not defined in the DTO.`);
+    Logger.warn(`[utils] Field "${fieldName}" is not defined in the DTO.`);
   }
 };

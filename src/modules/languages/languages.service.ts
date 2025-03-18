@@ -6,6 +6,7 @@ import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class LanguagesService {
+  private readonly logger = new Logger(LanguagesService.name);
   private readonly languagesPath = path.join(process.cwd(), 'pwa-languages');
 
   constructor() {}
@@ -26,13 +27,15 @@ export class LanguagesService {
     try {
       return this.readLanguageFile(filePath);
     } catch {
-      Logger.log(`File ${language}.json not found, falling back to en.json`);
+      this.logger.log(
+        `File ${language}.json not found, falling back to en.json`,
+      );
     }
 
     try {
       return this.readLanguageFile(fallbackFilePath);
     } catch {
-      Logger.log(`File en.json not found, falling back to en.json`);
+      this.logger.log(`File en.json not found, falling back to en.json`);
     }
   }
 }

@@ -10,6 +10,8 @@ import { Sha256 } from '@aws-crypto/sha256-js';
 
 @Injectable()
 export class FacebookService {
+  private readonly logger = new Logger(FacebookService.name);
+
   constructor(private readonly httpService: HttpService) {}
 
   async sendEventToFacebook(
@@ -53,9 +55,12 @@ export class FacebookService {
 
     try {
       const response = await firstValueFrom(this.httpService.post(url, data));
+      this.logger.log(
+        `Event: ${sentEvent} was successfully sent to facebook for pixelId: ${pixelId}`,
+      );
       return response.data;
     } catch (error) {
-      Logger.error('Facebook CAPI error:', error);
+      this.logger.error('Facebook CAPI error:', error);
       throw error;
     }
   }
