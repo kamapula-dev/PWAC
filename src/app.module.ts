@@ -40,6 +40,10 @@ import { SchedulerModule } from './modules/scheduler/scheduler.module';
           port: configService.get<number>('REDIS_PORT'),
           password: configService.get<string>('REDIS_PASSWORD'),
         },
+        defaultJobOptions: {
+          attempts: 1,
+          backoff: 0,
+        },
       }),
       inject: [ConfigService],
     }),

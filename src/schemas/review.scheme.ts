@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import * as deepl from 'deepl-node';
 
-@Schema()
+@Schema({ _id: false })
 export class Review extends Document {
   @Prop({ required: true })
   reviewAuthorName: string;

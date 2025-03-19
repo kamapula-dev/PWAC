@@ -117,6 +117,7 @@ export class PWAContent extends Document {
   pixel?: Pixel[];
 
   @Prop({
+    _id: false,
     type: {
       auto: { type: Boolean, required: false },
       dark: { type: Boolean, required: false },
@@ -129,6 +130,7 @@ export class PWAContent extends Document {
   };
 
   @Prop({
+    _id: false,
     type: {
       showAppHeader: { type: Boolean, required: false },
       title: { type: Map, of: String, required: false },
