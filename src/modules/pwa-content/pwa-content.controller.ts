@@ -30,7 +30,7 @@ import { ReadyDomainService } from '../ready-domain/ready-domain.service';
 import * as path from 'path';
 import { PWAEventLogService } from '../pwa-event-log/pwa-event-log.service';
 import { PWAExternalMappingService } from '../pwa-external-mapping/pwa-external-mapping.service';
-import { LANGUAGES, SUPPORTED_IMAGES } from './consts';
+import { AVAILABLE_COLORS, LANGUAGES, SUPPORTED_IMAGES } from './consts';
 import { PushService } from '../push/push.service';
 import { translateFields } from '../../services/languages';
 
@@ -112,6 +112,21 @@ export class PWAContentController {
     ]);
 
     if (createPWAContentDto.reviews) {
+      let shuffledColors = [...AVAILABLE_COLORS];
+      let colorIndex = 0;
+
+      const getNextColor = () => {
+        if (colorIndex >= shuffledColors.length) {
+          shuffledColors = [...AVAILABLE_COLORS].sort(
+            () => Math.random() - 0.5,
+          );
+          colorIndex = 0;
+        }
+        return shuffledColors[colorIndex++];
+      };
+
+      const reviewsWithColors = [];
+
       for (const review of createPWAContentDto.reviews) {
         await Promise.all([
           translateFields(
@@ -127,7 +142,16 @@ export class PWAContentController {
             this.translator,
           ),
         ]);
+
+        const newReview = {
+          ...review,
+          reviewIconColor: getNextColor(),
+        };
+
+        reviewsWithColors.push(newReview);
       }
+
+      createPWAContentDto.reviews = reviewsWithColors;
     }
 
     if (createPWAContentDto.customModal) {

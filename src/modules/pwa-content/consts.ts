@@ -36,3 +36,12 @@ export const LANGUAGES: deepl.TargetLanguageCode[] = [
 ];
 
 export const SUPPORTED_IMAGES = ['.png', '.jpeg', '.jpg', '.svg', '.webp'];
+
+export const AVAILABLE_COLORS = [
+  '#0098A7',
+  '#004D40',
+  '#F3511D',
+  '#34691E',
+  '#512DA9',
+  '#C2185B',
+];
