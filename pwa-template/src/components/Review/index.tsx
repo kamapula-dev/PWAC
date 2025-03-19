@@ -100,7 +100,16 @@ const Review: React.FC<ReviewProps> = ({
         {text}
       </div>
       <div className="flex justify-between items-center">
-        <p className="text-[#4B4B4B] leading-6 text-xs">
+        <p
+          className="text-[#4B4B4B] leading-6 text-xs"
+          style={
+            dark
+              ? {
+                  color: '#DFDFDF',
+                }
+              : {}
+          }
+        >
           {intl.formatMessage({
             id: 'wasTheReviewHelpful',
             defaultMessage: 'Was the review helpful?',
