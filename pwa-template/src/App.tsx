@@ -158,8 +158,6 @@ export default function App() {
         } as PwaContent;
 
         if (pwaContent._id) {
-          pwaContent.mainThemeColor = '#01875f';
-          pwaContent.installButtonTextColor = '#000000';
           trackExternalId(pwaContent._id, pwaContent.pwaLink);
         }
 
