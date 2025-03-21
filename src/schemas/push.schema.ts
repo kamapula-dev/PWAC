@@ -87,6 +87,9 @@ export class Push {
   @Prop({ default: 0 })
   delay: number;
 
+  @Prop({ required: false })
+  color?: string;
+
   @Prop({ type: [Date], required: false, index: true })
   schedules?: Date[];
 

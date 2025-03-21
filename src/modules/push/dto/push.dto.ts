@@ -98,6 +98,10 @@ export class PushDto {
   delay?: number;
 
   @IsOptional()
+  @IsString()
+  color?: string;
+
+  @IsOptional()
   @IsArray()
   @IsDate({ each: true })
   @Type(() => Date)

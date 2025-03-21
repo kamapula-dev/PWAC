@@ -17,7 +17,7 @@ export class SchedulerService {
     private mappingModel: Model<PWAExternalMapping>,
   ) {}
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_10_MINUTES)
   async handleScheduledPushes() {
     const now = new Date();
     const timeWindowEnd = new Date(now.getTime() + 2 * 60 * 60 * 1000);
