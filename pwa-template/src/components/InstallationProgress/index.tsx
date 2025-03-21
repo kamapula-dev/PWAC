@@ -11,21 +11,23 @@ export default function InstallationProgress({
   isVerified,
   hasPaidContent,
   dark,
+  mainThemeColor,
 }: {
   developerName: string;
   isVerified: boolean;
   hasPaidContent: boolean;
   dark: boolean;
+  mainThemeColor?: string;
 }) {
   const intl = useIntl();
 
   const isInstalling = useSelector(
     (state: RootState) =>
-      getInstallState(state.install) === PWAInstallState.installing
+      getInstallState(state.install) === PWAInstallState.installing,
   );
 
   const fakeDownloadProgress = useSelector(
-    (state: RootState) => state.install.fakeDownloadProgress
+    (state: RootState) => state.install.fakeDownloadProgress,
   );
 
   return isInstalling ? (
@@ -35,10 +37,21 @@ export default function InstallationProgress({
       </div>
       {isVerified && (
         <div
-          style={dark ? { color: "#A8C8FB" } : {}}
+          style={
+            mainThemeColor
+              ? { color: mainThemeColor }
+              : dark
+                ? { color: "#A8C8FB" }
+                : {}
+          }
           className="flex gap-0.5 items-center text-[11px] text-gray-500 justify-center"
         >
-          <VerifiedUserOutlinedIcon sx={{ fontSize: 12, color: "#1357CD" }} />
+          <VerifiedUserOutlinedIcon
+            sx={{
+              fontSize: 12,
+              color: mainThemeColor || (dark ? "#A8C8FB" : "#1357CD"),
+            }}
+          />
           {intl.formatMessage({ id: "verified" })}
         </div>
       )}
@@ -47,12 +60,20 @@ export default function InstallationProgress({
     <div className="flex flex-col gap-2">
       <div className="flex gap-1 items-center">
         <div
-          style={dark ? { color: "#A8C8FB" } : {}}
-          className="text-sm whitespace-nowrap font-bold text-[#1357CD]"
+          style={
+            mainThemeColor
+              ? { color: mainThemeColor }
+              : dark
+                ? { color: "#A8C8FB" }
+                : {}
+          }
+          className="text-sm whitespace-nowrap text-[#1357CD]"
         >
           {developerName}
         </div>
-        <VerifiedIcon />
+        <VerifiedIcon
+          color={mainThemeColor || (dark ? "#A8C8FB" : "#1357CD")}
+        />
       </div>
       {hasPaidContent && (
         <div

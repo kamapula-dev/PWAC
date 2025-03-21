@@ -28,6 +28,8 @@ interface Props {
   pixel?: [Pixel];
   id?: string;
   customText?: string;
+  mainThemeColor?: string;
+  installButtonTextColor?: string;
 }
 
 interface BeforeInstallPromptEvent extends Event {
@@ -49,9 +51,11 @@ const InstallButton: React.FC<Props> = ({
   pixel,
   id,
   customText,
+  mainThemeColor,
+  installButtonTextColor,
 }) => {
   const installState = useSelector((state: RootState) =>
-    getInstallState(state.install)
+    getInstallState(state.install),
   );
   const [askedOnce, setAskedOnce] = React.useState(false);
 
@@ -66,7 +70,7 @@ const InstallButton: React.FC<Props> = ({
 
         pixel.forEach((pixel) => {
           const event = pixel.events.find(
-            ({ triggerEvent }) => triggerEvent === eventName
+            ({ triggerEvent }) => triggerEvent === eventName,
           );
 
           if (pixel.pixelId && pixel.token && event) {
@@ -103,7 +107,7 @@ const InstallButton: React.FC<Props> = ({
       }${
         window.location.search
       }#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(
-        window.location.href
+        window.location.href,
       )};end`;
 
       window.location.href = intentUrl;
@@ -111,7 +115,6 @@ const InstallButton: React.FC<Props> = ({
     }
 
     if (installPrompt) {
-
       await installPrompt.prompt();
       const choiceResult = await installPrompt.userChoice;
       if (choiceResult.outcome === "accepted") {
@@ -186,7 +189,13 @@ const InstallButton: React.FC<Props> = ({
     <div className="flex justify-between gap-2">
       {installState === PWAInstallState.installing && (
         <button
-          style={dark ? { background: "#A8C8FB", color: "#062961" } : {}}
+          style={
+            mainThemeColor
+              ? { background: mainThemeColor, color: installButtonTextColor }
+              : dark
+                ? { background: "#A8C8FB", color: "#062961" }
+                : {}
+          }
           className={`h-9 rounded-[60px] bg-[#1357CD] w-full text-white ${
             customText ? "" : "mb-[22px]"
           } transition duration-300 active:scale-95 disabled:bg-gray-300`}
@@ -200,12 +209,17 @@ const InstallButton: React.FC<Props> = ({
       )}
       <button
         style={
-          dark
+          mainThemeColor
             ? {
-                background: disabled ? "#D1D5DB" : "#A8C8FB",
-                color: disabled ? "#FFFFFF" : "#062961",
+                background: disabled ? "#D1D5DB" : mainThemeColor,
+                color: installButtonTextColor,
               }
-            : {}
+            : dark
+              ? {
+                  background: disabled ? "#D1D5DB" : "#A8C8FB",
+                  color: disabled ? "#FFFFFF" : "#062961",
+                }
+              : {}
         }
         className={`h-9 rounded-[60px] bg-[#1357CD]  w-full text-white ${
           customText ? "" : "mb-[22px]"

@@ -48,7 +48,7 @@ export default function App() {
   const { installPWA } = useInstallPwaInstall(
     installPrompt,
     pwaContent?.pixel,
-    pwaContent?._id
+    pwaContent?._id,
   );
 
   const dispatch = useDispatch();
@@ -73,7 +73,7 @@ export default function App() {
         e.preventDefault();
         console.log("beforeinstallprompt fired");
         setInstallPrompt(e);
-      }
+      },
     );
 
     return () => {
@@ -84,7 +84,6 @@ export default function App() {
   }, []);
 
   const pwaLink = localStorage.getItem("pwaLink");
-
 
   useEffect(() => {
     if (pwaLink || isPWAActive) return;
@@ -103,9 +102,7 @@ export default function App() {
     const getPwaContent = async () => {
       try {
         const response = await axios.get(
-          `https://pwac.world/pwa-content/${
-            import.meta.env.VITE_PWA_CONTENT_ID
-          }/trusted`
+          `https://pwac.world/pwa-content/67db3aeebd2d283588aff847/trusted`,
         );
 
         const language =
@@ -159,12 +156,14 @@ export default function App() {
         } as PwaContent;
 
         if (pwaContent._id) {
+          pwaContent.mainThemeColor = "#01875f";
+          pwaContent.installButtonTextColor = "#000000";
           trackExternalId(pwaContent._id, pwaContent.pwaLink);
         }
 
         if (window.matchMedia && !!pwaContent?.theme?.auto) {
           const darkModeMediaQuery = window.matchMedia(
-            "(prefers-color-scheme: dark)"
+            "(prefers-color-scheme: dark)",
           );
 
           setDark(darkModeMediaQuery.matches);
@@ -187,7 +186,7 @@ export default function App() {
 
           pwaContent.pixel.forEach((pixel) => {
             const event = pixel.events.find(
-              ({ triggerEvent }) => triggerEvent === eventName
+              ({ triggerEvent }) => triggerEvent === eventName,
             );
 
             if (pixel.pixelId && pixel.token && event) {
@@ -203,7 +202,7 @@ export default function App() {
             pwaContent._id,
             window.location.hostname,
             "OpenPage",
-            getExternalId()
+            getExternalId(),
           );
         }
 
@@ -226,7 +225,7 @@ export default function App() {
 
   useEffect(() => {
     const isPWAActivated = window.matchMedia(
-      "(display-mode: standalone)"
+      "(display-mode: standalone)",
     ).matches;
 
     setIsPWAActive(isPWAActivated);
@@ -237,7 +236,7 @@ export default function App() {
       }${
         window.location.search
       }#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(
-        window.location.href
+        window.location.href,
       )};end`;
 
       window.location.href = intentUrl;
@@ -252,6 +251,7 @@ export default function App() {
     case "main":
       currentView = (
         <MainView
+          mainThemeColor={pwaContent?.mainThemeColor}
           dark={dark}
           pwaContent={pwaContent}
           setView={setView}
@@ -267,6 +267,7 @@ export default function App() {
     case "reviews":
       currentView = (
         <ReviewsView
+          mainThemeColor={pwaContent?.mainThemeColor}
           dark={dark}
           pwaContent={pwaContent}
           setView={setView}
@@ -302,11 +303,13 @@ export default function App() {
       {currentView}
       {pwaContent?.hasMenu && (
         <div onClick={installPWA}>
-          <Menu dark={dark} />
+          <Menu mainThemeColor={pwaContent?.mainThemeColor} dark={dark} />
         </div>
       )}
       {pwaContent?.customModal && (
         <ModalMenu
+          mainThemeColor={pwaContent?.mainThemeColor}
+          installButtonTextColor={pwaContent?.installButtonTextColor}
           showAppHeader={true}
           title={pwaContent?.customModal?.title}
           content={pwaContent?.customModal?.content}

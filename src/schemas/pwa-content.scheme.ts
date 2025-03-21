@@ -147,6 +147,12 @@ export class PWAContent extends Document {
   };
 
   @Prop({ required: false })
+  mainThemeColor?: string;
+
+  @Prop({ required: false })
+  installButtonTextColor?: string;
+
+  @Prop({ required: false })
   hasPushes?: boolean;
 }
 

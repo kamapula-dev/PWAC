@@ -10,6 +10,7 @@ interface Props {
   pwaContent: PwaContent;
   dark: boolean;
   installPrompt: BeforeInstallPromptEvent | null;
+  mainThemeColor?: string;
 }
 
 const ReviewsView: React.FC<Props> = ({
@@ -17,6 +18,7 @@ const ReviewsView: React.FC<Props> = ({
   pwaContent,
   dark,
   installPrompt,
+  mainThemeColor,
 }) => {
   const slideVariants = {
     hidden: { x: "-100%", opacity: 0 },
@@ -32,6 +34,7 @@ const ReviewsView: React.FC<Props> = ({
       transition={{ duration: 0.25, ease: "easeInOut" }}
     >
       <ViewHeader
+        mainThemeColor={mainThemeColor}
         dark={dark}
         setView={setView}
         appIcon={pwaContent.appIcon}
@@ -43,6 +46,7 @@ const ReviewsView: React.FC<Props> = ({
           {pwaContent.reviews.map((review) => {
             return (
               <Review
+                mainThemeColor={mainThemeColor}
                 dark={dark}
                 reviewIconColor={review.reviewIconColor}
                 src={review.reviewAuthorIcon}

@@ -233,6 +233,14 @@ export class CreatePWAContentDto {
   @Type(() => ThemeDto)
   theme?: ThemeDto;
 
+  @IsOptional()
+  @IsString()
+  mainThemeColor?: string;
+
+  @IsOptional()
+  @IsString()
+  installButtonTextColor?: string;
+
   @IsArray()
   @ArrayMinSize(5, { message: 'Array must contain exactly 5 values' })
   @ArrayMaxSize(5, { message: 'Array must contain exactly 5 values' })

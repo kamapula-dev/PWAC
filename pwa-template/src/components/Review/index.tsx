@@ -1,11 +1,11 @@
-import Avatar from '@mui/material/Avatar';
-import { Rating } from '@mui/material';
-import moment from 'moment';
-import DotsIcon from '../../shared/icons/DotsIcon';
-import { useIntl } from 'react-intl';
-import { BeforeInstallPromptEvent } from '../../App';
-import { PwaContent } from '../../shared/models';
-import useInstallPwaInstall from '../../shared/useInstallPwa';
+import Avatar from "@mui/material/Avatar";
+import { Rating } from "@mui/material";
+import moment from "moment";
+import DotsIcon from "../../shared/icons/DotsIcon";
+import { useIntl } from "react-intl";
+import { BeforeInstallPromptEvent } from "../../App";
+import { PwaContent } from "../../shared/models";
+import useInstallPwaInstall from "../../shared/useInstallPwa";
 
 interface ReviewProps {
   name: string;
@@ -20,6 +20,7 @@ interface ReviewProps {
   keepActualDateOfReviews?: boolean;
   installPrompt: BeforeInstallPromptEvent | null;
   pwaContent: PwaContent;
+  mainThemeColor?: string;
 }
 
 const Review: React.FC<ReviewProps> = ({
@@ -35,11 +36,12 @@ const Review: React.FC<ReviewProps> = ({
   keepActualDateOfReviews = false,
   installPrompt,
   pwaContent,
+  mainThemeColor,
 }) => {
   const avatarName = name
-    .split(' ')
+    .split(" ")
     .map((word) => word[0])
-    .join('')
+    .join("")
     .toUpperCase();
 
   const actualDate = keepActualDateOfReviews ? date : new Date().toISOString();
@@ -63,7 +65,7 @@ const Review: React.FC<ReviewProps> = ({
             {avatarName}
           </Avatar>
           <div
-            style={dark ? { color: '#DFDFDF' } : {}}
+            style={dark ? { color: "#DFDFDF" } : {}}
             className="font-roboto font-normal text-main text-[0.875rem] leading-[1.25rem]"
           >
             {name}
@@ -79,22 +81,25 @@ const Review: React.FC<ReviewProps> = ({
           defaultValue={stars}
           precision={1}
           readOnly
-          sx={{ color: dark ? '#A8C8FB' : '#1357CD', fontSize: '14px' }}
+          sx={{
+            color: mainThemeColor || (dark ? "#A8C8FB" : "#1357CD"),
+            fontSize: "14px",
+          }}
         />
         <div
-          style={dark ? { color: '#DFDFDF' } : {}}
+          style={dark ? { color: "#DFDFDF" } : {}}
           className="flex items-center text-[#605D64] text-xs "
         >
-          {moment(actualDate).format('DD.MM.YYYY')}
+          {moment(actualDate).format("DD.MM.YYYY")}
         </div>
       </div>
       <div
         className="font-normal text-sm leading-5 text-[#322F35] text-justify"
         style={{
-          textOverflow: 'ellipsis',
-          letterSpacing: '0.0142857143em',
-          overflowWrap: 'anywhere',
-          ...(dark && { color: '#DFDFDF' }),
+          textOverflow: "ellipsis",
+          letterSpacing: "0.0142857143em",
+          overflowWrap: "anywhere",
+          ...(dark && { color: "#DFDFDF" }),
         }}
       >
         {text}
@@ -105,14 +110,14 @@ const Review: React.FC<ReviewProps> = ({
           style={
             dark
               ? {
-                  color: '#DFDFDF',
+                  color: "#DFDFDF",
                 }
               : {}
           }
         >
           {intl.formatMessage({
-            id: 'wasTheReviewHelpful',
-            defaultMessage: 'Was the review helpful?',
+            id: "wasTheReviewHelpful",
+            defaultMessage: "Was the review helpful?",
           })}
         </p>
         <div className="flex gap-[9px]">
@@ -122,15 +127,15 @@ const Review: React.FC<ReviewProps> = ({
             style={
               dark
                 ? {
-                    color: 'rgb(6, 41, 97)',
-                    background: 'rgb(168, 200, 251)',
+                    border: "1px solid #DFDFDF",
+                    color: "#DFDFDF",
                   }
                 : {}
             }
           >
             {intl.formatMessage({
-              id: 'yes',
-              defaultMessage: 'Yes',
+              id: "yes",
+              defaultMessage: "Yes",
             })}
           </button>
           <button
@@ -139,15 +144,15 @@ const Review: React.FC<ReviewProps> = ({
             style={
               dark
                 ? {
-                    color: 'rgb(6, 41, 97)',
-                    background: 'rgb(168, 200, 251)',
+                    border: "1px solid #DFDFDF",
+                    color: "#DFDFDF",
                   }
                 : {}
             }
           >
             {intl.formatMessage({
-              id: 'no',
-              defaultMessage: 'No',
+              id: "no",
+              defaultMessage: "No",
             })}
           </button>
         </div>
@@ -155,13 +160,13 @@ const Review: React.FC<ReviewProps> = ({
       {devResponse && developerName && (
         <div
           style={
-            dark ? { background: 'rgb(48, 48, 48)', color: '#DFDFDF' } : {}
+            dark ? { background: "rgb(48, 48, 48)", color: "#DFDFDF" } : {}
           }
           className="rounded bg-[#EBEBEB] px-3 py-3 flex flex-col gap-4 text-sm leading-4"
         >
           <div className="flex justify-between">
             <div>{developerName}</div>
-            <div> {moment(actualDate).format('DD.MM.YYYY')}</div>
+            <div> {moment(actualDate).format("DD.MM.YYYY")}</div>
           </div>
           <div>{devResponse}</div>
         </div>

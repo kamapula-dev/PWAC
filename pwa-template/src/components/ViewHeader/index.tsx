@@ -7,6 +7,7 @@ interface Props {
   appName: string;
   appIcon: string;
   dark: boolean;
+  mainThemeColor?: string;
 }
 
 const ViewHeader: React.FC<Props> = ({
@@ -15,6 +16,7 @@ const ViewHeader: React.FC<Props> = ({
   appIcon,
   appName,
   dark,
+  mainThemeColor,
 }) => {
   const handleClick = () => {
     setView("main");
@@ -44,7 +46,13 @@ const ViewHeader: React.FC<Props> = ({
           {appName}
         </span>
         <span
-          style={dark ? { color: "#A8C8FB" } : {}}
+          style={
+            mainThemeColor
+              ? { color: mainThemeColor }
+              : dark
+                ? { color: "#A8C8FB" }
+                : {}
+          }
           className="text-[#1357CD]"
         >
           {developerName}

@@ -60,6 +60,8 @@ export interface PwaContent {
     content: string;
     buttonText: string;
   };
+  mainThemeColor?: string;
+  installButtonTextColor?: string;
   simulate_install?: boolean;
   hasPushes: boolean;
 }
