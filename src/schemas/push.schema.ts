@@ -81,7 +81,7 @@ export class Push {
   @Prop({ default: false, index: true })
   active: boolean;
 
-  @Prop({ enum: PwaEvent, required: true })
+  @Prop({ enum: PwaEvent, required: false })
   triggerEvent: PwaEvent;
 
   @Prop({ default: 0 })
