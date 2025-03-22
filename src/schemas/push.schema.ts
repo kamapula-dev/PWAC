@@ -96,6 +96,9 @@ export class Push {
   @Prop({ type: [Date], required: false, index: true })
   schedules?: Date[];
 
+  @Prop({ type: [Date], required: false, index: true })
+  recordedSchedules?: Date[];
+
   @Prop({ default: 0 })
   interval?: number;
 

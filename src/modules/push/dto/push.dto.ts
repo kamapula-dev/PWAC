@@ -112,6 +112,12 @@ export class PushDto {
   schedules?: Date[];
 
   @IsOptional()
+  @IsArray()
+  @IsDate({ each: true })
+  @Type(() => Date)
+  recordedSchedules?: Date[];
+
+  @IsOptional()
   @IsInt()
   interval?: number;
 
