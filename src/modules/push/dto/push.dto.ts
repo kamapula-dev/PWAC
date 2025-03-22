@@ -9,6 +9,7 @@ import {
   IsArray,
   IsObject,
   IsDate,
+  IsNumber,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { SendToType } from '../../../schemas/push.schema';
@@ -100,6 +101,10 @@ export class PushDto {
   @IsOptional()
   @IsString()
   color?: string;
+
+  @IsNumber()
+  @IsOptional()
+  timeZone?: number;
 
   @IsOptional()
   @IsArray()
