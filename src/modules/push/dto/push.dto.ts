@@ -89,7 +89,7 @@ export class PushDto {
   @IsBoolean()
   active?: boolean;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsEnum(PwaEvent)
   triggerEvent: PwaEvent;
 
