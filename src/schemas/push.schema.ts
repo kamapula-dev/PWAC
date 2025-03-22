@@ -85,7 +85,7 @@ export class Push {
   triggerEvent: PwaEvent;
 
   @Prop({ required: false })
-  timeZone?: number;
+  timeZone?: string;
 
   @Prop({ default: 0 })
   delay: number;
