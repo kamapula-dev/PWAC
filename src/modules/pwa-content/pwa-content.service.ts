@@ -66,6 +66,8 @@ export class PWAContentService {
     updatePWAContentDto: UpdatePWAContentDto,
     userId: string,
   ): Promise<PWAContent> {
+    delete (updatePWAContentDto as { user?: string })?.user;
+
     const updatedPWAContent = await this.pwaContentModel
       .findOneAndUpdate({ _id: id, user: userId }, updatePWAContentDto, {
         new: true,

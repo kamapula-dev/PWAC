@@ -32,6 +32,8 @@ export class PushService {
   }
 
   async update(id: string, dto: Partial<PushDto>): Promise<Push> {
+    delete (dto as { user?: string })?.user;
+
     const updated = await this.pushModel.findByIdAndUpdate(id, dto, {
       new: true,
       runValidators: true,
