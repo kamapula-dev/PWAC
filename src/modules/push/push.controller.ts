@@ -65,27 +65,30 @@ export class PushController {
     @Param('id') id: string,
     @Body() dto: Partial<PushDto>,
   ): Promise<Push> {
-    const languages = dto.content.languages;
-    const actualLanguages: deepl.TargetLanguageCode[] = languages.includes(
-      'all',
-    )
-      ? LANGUAGES
-      : (languages as deepl.TargetLanguageCode[]);
+    const languages = dto.content?.languages;
 
-    await Promise.all([
-      translateFields(
-        dto.content.title,
-        'title',
-        actualLanguages,
-        this.translator,
-      ),
-      translateFields(
-        dto.content.description,
-        'description',
-        actualLanguages,
-        this.translator,
-      ),
-    ]);
+    if (languages) {
+      const actualLanguages: deepl.TargetLanguageCode[] = languages.includes(
+        'all',
+      )
+        ? LANGUAGES
+        : (languages as deepl.TargetLanguageCode[]);
+
+      await Promise.all([
+        translateFields(
+          dto.content.title,
+          'title',
+          actualLanguages,
+          this.translator,
+        ),
+        translateFields(
+          dto.content.description,
+          'description',
+          actualLanguages,
+          this.translator,
+        ),
+      ]);
+    }
 
     return this.pushService.update(id, dto);
   }
