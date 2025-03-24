@@ -33,17 +33,17 @@ class PushContentDto {
   @IsObject()
   description: Map<deepl.TargetLanguageCode, string>;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  badge: string;
+  badge?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  icon: string;
+  icon?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  picture: string;
+  picture?: string;
 
   @IsOptional()
   @IsString()

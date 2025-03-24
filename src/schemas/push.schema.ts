@@ -25,14 +25,14 @@ export class PushContent {
   @Prop()
   description: Map<string, string>;
 
-  @Prop()
-  badge: string;
+  @Prop({ required: false })
+  badge?: string;
 
-  @Prop()
-  icon: string;
+  @Prop({ required: false })
+  icon?: string;
 
-  @Prop()
-  picture: string;
+  @Prop({ required: false })
+  picture?: string;
 
   @Prop({ required: false })
   url?: string;

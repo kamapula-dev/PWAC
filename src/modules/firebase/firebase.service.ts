@@ -31,12 +31,12 @@ export class FirebaseService {
         notification: {
           title: payload.title,
           body: payload.body,
-          imageUrl: payload.picture,
+          ...(payload.picture && { imageUrl: payload.picture }),
         },
         data: {
           url: payload.url,
-          icon: payload.icon,
-          badge: payload.badge,
+          ...(payload.icon && { icon: payload.icon }),
+          ...(payload.badge && { badge: payload.badge }),
         },
         android: {
           notification: {
