@@ -33,6 +33,14 @@ import { PWAExternalMappingService } from '../pwa-external-mapping/pwa-external-
 import { AVAILABLE_COLORS, LANGUAGES, SUPPORTED_IMAGES } from './consts';
 import { PushService } from '../push/push.service';
 import { translateFields } from '../../services/languages';
+import { PwaStatus } from '../../schemas/user.schema';
+
+export interface USER_PWA {
+  pwaContent: PWAContent;
+  domain?: string;
+  status?: PwaStatus;
+  loading: boolean;
+}
 
 @Controller('pwa-content')
 export class PWAContentController {
@@ -185,6 +193,13 @@ export class PWAContentController {
   async findAll(@Request() req): Promise<PWAContent[]> {
     const userId = req.user._id;
     return this.pwaContentService.findAll(userId);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('pwas')
+  async findAllPwas(@Request() req): Promise<Array<USER_PWA>> {
+    const userId = req.user._id;
+    return this.pwaContentService.findAllWithUserData(userId);
   }
 
   @Get(':id/trusted')

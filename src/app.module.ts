@@ -43,6 +43,12 @@ import { SchedulerModule } from './modules/scheduler/scheduler.module';
         defaultJobOptions: {
           attempts: 1,
           backoff: 0,
+          removeOnComplete: {
+            age: 3600,
+          },
+          removeOnFail: {
+            age: 3600,
+          },
         },
       }),
       inject: [ConfigService],

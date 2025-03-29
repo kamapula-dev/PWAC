@@ -4,7 +4,11 @@ import { Model, Types } from 'mongoose';
 import { CreatePWAContentDto } from './dto/create-pwa-content.dto';
 import { UpdatePWAContentDto } from './dto/update-pwa-content.dto';
 import { PWAContent } from '../../schemas/pwa-content.scheme';
-import { Push, Recipient } from '../../schemas/push.schema';
+import { Push } from '../../schemas/push.schema';
+import { User } from '../../schemas/user.schema';
+import { InjectQueue } from '@nestjs/bull';
+import { Job, Queue } from 'bull';
+import { USER_PWA } from './pwa-content.controller';
 
 @Injectable()
 export class PWAContentService {
@@ -14,6 +18,9 @@ export class PWAContentService {
 
     @InjectModel(Push.name)
     private readonly pushModel: Model<Push>,
+
+    @InjectModel('User') private readonly userModel: Model<User>,
+    @InjectQueue('buildPWA') private readonly buildQueue: Queue,
   ) {}
 
   async create(
@@ -29,6 +36,62 @@ export class PWAContentService {
 
   async findAll(userId: string): Promise<PWAContent[]> {
     return this.pwaContentModel.find({ user: userId }).exec();
+  }
+
+  async findAllWithUserData(userId: string): Promise<Array<USER_PWA>> {
+    const user = await this.userModel.findById(userId).lean();
+
+    if (!user) return [];
+
+    const userPwaIds = user.pwas.map((pwa) => pwa.pwaContentId);
+    const jobs = await this.buildQueue.getJobs([
+      'waiting',
+      'active',
+      'delayed',
+    ]);
+
+    const jobMap = new Map<string, Job>();
+
+    for (const job of jobs) {
+      const jobPwaContentId = job.data?.pwaContentId;
+
+      if (jobPwaContentId) {
+        jobMap.set(jobPwaContentId, job);
+      }
+    }
+
+    const allIdsSet = new Set([...userPwaIds, ...jobMap.keys()]);
+    const pwaContents = await this.pwaContentModel
+      .find({ _id: { $in: Array.from(allIdsSet) } })
+      .lean<PWAContent[]>();
+
+    const result = [];
+
+    for (const pwaContentId of allIdsSet) {
+      const pwaContent = pwaContents.find(
+        (doc) => doc._id.toString() === pwaContentId,
+      )!;
+
+      const userPwa = user.pwas.find((p) => p.pwaContentId === pwaContentId);
+      const domain = userPwa?.domainName;
+      const status = userPwa?.status;
+
+      let jobStatus: string | undefined;
+      const job = jobMap.get(pwaContentId);
+
+      if (job) {
+        jobStatus = await job.getState();
+      }
+
+      result.push({
+        pwaContent,
+        domain,
+        status,
+        loading: Boolean(jobStatus),
+      });
+    }
+
+    return result;
   }
 
   async findOne(id: string, userId: string): Promise<PWAContent> {
