@@ -151,12 +151,19 @@ const Review: React.FC<ReviewProps> = ({
             className="py-1 px-4 border border-solid border-[#C5C5C5] rounded-lg bg-transparent active:bg-[#c3e7ff] active:border-transparent transition-colors duration-200"
             onClick={installPWA}
             style={
-              dark
+              pwaContent?.testDesign
                 ? {
-                    border: '1px solid #DFDFDF',
-                    color: '#DFDFDF',
+                    color: 'rgb(96, 93, 100)',
+                    fontSize: '12px',
+                    height: '26px',
+                    borderRadius: '24px',
                   }
-                : {}
+                : dark
+                  ? {
+                      border: '1px solid #DFDFDF',
+                      color: '#DFDFDF',
+                    }
+                  : {}
             }
           >
             {intl.formatMessage({
