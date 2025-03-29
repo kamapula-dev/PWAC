@@ -11,6 +11,7 @@ export interface Pixel {
 }
 
 export interface PwaContent {
+  testDesign?: boolean;
   appName: string;
   developerName: string;
   hasPaidContentTitle: boolean;

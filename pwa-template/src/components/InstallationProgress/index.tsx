@@ -12,12 +12,14 @@ export default function InstallationProgress({
   hasPaidContent,
   dark,
   mainThemeColor,
+  testDesign,
 }: {
   developerName: string;
   isVerified: boolean;
   hasPaidContent: boolean;
   dark: boolean;
   mainThemeColor?: string;
+  testDesign?: boolean;
 }) {
   const intl = useIntl();
 
@@ -31,7 +33,9 @@ export default function InstallationProgress({
   );
 
   return isInstalling ? (
-    <div className="mt-1 flex flex-col gap-[3px] text-sm">
+    <div
+      className={`mt-1 flex flex-col ${!!(testDesign ? "" : "gap-[3px]")} text-sm`}
+    >
       <div style={dark ? { color: "#DFDFDF" } : {}} className="text-black">
         {fakeDownloadProgress}
       </div>

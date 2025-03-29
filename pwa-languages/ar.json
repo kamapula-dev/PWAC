@@ -70,7 +70,10 @@
   "games": "الألعاب",
   "apps": "التطبيقات",
   "search": "بحث",
-  "books": "الكتب",
   "recommended": "مُوصى به من قِبَل",
-  "wasTheReviewHelpful": "هل كانت هذه المراجعة مفيدة؟"
+  "wasTheReviewHelpful": "هل كانت هذه المراجعة مفيدة؟",
+  "seeAllReviews": "عرض جميع المراجعات",
+  "books": "كتب",
+  "kids": "أطفال",
+  "films": "أفلام"
 }

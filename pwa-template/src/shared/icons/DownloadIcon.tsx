@@ -1,6 +1,18 @@
-const DownloadIcon = ({ dark }: { dark: boolean }) => (
+const DownloadIcon = ({
+  dark,
+  width,
+  height,
+}: {
+  dark: boolean;
+  width?: string;
+  height?: string;
+}) => (
   <svg
-    style={{ width: "16px", marginBottom: "4px", height: "16px" }}
+    style={{
+      width: width || "16px",
+      marginBottom: "4px",
+      height: height || "16px",
+    }}
     version="1.0"
     xmlns="http://www.w3.org/2000/svg"
     width="398"

@@ -150,6 +150,9 @@ export class PWAContent extends Document {
   mainThemeColor?: string;
 
   @Prop({ required: false })
+  testDesign?: boolean;
+
+  @Prop({ required: false })
   installButtonTextColor?: string;
 
   @Prop({ required: false })

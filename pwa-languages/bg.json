@@ -70,7 +70,10 @@
   "games": "Игри",
   "apps": "Приложения",
   "search": "Търсене",
-  "books": "Книги",
   "recommended": "Препоръчано",
-  "wasTheReviewHelpful": "Помогна ли ви този отзив?"
+  "wasTheReviewHelpful": "Помогна ли ви този отзив?",
+  "seeAllReviews": "Виж всички отзиви",
+  "books": "Книги",
+  "kids": "Деца",
+  "films": "Филми"
 }
