@@ -83,6 +83,10 @@ export class PWAContentService {
         jobStatus = await job.getState();
       }
 
+      if (!pwaContent) {
+        continue;
+      }
+
       result.push({
         pwaContent,
         domain,
