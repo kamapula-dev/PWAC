@@ -1,26 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
-import MainView from "./components/MainView";
-import AboutView from "./components/AboutView";
-import PwaView from "./components/PwaView";
-import ReviewsView from "./components/ReviewsView";
-import axios from "axios";
-import { PwaContent, PWAInstallState } from "./shared/models";
-import playMarket from "./shared/icons/playMarketIcon.svg";
-import Menu from "./components/Menu/Menu";
+import { useEffect, useState } from 'react';
+import MainView from './components/MainView';
+import AboutView from './components/AboutView';
+import PwaView from './components/PwaView';
+import ReviewsView from './components/ReviewsView';
+import axios from 'axios';
+import { PwaContent, PWAInstallState } from './shared/models';
+import playMarket from './shared/icons/playMarketIcon.svg';
+import Menu from './components/Menu/Menu';
 import {
   buildAppLink,
   getExternalId,
   logEvent,
   sendEventWithCAPI,
   trackExternalId,
-} from "./shared/helpers/analytics.ts";
-import ModalMenu from "./components/ModalMenu/ModalMenu.tsx";
-import Cookies from "js-cookie";
-import { useDispatch } from "react-redux";
-import { setInstallState } from "./Redux/feat/InstallSlice.tsx";
-import { UAParser } from "ua-parser-js";
-import useInstallPwaInstall from "./shared/useInstallPwa.ts";
+} from './shared/helpers/analytics.ts';
+import ModalMenu from './components/ModalMenu/ModalMenu.tsx';
+import Cookies from 'js-cookie';
+import { useDispatch } from 'react-redux';
+import { setInstallState } from './Redux/feat/InstallSlice.tsx';
+import { UAParser } from 'ua-parser-js';
+import useInstallPwaInstall from './shared/useInstallPwa.ts';
 
 const parser = new UAParser();
 const ua = parser.getResult();
@@ -29,15 +29,15 @@ declare const window: any;
 
 export interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
 }
 
 const shouldRedirectToApp =
-  ua.os.name === "Android" &&
-  (ua.browser.name === "Facebook" || /FBAN|FBAV/i.test(navigator.userAgent));
+  ua.os.name === 'Android' &&
+  (ua.browser.name === 'Facebook' || /FBAN|FBAV/i.test(navigator.userAgent));
 
 export default function App() {
-  const [view, setView] = useState("main");
+  const [view, setView] = useState('main');
   const [isPWAActive, setIsPWAActive] = useState(false);
   const [pwaContent, setPwaContent] = useState<PwaContent | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -56,7 +56,7 @@ export default function App() {
   useEffect(() => {
     if (!pwaContent) return;
     const interval = setInterval(() => {
-      const pwaLink = localStorage.getItem("pwaLink");
+      const pwaLink = localStorage.getItem('pwaLink');
       if (!pwaLink) {
         dispatch(setInstallState(PWAInstallState.waitingForRedirect));
       } else {
@@ -68,31 +68,31 @@ export default function App() {
 
   useEffect(() => {
     window.addEventListener(
-      "beforeinstallprompt",
+      'beforeinstallprompt',
       (e: BeforeInstallPromptEvent) => {
         e.preventDefault();
-        console.log("beforeinstallprompt fired");
+        console.log('beforeinstallprompt fired');
         setInstallPrompt(e);
       },
     );
 
     return () => {
-      window.removeEventListener("beforeinstallprompt", () => {
+      window.removeEventListener('beforeinstallprompt', () => {
         setInstallPrompt(null);
       });
     };
   }, []);
 
-  const pwaLink = localStorage.getItem("pwaLink");
+  const pwaLink = localStorage.getItem('pwaLink');
 
   useEffect(() => {
     if (pwaLink || isPWAActive) return;
     if (!isPWAActive && pwaContent?.pwaLink) {
       setTimeout(() => {
-        const fbc = Cookies.get("_fbc");
-        const fbp = Cookies.get("_fbp");
+        const fbc = Cookies.get('_fbc');
+        const fbp = Cookies.get('_fbp');
         const generatedPwaLink = buildAppLink(pwaContent?.pwaLink, fbc, fbp);
-        localStorage.setItem("pwaLink", generatedPwaLink);
+        localStorage.setItem('pwaLink', generatedPwaLink);
       }, 3000);
     }
   }, [isPWAActive, pwaContent]);
@@ -108,10 +108,10 @@ export default function App() {
         );
 
         const language =
-          Intl.DateTimeFormat().resolvedOptions().locale?.split("-")[0] ??
+          Intl.DateTimeFormat().resolvedOptions().locale?.split('-')[0] ??
           window.navigator.language ??
           navigator.language ??
-          "en";
+          'en';
 
         const pwaContent = {
           ...response.data,
@@ -159,21 +159,20 @@ export default function App() {
 
         if (pwaContent._id) {
           trackExternalId(pwaContent._id, pwaContent.pwaLink);
-          pwaContent.testDesign = true;
         }
 
         if (window.matchMedia && !!pwaContent?.theme?.auto) {
           const darkModeMediaQuery = window.matchMedia(
-            "(prefers-color-scheme: dark)",
+            '(prefers-color-scheme: dark)',
           );
 
           setDark(darkModeMediaQuery.matches);
 
-          if (typeof darkModeMediaQuery.addEventListener === "function") {
-            darkModeMediaQuery.addEventListener("change", (event: any) => {
+          if (typeof darkModeMediaQuery.addEventListener === 'function') {
+            darkModeMediaQuery.addEventListener('change', (event: any) => {
               setDark(event.matches);
             });
-          } else if (typeof darkModeMediaQuery.addListener === "function") {
+          } else if (typeof darkModeMediaQuery.addListener === 'function') {
             darkModeMediaQuery.addListener((event: any) => {
               setDark(event.matches);
             });
@@ -183,7 +182,7 @@ export default function App() {
         }
 
         if (window.fbq && pwaContent?.pixel?.length) {
-          const eventName = "OpenPage";
+          const eventName = 'OpenPage';
 
           pwaContent.pixel.forEach((pixel) => {
             const event = pixel.events.find(
@@ -193,7 +192,7 @@ export default function App() {
             if (pixel.pixelId && pixel.token && event) {
               sendEventWithCAPI(pixel.pixelId, pixel.token, event.sentEvent);
             } else if (event) {
-              window.fbq("track", pixel.pixelId, event.sentEvent);
+              window.fbq('track', pixel.pixelId, event.sentEvent);
             }
           });
         }
@@ -202,7 +201,7 @@ export default function App() {
           logEvent(
             pwaContent._id,
             window.location.hostname,
-            "OpenPage",
+            'OpenPage',
             getExternalId(),
           );
         }
@@ -226,7 +225,7 @@ export default function App() {
 
   useEffect(() => {
     const isPWAActivated = window.matchMedia(
-      "(display-mode: standalone)",
+      '(display-mode: standalone)',
     ).matches;
 
     setIsPWAActive(isPWAActivated);
@@ -249,7 +248,7 @@ export default function App() {
   let currentView;
 
   switch (view) {
-    case "main":
+    case 'main':
       currentView = (
         <MainView
           mainThemeColor={pwaContent?.mainThemeColor}
@@ -260,12 +259,12 @@ export default function App() {
         />
       );
       break;
-    case "about":
+    case 'about':
       currentView = (
         <AboutView dark={dark} setView={setView} pwaContent={pwaContent} />
       );
       break;
-    case "reviews":
+    case 'reviews':
       currentView = (
         <ReviewsView
           mainThemeColor={pwaContent?.mainThemeColor}
@@ -292,12 +291,12 @@ export default function App() {
         style={
           dark
             ? {
-                background: "rgb(19, 19, 19)",
+                background: 'rgb(19, 19, 19)',
               }
             : {}
         }
         className={`fixed z-[10000000] bg-white w-full h-full justify-center items-center top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${
-          isLoading && pwaContent?.hasLoadingScreen ? "flex" : "hidden"
+          isLoading && pwaContent?.hasLoadingScreen ? 'flex' : 'hidden'
         }`}
       >
         {pwaContent?.testDesign ? (
