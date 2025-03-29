@@ -44,7 +44,7 @@ const Review: React.FC<ReviewProps> = ({
     .join('')
     .toUpperCase();
 
-  const actualDate = keepActualDateOfReviews ? date : new Date().toISOString();
+  const actualDate = keepActualDateOfReviews ? new Date().toISOString() : date;
   const intl = useIntl();
 
   const { installPWA } = useInstallPwaInstall(
