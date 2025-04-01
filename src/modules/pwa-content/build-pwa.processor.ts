@@ -131,7 +131,7 @@ export class BuildPWAProcessor {
             const notificationOptions = {
               body: payload.notification.body,
               icon: payload.data?.icon || 'https://${domain}/apple-touch-icon-180x180.png',
-              badge: payload.data?.badge || 'https://${domain}/apple-touch-icon-180x180.png',
+              badge: payload.data?.badge,
               image: payload.notification.image,
               data: {
                 url: payload.data?.url || 'https://${domain}'
