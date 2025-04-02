@@ -217,6 +217,11 @@ export default function App() {
     const isPWAActivated = window.matchMedia(
       '(display-mode: standalone)',
     ).matches;
+    const preloader = document.getElementById('preloader');
+
+    if (isPWAActivated && preloader) {
+      preloader.style.display = 'none';
+    }
 
     setIsPWAActive(isPWAActivated);
 
