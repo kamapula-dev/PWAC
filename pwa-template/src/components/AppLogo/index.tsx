@@ -1,22 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import CircularProgress from "@mui/material/CircularProgress";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import CircularProgress from '@mui/material/CircularProgress';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
 import {
   getInstallState,
   setFakeDownloadProgress,
   setInstallState,
-} from "../../Redux/feat/InstallSlice";
+} from '../../Redux/feat/InstallSlice';
 
-import { RootState } from "../../Redux/store/store";
-import { PWAInstallState } from "../../shared/models";
+import { RootState } from '../../Redux/store/store';
+import { PWAInstallState } from '../../shared/models';
 
 function AppLogo({ logoUrl }: { logoUrl: string }) {
   const installState = useSelector((state: RootState) =>
-    getInstallState(state.install)
+    getInstallState(state.install),
   );
   const fakeDownloadProgress = useSelector(
-    (state: RootState) => state.install.fakeDownloadProgress
+    (state: RootState) => state.install.fakeDownloadProgress,
   );
   const dispatch = useDispatch();
 
@@ -29,23 +29,19 @@ function AppLogo({ logoUrl }: { logoUrl: string }) {
       const increment = 100 / steps;
 
       const interval = setInterval(async () => {
-        if ("getInstalledRelatedApps" in navigator) {
-          try {
-            const relatedApps = await (
-              navigator as any
-            ).getInstalledRelatedApps();
-            if (relatedApps.length > 0) {
-              clearInterval(interval);
-              dispatch(setFakeDownloadProgress(99));
+        if ('getInstalledRelatedApps' in navigator) {
+          const relatedApps = await (
+            navigator as any
+          ).getInstalledRelatedApps();
+          if (relatedApps.length > 0) {
+            clearInterval(interval);
+            dispatch(setFakeDownloadProgress(99));
 
-              setTimeout(() => {
-                dispatch(setFakeDownloadProgress(100));
-                dispatch(setInstallState(PWAInstallState.installed));
-              }, 3000);
-              return;
-            }
-          } catch (error) {
-            console.error("Error checking related apps", error);
+            setTimeout(() => {
+              dispatch(setFakeDownloadProgress(100));
+              dispatch(setInstallState(PWAInstallState.installed));
+            }, 3000);
+            return;
           }
         }
 
@@ -60,14 +56,19 @@ function AppLogo({ logoUrl }: { logoUrl: string }) {
       }, intervalTime);
     };
 
-    if (installState === PWAInstallState.installing) {
-      fakeInstall();
+    try {
+      if (installState === PWAInstallState.installing) {
+        fakeInstall().catch((err) =>
+          console.error('Unhandled error in fakeInstall:', err),
+        );
+      }
+    } catch (error) {
+      console.error('Error in useEffect:', error);
     }
   }, [installState]);
 
   const showPermanentCircularProgress =
-    installState === PWAInstallState.installing 
-
+    installState === PWAInstallState.installing;
 
   return (
     <>
@@ -82,27 +83,29 @@ function AppLogo({ logoUrl }: { logoUrl: string }) {
           </div>
 
           <CircularProgress
-            value={+fakeDownloadProgress.split("%")[0] || 0}
+            value={+fakeDownloadProgress.split('%')[0] || 0}
             variant={
               installState === PWAInstallState.installing
-                ? "determinate"
-                : "indeterminate"
+                ? 'determinate'
+                : 'indeterminate'
             }
             size={60}
             thickness={2}
             sx={{
-              position: "absolute",
-              color: "#1357CD",
+              position: 'absolute',
+              color: '#1357CD',
             }}
           />
         </div>
-      ) : (<div className="relative block overflow-hidden w-[70px] h-[70px] rounded-xl mr-5">
-      <img
-        src={logoUrl}
-        alt="App logo"
-        className="w-full h-full object-cover"
-      />
-    </div>)}
+      ) : (
+        <div className="relative block overflow-hidden w-[70px] h-[70px] rounded-xl mr-5">
+          <img
+            src={logoUrl}
+            alt="App logo"
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
     </>
   );
 }
