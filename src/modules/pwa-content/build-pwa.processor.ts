@@ -276,14 +276,6 @@ export class BuildPWAProcessor {
                       </g>
                   </svg>
               </div>
-            
-              <script>
-                  window.addEventListener('load', () => {
-                      setTimeout(() => {
-                          document.getElementById('preloader').style.display = 'none';
-                      }, 300);
-                  });
-              </script>
             `;
 
         indexHtml = indexHtml.replace('</html>', `${preloaderCode}</html>`);
