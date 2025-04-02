@@ -261,7 +261,12 @@ export default function App() {
       break;
     case 'about':
       currentView = (
-        <AboutView dark={dark} setView={setView} pwaContent={pwaContent} />
+        <AboutView
+          mainThemeColor={pwaContent?.mainThemeColor}
+          dark={dark}
+          setView={setView}
+          pwaContent={pwaContent}
+        />
       );
       break;
     case 'reviews':
