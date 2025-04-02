@@ -349,6 +349,7 @@ export class PWAContentController {
         readyDomainId: readyDomainId,
         pwaName: pwaContent.appName,
         theme: pwaContent.theme,
+        hasLoadingScreen: pwaContent.hasLoadingScreen,
         ...(pwaContent?.pixel && { pixel: pwaContent.pixel }),
       });
 

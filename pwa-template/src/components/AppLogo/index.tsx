@@ -11,7 +11,13 @@ import {
 import { RootState } from '../../Redux/store/store';
 import { PWAInstallState } from '../../shared/models';
 
-function AppLogo({ logoUrl }: { logoUrl: string }) {
+function AppLogo({
+  logoUrl,
+  mainThemeColor,
+}: {
+  logoUrl: string;
+  mainThemeColor?: string;
+}) {
   const installState = useSelector((state: RootState) =>
     getInstallState(state.install),
   );
@@ -93,7 +99,7 @@ function AppLogo({ logoUrl }: { logoUrl: string }) {
             thickness={2}
             sx={{
               position: 'absolute',
-              color: '#1357CD',
+              color: mainThemeColor || '#1357CD',
             }}
           />
         </div>
