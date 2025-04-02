@@ -132,7 +132,21 @@ export class PWAContent extends Document {
   @Prop({
     _id: false,
     type: {
+      auto: { type: String, required: false },
+      dark: { type: String, required: false },
+    },
+    required: false,
+  })
+  offerPreloader?: {
+    background?: string;
+    loader?: string;
+  };
+
+  @Prop({
+    _id: false,
+    type: {
       showAppHeader: { type: Boolean, required: false },
+      timeout: { type: Number, required: false },
       title: { type: Map, of: String, required: false },
       content: { type: Map, of: String, required: false },
       buttonText: { type: Map, of: String, required: false },
@@ -141,6 +155,7 @@ export class PWAContent extends Document {
   })
   customModal?: {
     showAppHeader?: boolean;
+    timeout?: number;
     title?: Map<string, string>;
     content?: Map<string, string>;
     buttonText?: Map<string, string>;

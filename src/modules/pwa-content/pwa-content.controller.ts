@@ -348,6 +348,7 @@ export class PWAContentController {
         gApiKey: gApiKey,
         readyDomainId: readyDomainId,
         pwaName: pwaContent.appName,
+        theme: pwaContent.theme,
         ...(pwaContent?.pixel && { pixel: pwaContent.pixel }),
       });
 

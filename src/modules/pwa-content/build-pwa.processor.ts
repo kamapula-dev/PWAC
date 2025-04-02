@@ -48,6 +48,7 @@ export class BuildPWAProcessor {
       readyDomainId,
       pwaName,
       pixel,
+      theme,
     } = job.data;
 
     let tempBuildFolder: string;
@@ -130,7 +131,7 @@ export class BuildPWAProcessor {
           
             const notificationOptions = {
               body: payload.notification.body,
-              icon: payload.data?.icon || 'https://${domain}/apple-touch-icon-180x180.png',
+              icon: payload.data?.icon,
               badge: payload.data?.badge,
               image: payload.notification.image,
               data: {
@@ -214,27 +215,81 @@ export class BuildPWAProcessor {
         throw new Error('Failed to update manifest.json');
       }
 
-      // Update index.html
       try {
         const indexPath = path.join(tempBuildFolder, 'index.html');
         let indexHtml = await fse.readFile(indexPath, 'utf-8');
 
-        // Update title
         indexHtml = indexHtml.replace(
           /<title>.*<\/title>/,
           `<title>${pwaName}</title>`,
         );
 
-        // Add pixel script
         const pixelArrayString = JSON.stringify(pixel || []);
         const pixelScript = pixel?.length
           ? this.generatePixelScriptWithArray(pixelArrayString)
           : this.generatePixelScriptWithQueryParam();
 
         indexHtml = indexHtml.replace('</head>', `${pixelScript}</head>`);
-        await fse.writeFile(indexPath, indexHtml, 'utf-8');
 
-        this.logger.log(`Index.html updated successfully`);
+        const preloaderCode = `
+              <style>
+                  .preloader {
+                      position: fixed;
+                      top: 0;
+                      left: 0;
+                      right: 0;
+                      width: 100%;
+                      height: 100%;
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                      z-index: 9999;
+                      transition: background-color 0.3s ease;
+                  }
+                  .preloader {
+                      background-color: ${!theme?.auto && theme?.dark ? '#131313' : 'white'};
+                  }
+                  @media (prefers-color-scheme: dark) {
+                      .preloader {
+                          background-color: ${theme?.auto ? '#131313' : ''};
+                      }
+                  }
+                  .google-icon {
+                      width: 125px;
+                      height: 137px;
+                      animation: pulse 1.5s ease-in-out infinite;
+                  }
+                  @keyframes pulse {
+                      0%, 100% { transform: scale(1); }
+                      50% { transform: scale(1.05); }
+                  }
+              </style>
+            
+              <div class="preloader" id="preloader">
+                  <svg class="google-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                      <path fill="none" d="M0,0h40v40H0V0z"></path>
+                      <g>
+                          <path d="M19.7,19.2L4.3,35.3c0,0,0,0,0,0c0.5,1.7,2.1,3,4,3c0.8,0,1.5-0.2,2.1-0.6l0,0l17.4-9.9L19.7,19.2z" fill="#EA4335"></path>
+                          <path d="M35.3,16.4L35.3,16.4l-7.5-4.3l-8.4,7.4l8.5,8.3l7.5-4.2c1.3-0.7,2.2-2.1,2.2-3.6C37.5,18.5,36.6,17.1,35.3,16.4z" fill="#FBBC04"></path>
+                          <path d="M4.3,4.7C4.2,5,4.2,5.4,4.2,5.8v28.5c0,0.4,0,0.7,0.1,1.1l16-15.7L4.3,4.7z" fill="#4285F4"></path>
+                          <path d="M19.8,20l8-7.9L10.5,2.3C9.9,1.9,9.1,1.7,8.3,1.7c-1.9,0-3.6,1.3-4,3c0,0,0,0,0,0L19.8,20z" fill="#34A853"></path>
+                      </g>
+                  </svg>
+              </div>
+            
+              <script>
+                  window.addEventListener('load', () => {
+                      setTimeout(() => {
+                          document.getElementById('preloader').style.display = 'none';
+                      }, 300);
+                  });
+              </script>
+            `;
+
+        indexHtml = indexHtml.replace('</html>', `${preloaderCode}</html>`);
+
+        await fse.writeFile(indexPath, indexHtml, 'utf-8');
+        this.logger.log('Index.html updated successfully');
       } catch (error) {
         this.logger.error('Error updating index.html:', error);
         throw new Error('Failed to update index.html');

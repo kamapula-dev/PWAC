@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useIntl } from "react-intl";
 import {
   getInstallState,
@@ -30,6 +30,7 @@ interface Props {
   customText?: string;
   mainThemeColor?: string;
   installButtonTextColor?: string;
+  onClick?: () => void;
 }
 
 interface BeforeInstallPromptEvent extends Event {
@@ -53,6 +54,7 @@ const InstallButton: React.FC<Props> = ({
   customText,
   mainThemeColor,
   installButtonTextColor,
+  onClick,
 }) => {
   const installState = useSelector((state: RootState) =>
     getInstallState(state.install),
@@ -100,17 +102,16 @@ const InstallButton: React.FC<Props> = ({
   };
 
   const installPWA = async () => {
+    onClick?.();
     if (shouldRedirectToApp && !askedOnce) {
       setAskedOnce(true);
-      const intentUrl = `intent://${window.location.hostname}${
+      window.location.href = `intent://${window.location.hostname}${
         window.location.pathname
       }${
         window.location.search
       }#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(
         window.location.href,
       )};end`;
-
-      window.location.href = intentUrl;
       return;
     }
 

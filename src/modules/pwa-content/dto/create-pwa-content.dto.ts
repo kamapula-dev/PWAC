@@ -47,12 +47,26 @@ export class CustomModalDto {
   title?: Map<deepl.TargetLanguageCode, string>;
 
   @IsOptional()
+  @IsNumber()
+  timeout?: number;
+
+  @IsOptional()
   @IsObject()
   content?: Map<deepl.TargetLanguageCode, string>;
 
   @IsOptional()
   @IsObject()
   buttonText?: Map<deepl.TargetLanguageCode, string>;
+}
+
+export class OfferPreloaderDTO {
+  @IsOptional()
+  @IsString()
+  background?: string;
+
+  @IsOptional()
+  @IsString()
+  loader?: string;
 }
 
 export class ThemeDto {
@@ -232,6 +246,11 @@ export class CreatePWAContentDto {
   @ValidateNested()
   @Type(() => ThemeDto)
   theme?: ThemeDto;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => OfferPreloaderDTO)
+  offerPreloader?: OfferPreloaderDTO;
 
   @IsOptional()
   @IsString()

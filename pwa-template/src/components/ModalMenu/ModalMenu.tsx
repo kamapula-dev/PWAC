@@ -20,6 +20,7 @@ const ModalMenu = ({
   dark,
   mainThemeColor,
   installButtonTextColor,
+  timeout,
 }: {
   showAppHeader?: boolean;
   title?: string;
@@ -30,6 +31,7 @@ const ModalMenu = ({
   dark: boolean;
   mainThemeColor?: string;
   installButtonTextColor?: string;
+  timeout?: number;
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const intl = useIntl();
@@ -37,6 +39,11 @@ const ModalMenu = ({
   const installState = useSelector((state: RootState) =>
     getInstallState(state.install),
   );
+
+  const installPwaCallback = () => {
+    setIsModalVisible(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -46,10 +53,10 @@ const ModalMenu = ({
         }
         return prev;
       });
-    }, 7000);
+    }, timeout || 7000);
 
     return () => clearTimeout(timer);
-  }, [installState]);
+  }, [installState, timeout]);
 
   return (
     <Modal
@@ -144,6 +151,7 @@ const ModalMenu = ({
           {content}
         </div>
         <InstallButton
+          onClick={installPwaCallback}
           mainThemeColor={mainThemeColor}
           installButtonTextColor={installButtonTextColor}
           customText={buttonText}
