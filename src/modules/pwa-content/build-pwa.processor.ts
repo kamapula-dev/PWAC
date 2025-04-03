@@ -211,6 +211,7 @@ export class BuildPWAProcessor {
         ];
 
         manifestData.background_color = offerPreloader.background;
+        manifestData.theme_color = offerPreloader.background;
 
         await fse.writeJson(manifestPath, manifestData, { spaces: 2 });
         this.logger.log(`Manifest updated with name: ${pwaName}`);
