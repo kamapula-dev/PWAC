@@ -62,7 +62,7 @@ export class PWAContentService {
 
     const allIdsSet = new Set([...userPwaIds, ...jobMap.keys()]);
     const pwaContents = await this.pwaContentModel
-      .find({ _id: { $in: Array.from(allIdsSet) } })
+      .find({ _id: { $in: Array.from(allIdsSet) }, user: userId })
       .lean<PWAContent[]>();
 
     const result = [];
