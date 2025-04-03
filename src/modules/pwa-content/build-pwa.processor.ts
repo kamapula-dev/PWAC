@@ -50,6 +50,7 @@ export class BuildPWAProcessor {
       pixel,
       theme,
       hasLoadingScreen,
+      offerPreloader,
     } = job.data;
 
     let tempBuildFolder: string;
@@ -208,6 +209,8 @@ export class BuildPWAProcessor {
             url: `https://${domain}/manifest.webmanifest`,
           },
         ];
+
+        manifestData.background_color = offerPreloader.background;
 
         await fse.writeJson(manifestPath, manifestData, { spaces: 2 });
         this.logger.log(`Manifest updated with name: ${pwaName}`);
