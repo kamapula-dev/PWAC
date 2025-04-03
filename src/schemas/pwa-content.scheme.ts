@@ -132,8 +132,8 @@ export class PWAContent extends Document {
   @Prop({
     _id: false,
     type: {
-      auto: { type: String, required: false },
-      dark: { type: String, required: false },
+      background: { type: String, required: false },
+      loader: { type: String, required: false },
     },
     required: false,
   })
