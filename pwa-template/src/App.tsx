@@ -311,7 +311,7 @@ export default function App() {
           />
         </div>
       )}
-      {pwaContent?.customModal && (
+      {pwaContent?.customModal && installPrompt && (
         <ModalMenu
           timeout={pwaContent.customModal?.timeout}
           mainThemeColor={pwaContent?.mainThemeColor}
