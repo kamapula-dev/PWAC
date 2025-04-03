@@ -350,6 +350,7 @@ export class PWAContentController {
         pwaName: pwaContent.appName,
         theme: pwaContent.theme,
         hasLoadingScreen: pwaContent.hasLoadingScreen,
+        offerPreloader: pwaContent.offerPreloader,
         ...(pwaContent?.pixel && { pixel: pwaContent.pixel }),
       });
 
