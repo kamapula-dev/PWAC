@@ -91,7 +91,7 @@ export default function App() {
         const fbp = Cookies.get('_fbp');
         const generatedPwaLink = buildAppLink(pwaContent?.pwaLink, fbc, fbp);
         localStorage.setItem('pwaLink', generatedPwaLink);
-      }, 3000);
+      }, 5000);
     }
   }, [isPWAActive, pwaContent, pwaLink]);
 
