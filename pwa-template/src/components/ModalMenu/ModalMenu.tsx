@@ -1,13 +1,10 @@
 import { Modal } from 'antd';
 import { useEffect, useState } from 'react';
 import GooglePlayLogo from '../../shared/icons/GooglePlayLogo';
-import { PwaContent, PWAInstallState } from '../../shared/models';
+import { PwaContent } from '../../shared/models';
 import { useIntl } from 'react-intl';
 import InstallButton from '../InstallButton';
 import { BeforeInstallPromptEvent } from '../../App';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../Redux/store/store';
-import { getInstallState } from '../../Redux/feat/InstallSlice';
 import GooglePlayDark from '../../shared/icons/GooglePlayDark';
 
 const ModalMenu = ({
@@ -36,30 +33,20 @@ const ModalMenu = ({
   const [isModalVisible, setIsModalVisible] = useState(false);
   const intl = useIntl();
 
-  const installState = useSelector((state: RootState) =>
-    getInstallState(state.install),
-  );
-
   const installPwaCallback = () => {
     setIsModalVisible(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsModalVisible((prev) => {
-        if (
-          PWAInstallState.idle === installState ||
-          (PWAInstallState.waitingForRedirect && prev === false)
-        ) {
-          return true;
-        }
-        return false;
-      });
-    }, timeout || 7000);
+    const timerId = setTimeout(() => {
+      setIsModalVisible(true);
+    }, timeout ?? 7000);
 
-    return () => clearTimeout(timer);
-  }, [installState, timeout]);
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, []);
 
   return (
     <Modal

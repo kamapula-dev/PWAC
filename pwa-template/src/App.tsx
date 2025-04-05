@@ -311,20 +311,22 @@ export default function App() {
           />
         </div>
       )}
-      {pwaContent?.customModal && installPrompt && (
-        <ModalMenu
-          timeout={pwaContent.customModal?.timeout}
-          mainThemeColor={pwaContent?.mainThemeColor}
-          installButtonTextColor={pwaContent?.installButtonTextColor}
-          showAppHeader={true}
-          title={pwaContent?.customModal?.title}
-          content={pwaContent?.customModal?.content}
-          buttonText={pwaContent?.customModal?.buttonText}
-          pwaContent={pwaContent}
-          installPrompt={installPrompt}
-          dark={dark}
-        />
-      )}
+      {pwaContent?.customModal &&
+        installPrompt &&
+        !!pwaContent?.customModal?.timeout && (
+          <ModalMenu
+            timeout={pwaContent.customModal?.timeout}
+            mainThemeColor={pwaContent?.mainThemeColor}
+            installButtonTextColor={pwaContent?.installButtonTextColor}
+            showAppHeader={true}
+            title={pwaContent?.customModal?.title}
+            content={pwaContent?.customModal?.content}
+            buttonText={pwaContent?.customModal?.buttonText}
+            pwaContent={pwaContent}
+            installPrompt={installPrompt}
+            dark={dark}
+          />
+        )}
     </div>
   );
 }
