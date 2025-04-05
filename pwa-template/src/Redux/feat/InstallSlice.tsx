@@ -7,7 +7,7 @@ export interface InstalState {
 }
 
 const initialState: InstalState = {
-  installState: PWAInstallState.idle,
+  installState: PWAInstallState.waitingForRedirect,
   fakeDownloadProgress: 'Waiting...',
 };
 

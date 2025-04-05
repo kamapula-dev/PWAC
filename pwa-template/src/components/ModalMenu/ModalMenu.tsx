@@ -48,10 +48,13 @@ const ModalMenu = ({
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsModalVisible((prev) => {
-        if (PWAInstallState.idle === installState) {
+        if (
+          PWAInstallState.idle === installState ||
+          (PWAInstallState.waitingForRedirect && prev === false)
+        ) {
           return true;
         }
-        return prev;
+        return false;
       });
     }, timeout || 7000);
 
