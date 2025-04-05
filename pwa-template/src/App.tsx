@@ -129,6 +129,7 @@ export default function App() {
                   Object.values(response.data.customModal?.buttonText)[0] ??
                   undefined,
                 showAppHeader: response.data.customModal.showAppHeader ?? false,
+                timeout: response.data.customModal.timeout ?? 7000,
               },
             }),
           shortDescription:
