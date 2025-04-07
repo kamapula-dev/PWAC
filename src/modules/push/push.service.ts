@@ -173,31 +173,42 @@ export class PushService {
     for (const recipient of recipients) {
       const { pwas, filters } = recipient;
 
+      console.log(JSON.stringify(pwas, null, 2));
+
       const mappings = await this.mappingModel.find({
         pwaContentId: { $in: pwas.map((pwa) => pwa.id) },
         pushToken: { $exists: true, $ne: '' },
         ...(externalId && { externalId }),
       });
 
-      let shouldSend = false;
+      console.log(JSON.stringify(mappings, null, 2));
 
-      for (const filter of filters) {
-        const userHasEvent = await this.pwaEventLogModel.countDocuments({
-          event: filter.event,
-          ...(externalId && { externalId }),
-        });
+      let shouldSend: boolean[] = [];
 
-        if (
-          (filter.sendTo === SendToType.with && userHasEvent) ||
-          (filter.sendTo === SendToType.without && !userHasEvent) ||
-          filter.sendTo === SendToType.all
-        ) {
-          shouldSend = true;
-          break;
+      if (externalId) {
+        for (const filter of filters) {
+          const userHasEvent = await this.pwaEventLogModel.countDocuments({
+            event: filter.event,
+            externalId,
+          });
+
+          if (
+            (filter.sendTo === SendToType.with && userHasEvent) ||
+            (filter.sendTo === SendToType.without && !userHasEvent) ||
+            filter.sendTo === SendToType.all
+          ) {
+            shouldSend.push(true);
+          } else {
+            shouldSend.push(false);
+          }
         }
+      } else {
+        shouldSend.push(true);
       }
 
-      if (shouldSend) {
+      console.log(shouldSend, 'shouldSend');
+
+      if (shouldSend.every((should) => should) || !shouldSend.length) {
         const tokens = mappings
           .map((m) => ({
             token: m.pushToken,
@@ -301,7 +312,7 @@ export class PushService {
         continue;
       }
 
-      let shouldSend = false;
+      let shouldSend: boolean[] = [];
 
       for (const recipient of matchingRecipients) {
         for (const filter of recipient.filters) {
@@ -311,16 +322,18 @@ export class PushService {
           });
 
           if (filter.sendTo === SendToType.with && userHasEvent) {
-            shouldSend = true;
+            shouldSend.push(true);
           } else if (filter.sendTo === SendToType.without && !userHasEvent) {
-            shouldSend = true;
+            shouldSend.push(true);
           } else if (filter.sendTo === SendToType.all) {
-            shouldSend = true;
+            shouldSend.push(true);
+          } else {
+            shouldSend.push(false);
           }
         }
       }
 
-      if (!shouldSend) {
+      if (!shouldSend.every((should) => should) || !shouldSend.length) {
         this.logger.log(
           `Push not sent for event ${eventLog.event} due to filters`,
         );
