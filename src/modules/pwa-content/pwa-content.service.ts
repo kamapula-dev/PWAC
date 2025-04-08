@@ -101,6 +101,74 @@ export class PWAContentService {
     return result;
   }
 
+  async getAll(
+    userId: string,
+    offset: number = 0,
+    limit: number = 10,
+    search?: string,
+  ): Promise<{ pwas: USER_PWA[]; total: number }> {
+    const user = await this.userModel.findById(userId).lean();
+
+    if (!user) return { pwas: [], total: 0 };
+
+    const userPwaIds = user.pwas.map((pwa) => pwa.pwaContentId);
+    const jobs = await this.buildQueue.getJobs([
+      'waiting',
+      'active',
+      'delayed',
+    ]);
+    const jobMap = new Map<string, Job>();
+
+    for (const job of jobs) {
+      const jobPwaContentId = job.data?.pwaContentId;
+      if (jobPwaContentId) jobMap.set(jobPwaContentId, job);
+    }
+
+    const allIdsSet = new Set([...userPwaIds, ...jobMap.keys()]);
+    const searchCondition: Record<string, unknown> = {};
+
+    if (search) {
+      const regexSearch = { $regex: search, $options: 'i' };
+      searchCondition.$or = [
+        { appName: regexSearch },
+        { pwaName: regexSearch },
+      ];
+    }
+
+    const baseFilter = {
+      _id: { $in: Array.from(allIdsSet) },
+      user: userId,
+      ...searchCondition,
+    };
+
+    const [pwaContents, total] = await Promise.all([
+      this.pwaContentModel
+        .find(baseFilter)
+        .sort({ createdAt: -1 })
+        .skip(offset)
+        .limit(limit)
+        .lean<PWAContent[]>(),
+      this.pwaContentModel.countDocuments(baseFilter).exec(),
+    ]);
+
+    const result = [];
+
+    for (const pwaContent of pwaContents) {
+      const pwaContentId = pwaContent._id.toString();
+      const userPwa = user.pwas.find((p) => p.pwaContentId === pwaContentId);
+      const job = jobMap.get(pwaContentId);
+
+      result.push({
+        pwaContent,
+        domain: userPwa?.domainName,
+        status: userPwa?.status,
+        loading: !!job,
+      });
+    }
+
+    return { pwas: result, total };
+  }
+
   async findOne(id: string, userId: string): Promise<PWAContent> {
     const pwaContent = await this.pwaContentModel
       .findOne({ _id: id, user: userId })

@@ -197,6 +197,17 @@ export class PWAContentController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Get('all')
+  async getAll(
+    @Request() req,
+    @Query('offset') offset: number = 0,
+    @Query('limit') limit: number = 10,
+    @Query('search') search?: string,
+  ): Promise<{ pwas: USER_PWA[]; total: number }> {
+    return this.pwaContentService.getAll(req.user._id, offset, limit, search);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
   @Get('pwas')
   async findAllPwas(
     @Request() req,
@@ -204,9 +215,8 @@ export class PWAContentController {
     @Query('limit') limit: number = 10000,
     @Query('search') search?: string,
   ): Promise<Array<USER_PWA>> {
-    const userId = req.user._id;
     return this.pwaContentService.findAllWithUserData(
-      userId,
+      req.user._id,
       offset,
       limit,
       search,

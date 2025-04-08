@@ -66,6 +66,44 @@ export class PushService {
     );
   }
 
+  async getAll(params: {
+    userId: string;
+    active?: boolean;
+    event?: string;
+    search?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<{ pushes: Push[]; total: number }> {
+    const { active, event, search, userId, limit = 10, offset = 0 } = params;
+    const filter: Record<string, unknown> = {};
+
+    if (active !== undefined) {
+      filter.active = active;
+    }
+
+    if (event) {
+      filter.triggerEvent = event;
+    }
+
+    if (search) {
+      filter.systemName = { $regex: search, $options: 'i' };
+    }
+
+    const combinedFilter = { ...filter, user: userId };
+
+    const [pushes, total] = await Promise.all([
+      this.pushModel
+        .find(combinedFilter)
+        .sort({ createdAt: -1 })
+        .skip(offset)
+        .limit(limit)
+        .exec(),
+      this.pushModel.countDocuments(combinedFilter).exec(),
+    ]);
+
+    return { pushes, total };
+  }
+
   async findAll(params: {
     userId: string;
     active?: boolean;

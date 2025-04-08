@@ -100,6 +100,29 @@ export class PushController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Get('all')
+  async getAll(
+    @Request() req,
+    @Query('active') active?: string,
+    @Query('event') event?: string,
+    @Query('search') search?: string,
+    @Query('limit') limit = 10,
+    @Query('offset') offset = 0,
+  ): Promise<{ pushes: Push[]; total: number }> {
+    const userId = req.user._id;
+    const isActive = active !== undefined ? active === 'true' : undefined;
+
+    return this.pushService.getAll({
+      active: isActive,
+      event,
+      search,
+      userId,
+      limit,
+      offset,
+    });
+  }
+
+  @UseGuards(AuthGuard('jwt'))
   @Get()
   async getAllPushes(
     @Request() req,
