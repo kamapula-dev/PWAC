@@ -9,6 +9,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Request,
   Res,
   UseGuards,
@@ -197,9 +198,19 @@ export class PWAContentController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get('pwas')
-  async findAllPwas(@Request() req): Promise<Array<USER_PWA>> {
+  async findAllPwas(
+    @Request() req,
+    @Query('offset') offset: number = 0,
+    @Query('limit') limit: number = 10000,
+    @Query('search') search?: string,
+  ): Promise<Array<USER_PWA>> {
     const userId = req.user._id;
-    return this.pwaContentService.findAllWithUserData(userId);
+    return this.pwaContentService.findAllWithUserData(
+      userId,
+      offset,
+      limit,
+      search,
+    );
   }
 
   @Get(':id/trusted')

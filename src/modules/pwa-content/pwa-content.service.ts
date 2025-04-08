@@ -38,7 +38,12 @@ export class PWAContentService {
     return this.pwaContentModel.find({ user: userId }).exec();
   }
 
-  async findAllWithUserData(userId: string): Promise<Array<USER_PWA>> {
+  async findAllWithUserData(
+    userId: string,
+    offset: number = 0,
+    limit: number = 10,
+    search?: string,
+  ): Promise<Array<USER_PWA>> {
     const user = await this.userModel.findById(userId).lean();
 
     if (!user) return [];
@@ -49,49 +54,47 @@ export class PWAContentService {
       'active',
       'delayed',
     ]);
-
     const jobMap = new Map<string, Job>();
 
     for (const job of jobs) {
       const jobPwaContentId = job.data?.pwaContentId;
-
-      if (jobPwaContentId) {
-        jobMap.set(jobPwaContentId, job);
-      }
+      if (jobPwaContentId) jobMap.set(jobPwaContentId, job);
     }
 
     const allIdsSet = new Set([...userPwaIds, ...jobMap.keys()]);
+    const searchCondition: Record<string, unknown> = {};
+
+    if (search) {
+      const regexSearch = { $regex: search, $options: 'i' };
+      searchCondition.$or = [
+        { appName: regexSearch },
+        { pwaName: regexSearch },
+      ];
+    }
+
     const pwaContents = await this.pwaContentModel
-      .find({ _id: { $in: Array.from(allIdsSet) }, user: userId })
+      .find({
+        _id: { $in: Array.from(allIdsSet) },
+        user: userId,
+        ...searchCondition,
+      })
+      .sort({ createdAt: -1 })
+      .skip(offset)
+      .limit(limit)
       .lean<PWAContent[]>();
 
     const result = [];
 
-    for (const pwaContentId of allIdsSet) {
-      const pwaContent = pwaContents.find(
-        (doc) => doc._id.toString() === pwaContentId,
-      )!;
-
+    for (const pwaContent of pwaContents) {
+      const pwaContentId = pwaContent._id.toString();
       const userPwa = user.pwas.find((p) => p.pwaContentId === pwaContentId);
-      const domain = userPwa?.domainName;
-      const status = userPwa?.status;
-
-      let jobStatus: string | undefined;
       const job = jobMap.get(pwaContentId);
-
-      if (job) {
-        jobStatus = await job.getState();
-      }
-
-      if (!pwaContent) {
-        continue;
-      }
 
       result.push({
         pwaContent,
-        domain,
-        status,
-        loading: Boolean(jobStatus),
+        domain: userPwa?.domainName,
+        status: userPwa?.status,
+        loading: !!job,
       });
     }
 

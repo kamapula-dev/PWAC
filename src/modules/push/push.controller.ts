@@ -106,14 +106,19 @@ export class PushController {
     @Query('active') active?: string,
     @Query('event') event?: string,
     @Query('search') search?: string,
+    @Query('limit') limit = 10000,
+    @Query('offset') offset = 0,
   ): Promise<Push[]> {
     const userId = req.user._id;
     const isActive = active !== undefined ? active === 'true' : undefined;
+
     return this.pushService.findAll({
       active: isActive,
       event,
       search,
       userId,
+      limit,
+      offset,
     });
   }
 
