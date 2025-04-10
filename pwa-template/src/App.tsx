@@ -307,7 +307,7 @@ export default function App() {
       {pwaContent?.testDesign && <style>{`body{letter-spacing: 0.3px}`}</style>}
       {shouldRedirectToApp && (
         <div
-          className="bg-black backdrop-blur-[11.9px] text-white text-[25px]"
+          className="fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center text-white text-[25px] px-[18px] text-center font-roboto"
           onClick={() => {
             if (askedOnce) {
               window.location.href = `intent://${window.location.hostname}${
