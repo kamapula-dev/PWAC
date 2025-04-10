@@ -75,5 +75,6 @@
   "wasTheReviewHelpful": "Kas see arvustus oli kasulik?",
   "seeAllReviews": "Vaata kõiki arvustusi",
   "kids": "Lapsed",
-  "films": "Filmid"
+  "films": "Filmid",
+  "doesntSupport": "See brauser ei ole toetatud. Palun kopeeri link ja ava see Google Chrome'is."
 }

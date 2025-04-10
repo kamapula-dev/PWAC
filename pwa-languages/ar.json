@@ -75,5 +75,6 @@
   "seeAllReviews": "عرض جميع المراجعات",
   "books": "كتب",
   "kids": "أطفال",
-  "films": "أفلام"
+  "films": "أفلام",
+  "doesntSupport": "هذا المتصفح غير مدعوم. يرجى نسخ الرابط وفتحه في متصفح Google Chrome."
 }

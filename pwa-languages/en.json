@@ -72,5 +72,6 @@
   "seeAllReviews": "See all reviews",
   "books": "Books",
   "kids": "Kids",
-  "films": "Films"
+  "films": "Films",
+  "doesntSupport": "This browser is not supported. Please copy the link and open it in Google Chrome."
 }

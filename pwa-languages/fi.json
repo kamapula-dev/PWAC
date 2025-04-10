@@ -75,5 +75,6 @@
   "wasTheReviewHelpful": "Oliko arvostelusta apua?",
   "seeAllReviews": "Näytä kaikki arvostelut",
   "kids": "Lapset",
-  "films": "Elokuvat"
+  "films": "Elokuvat",
+  "doesntSupport": "Tämä selain ei ole tuettu. Kopioi linkki ja avaa se Google Chromessa."
 }

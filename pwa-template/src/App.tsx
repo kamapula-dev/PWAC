@@ -20,6 +20,7 @@ import { setInstallState } from './Redux/feat/InstallSlice.tsx';
 import { UAParser } from 'ua-parser-js';
 import useInstallPwaInstall from './shared/useInstallPwa.ts';
 import PageLoader from './components/PageLoader';
+import { useIntl } from 'react-intl';
 
 const parser = new UAParser();
 const ua = parser.getResult();
@@ -36,9 +37,11 @@ const shouldRedirectToApp =
   (ua.browser.name === 'Facebook' || /FBAN|FBAV/i.test(navigator.userAgent));
 
 export default function App() {
+  const [askedOnce, setAskedOnce] = useState(false);
   const [view, setView] = useState('main');
   const [isPWAActive, setIsPWAActive] = useState(false);
   const [pwaContent, setPwaContent] = useState<PwaContent | null>(null);
+  const intl = useIntl();
   const [dark, setDark] = useState(false);
   const [installPrompt, setInstallPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
@@ -302,6 +305,31 @@ export default function App() {
     <div>
       {dark && <style>{`body{background-color: #131313;}`}</style>}
       {pwaContent?.testDesign && <style>{`body{letter-spacing: 0.3px}`}</style>}
+      {shouldRedirectToApp && (
+        <div
+          className="bg-black backdrop-blur-[11.9px] text-white text-[25px]"
+          onClick={() => {
+            if (askedOnce) {
+              window.location.href = `intent://${window.location.hostname}${
+                window.location.pathname
+              }${
+                window.location.search
+              }#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(
+                window.location.href,
+              )};end`;
+              setAskedOnce(true);
+            } else {
+              installPWA();
+            }
+          }}
+        >
+          {intl.formatMessage({
+            id: 'doesntSupport',
+            defaultMessage:
+              'This browser is not supported. Please copy the link and open it in Google Chrome.',
+          })}
+        </div>
+      )}
       {currentView}
       {pwaContent?.hasMenu && (
         <div onClick={installPWA}>
