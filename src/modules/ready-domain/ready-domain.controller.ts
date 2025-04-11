@@ -1,4 +1,11 @@
-import { Controller, Get, Body, UseGuards, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Body,
+  UseGuards,
+  Post,
+  Request,
+} from '@nestjs/common';
 import { ReadyDomainService } from './ready-domain.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateReadyDomainDto } from '../../schemas/ready-domain.scheme';
@@ -7,9 +14,10 @@ import { CreateReadyDomainDto } from '../../schemas/ready-domain.scheme';
 export class ReadyDomainController {
   constructor(private readonly readyDomainService: ReadyDomainService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Get()
-  async getAllAvailableDomains() {
-    return this.readyDomainService.getAllAvailableDomains();
+  async getAllAvailableDomains(@Request() req) {
+    return this.readyDomainService.getAllAvailableDomains(req.user._id);
   }
 
   @UseGuards(AuthGuard('jwt'))

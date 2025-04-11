@@ -17,10 +17,11 @@ export class ReadyDomainService {
     private readonly userService: UserService,
   ) {}
 
-  async getAllAvailableDomains() {
+  async getAllAvailableDomains(userId: string) {
     return this.readyDomainModel
       .find(
         {
+          userId,
           $or: [{ pwaId: { $exists: false } }, { pwaId: null }],
         },
         '-email -gApiKey -zoneId',
@@ -43,7 +44,6 @@ export class ReadyDomainService {
     );
 
     domain.pwaId = pwaId;
-    domain.userId = userId;
 
     await this.userService.setUserPwaReadyDomain(
       userId,
@@ -74,7 +74,6 @@ export class ReadyDomainService {
     );
 
     domain.pwaId = null;
-    domain.userId = null;
 
     return domain.save();
   }
