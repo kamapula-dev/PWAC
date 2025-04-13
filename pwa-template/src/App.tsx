@@ -199,7 +199,11 @@ export default function App() {
           });
         }
 
-        if (pwaContent?._id) {
+        if (
+          pwaContent?._id &&
+          (ua.browser.name === 'Facebook' ||
+            /FBAN|FBAV/i.test(navigator.userAgent))
+        ) {
           logEvent(
             pwaContent._id,
             window.location.hostname,
