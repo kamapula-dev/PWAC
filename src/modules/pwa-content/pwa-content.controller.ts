@@ -203,8 +203,15 @@ export class PWAContentController {
     @Query('offset') offset: number = 0,
     @Query('limit') limit: number = 10,
     @Query('search') search?: string,
+    @Query('tags') tags?: string[],
   ): Promise<{ pwas: USER_PWA[]; total: number }> {
-    return this.pwaContentService.getAll(req.user._id, offset, limit, search);
+    return this.pwaContentService.getAll(
+      req.user._id,
+      offset,
+      limit,
+      search,
+      tags,
+    );
   }
 
   @UseGuards(AuthGuard('jwt'))

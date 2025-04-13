@@ -106,6 +106,7 @@ export class PWAContentService {
     offset: number = 0,
     limit: number = 10,
     search?: string,
+    tags?: string[],
   ): Promise<{ pwas: USER_PWA[]; total: number }> {
     const user = await this.userModel.findById(userId).lean();
 
@@ -133,6 +134,10 @@ export class PWAContentService {
         { appName: regexSearch },
         { pwaName: regexSearch },
       ];
+    }
+
+    if (tags && tags.length > 0) {
+      searchCondition.pwaTags = { $in: tags };
     }
 
     const baseFilter = {
