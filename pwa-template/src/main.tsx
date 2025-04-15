@@ -9,16 +9,11 @@ import { UAParser } from 'ua-parser-js';
 
 const parser = new UAParser();
 const browser = parser.getBrowser();
-const browserName = browser.name || '';
+const browserName = (browser.name || '').toLowerCase();
 
 const urlParams = new URLSearchParams(window.location.search);
-const alreadyRedirected = window.location.hash.includes('__intentRedirected');
 
-if (
-  browserName !== 'Chrome' &&
-  browserName !== 'Yandex' &&
-  !alreadyRedirected
-) {
+if (!browserName.includes('chrome') && !browserName.includes('yandex')) {
   const fallbackUrl = `${window.location.origin}${window.location.pathname}${window.location.search}#__intentRedirected`;
 
   const intentUrl = `intent://${window.location.hostname}/?${urlParams}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(
