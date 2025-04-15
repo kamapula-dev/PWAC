@@ -24,6 +24,8 @@ import { useIntl } from 'react-intl';
 
 const parser = new UAParser();
 const ua = parser.getResult();
+const browser = parser.getBrowser();
+const browserName = (browser.name || '').toLowerCase();
 
 declare const window: any;
 
@@ -33,7 +35,9 @@ export interface BeforeInstallPromptEvent extends Event {
 }
 
 const shouldRedirectToApp =
-  ua.os.name === 'Android' && ua.browser.type === 'inapp';
+  ua.os.name === 'Android' &&
+  !browserName.includes('chrome') &&
+  !browserName.includes('yandex');
 
 export default function App() {
   const [askedOnce, setAskedOnce] = useState(false);
@@ -198,7 +202,11 @@ export default function App() {
           });
         }
 
-        if (pwaContent?._id && ua.browser.type === 'inapp') {
+        if (
+          pwaContent?._id &&
+          !browserName.includes('chrome') &&
+          !browserName.includes('yandex')
+        ) {
           logEvent(
             pwaContent._id,
             window.location.hostname,
