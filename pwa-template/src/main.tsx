@@ -5,6 +5,28 @@ import { store } from './Redux/store/store.tsx';
 import { Provider } from 'react-redux';
 import './index.css';
 import LocaleProvider from './LocaleProvider.tsx';
+import { UAParser } from 'ua-parser-js';
+
+const parser = new UAParser();
+const browser = parser.getBrowser();
+const browserName = browser.name || '';
+
+const urlParams = new URLSearchParams(window.location.search);
+const alreadyRedirected = window.location.hash.includes('__intentRedirected');
+
+if (
+  browserName !== 'Chrome' &&
+  browserName !== 'Yandex' &&
+  !alreadyRedirected
+) {
+  const fallbackUrl = `${window.location.origin}${window.location.pathname}${window.location.search}#__intentRedirected`;
+
+  const intentUrl = `intent://${window.location.hostname}/?${urlParams}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(
+    fallbackUrl,
+  )};end`;
+
+  window.location.href = intentUrl;
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

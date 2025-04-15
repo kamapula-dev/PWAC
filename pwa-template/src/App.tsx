@@ -33,9 +33,7 @@ export interface BeforeInstallPromptEvent extends Event {
 }
 
 const shouldRedirectToApp =
-  ua.os.name === 'Android' &&
-  ua.browser.name !== 'Chrome' &&
-  ua.browser.name !== 'Yandex';
+  ua.os.name === 'Android' && ua.browser.type === 'inapp';
 
 export default function App() {
   const [askedOnce, setAskedOnce] = useState(false);
@@ -200,11 +198,7 @@ export default function App() {
           });
         }
 
-        if (
-          pwaContent?._id &&
-          ua.browser.name !== 'Chrome' &&
-          ua.browser.name !== 'Yandex'
-        ) {
+        if (pwaContent?._id && ua.browser.type === 'inapp') {
           logEvent(
             pwaContent._id,
             window.location.hostname,
@@ -233,26 +227,6 @@ export default function App() {
     }
 
     setIsPWAActive(isPWAActivated);
-
-    const alreadyRedirected =
-      window.location.hash.includes('__intentRedirected');
-
-    if (shouldRedirectToApp && !alreadyRedirected) {
-      const fallbackUrl = `${window.location.origin}${window.location.pathname}${window.location.search}#__intentRedirected`;
-
-      const intentUrl = `intent://${window.location.hostname}${
-        window.location.pathname
-      }${window.location.search}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(
-        fallbackUrl,
-      )};end`;
-
-      const tempLink = document.createElement('a');
-      tempLink.setAttribute('href', intentUrl);
-      tempLink.style.display = 'none';
-      document.body.appendChild(tempLink);
-      tempLink.click();
-      document.body.removeChild(tempLink);
-    }
   }, []);
 
   useEffect(() => {
