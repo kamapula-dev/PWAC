@@ -34,7 +34,8 @@ export interface BeforeInstallPromptEvent extends Event {
 
 const shouldRedirectToApp =
   ua.os.name === 'Android' &&
-  (ua.browser.name === 'Facebook' || /FBAN|FBAV/i.test(navigator.userAgent));
+  ua.browser.name !== 'Chrome' &&
+  ua.browser.name !== 'Yandex';
 
 export default function App() {
   const [askedOnce, setAskedOnce] = useState(false);
@@ -201,8 +202,8 @@ export default function App() {
 
         if (
           pwaContent?._id &&
-          (ua.browser.name === 'Facebook' ||
-            /FBAN|FBAV/i.test(navigator.userAgent))
+          ua.browser.name !== 'Chrome' &&
+          ua.browser.name !== 'Yandex'
         ) {
           logEvent(
             pwaContent._id,
@@ -236,13 +237,16 @@ export default function App() {
     if (shouldRedirectToApp) {
       const intentUrl = `intent://${window.location.hostname}${
         window.location.pathname
-      }${
-        window.location.search
-      }#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(
+      }${window.location.search}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(
         window.location.href,
       )};end`;
 
-      window.location.href = intentUrl;
+      const tempLink = document.createElement('a');
+      tempLink.setAttribute('href', intentUrl);
+      tempLink.style.display = 'none';
+      document.body.appendChild(tempLink);
+      tempLink.click();
+      document.body.removeChild(tempLink);
     }
   }, []);
 
