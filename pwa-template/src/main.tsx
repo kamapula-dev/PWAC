@@ -11,12 +11,15 @@ const parser = new UAParser();
 const browser = parser.getBrowser();
 const browserName = (browser.name || '').toLowerCase();
 
-const urlParams = new URLSearchParams(window.location.search);
+const url = new URL(window.location.href);
+const searchParams = url.searchParams;
 
 if (!browserName.includes('chrome') && !browserName.includes('yandex')) {
-  const fallbackUrl = `${window.location.origin}${window.location.pathname}${window.location.search}#__intentRedirected`;
+  searchParams.set('wasRedirected', '1');
 
-  const intentUrl = `intent://${window.location.hostname}/?${urlParams}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(
+  const fallbackUrl = `${window.location.origin}${window.location.pathname}?${searchParams.toString()}#__intentRedirected`;
+
+  const intentUrl = `intent://${window.location.hostname}/?${searchParams.toString()}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(
     fallbackUrl,
   )};end`;
 

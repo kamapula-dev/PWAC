@@ -201,8 +201,10 @@ export default function App() {
             }
           });
         }
+        const searchParams = new URLSearchParams(window.location.search);
+        const wasRedirected = searchParams.get('wasRedirected') === '1';
 
-        if (pwaContent?._id) {
+        if (pwaContent?._id && !wasRedirected) {
           logEvent(
             pwaContent._id,
             window.location.hostname,
