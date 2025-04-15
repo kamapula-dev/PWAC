@@ -234,11 +234,16 @@ export default function App() {
 
     setIsPWAActive(isPWAActivated);
 
-    if (shouldRedirectToApp) {
+    const alreadyRedirected =
+      window.location.hash.includes('__intentRedirected');
+
+    if (shouldRedirectToApp && !alreadyRedirected) {
+      const fallbackUrl = `${window.location.origin}${window.location.pathname}${window.location.search}#__intentRedirected`;
+
       const intentUrl = `intent://${window.location.hostname}${
         window.location.pathname
       }${window.location.search}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(
-        window.location.href,
+        fallbackUrl,
       )};end`;
 
       const tempLink = document.createElement('a');
