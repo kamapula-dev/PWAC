@@ -39,12 +39,6 @@ const shouldRedirectToApp =
   !browserName.includes('chrome') &&
   !browserName.includes('yandex');
 
-const isFacebookBrowser =
-  browser.name === 'Facebook' || /FBAN|FBAV/i.test(navigator.userAgent);
-
-const isInstagramBrowser =
-  browser.name === 'Instagram' || /Instagram/i.test(navigator.userAgent);
-
 export default function App() {
   const [askedOnce, setAskedOnce] = useState(false);
   const [view, setView] = useState('main');
@@ -208,7 +202,7 @@ export default function App() {
           });
         }
 
-        if (pwaContent?._id && isFacebookBrowser && isInstagramBrowser) {
+        if (pwaContent?._id) {
           logEvent(
             pwaContent._id,
             window.location.hostname,
