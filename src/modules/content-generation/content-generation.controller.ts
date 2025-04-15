@@ -45,4 +45,12 @@ export class ContentGenerationController {
   async generateReviewText(): Promise<{ text: string }> {
     return await this.contentGenerationService.generateAppReviewText();
   }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('generate-white-page')
+  async generateWhitePage(@Body('url') url: string): Promise<{ html: string }> {
+    const html =
+      await this.contentGenerationService.generateWhitePageFromUrl(url);
+    return { html };
+  }
 }

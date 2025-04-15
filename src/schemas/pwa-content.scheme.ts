@@ -5,6 +5,13 @@ import { Pixel, PixelSchema } from './pixel.scheme';
 import { Review, ReviewSchema } from './review.scheme';
 import { Media, MediaSchema } from './media.scheme';
 
+export enum TrafficDirection {
+  INSTALL_PAGE = 'INSTALL_PAGE',
+  WHITE_PAGE = 'WHITE_PAGE',
+  OFFER_URL = 'OFFER_URL',
+  CUSTOM_URL = 'CUSTOM_URL',
+}
+
 @Schema({ timestamps: true })
 export class PWAContent extends Document {
   @Prop({ required: true })
@@ -118,11 +125,11 @@ export class PWAContent extends Document {
 
   @Prop({
     _id: false,
+    required: false,
     type: {
       auto: { type: Boolean, required: false },
       dark: { type: Boolean, required: false },
     },
-    required: false,
   })
   theme?: {
     auto?: boolean;
@@ -131,11 +138,11 @@ export class PWAContent extends Document {
 
   @Prop({
     _id: false,
+    required: false,
     type: {
       background: { type: String, required: false },
       loader: { type: String, required: false },
     },
-    required: false,
   })
   offerPreloader?: {
     background?: string;
@@ -144,6 +151,7 @@ export class PWAContent extends Document {
 
   @Prop({
     _id: false,
+    required: false,
     type: {
       showAppHeader: { type: Boolean, required: false },
       timeout: { type: Number, required: false },
@@ -151,7 +159,6 @@ export class PWAContent extends Document {
       content: { type: Map, of: String, required: false },
       buttonText: { type: Map, of: String, required: false },
     },
-    required: false,
   })
   customModal?: {
     showAppHeader?: boolean;
@@ -172,6 +179,85 @@ export class PWAContent extends Document {
 
   @Prop({ required: false })
   hasPushes?: boolean;
+
+  @Prop({
+    _id: false,
+    required: false,
+    type: {
+      offer: {
+        all: { type: Boolean, required: true },
+        offersMap: {
+          type: Map,
+          of: String,
+          required: true,
+        },
+        irrelevantTrafficUrl: { type: String, required: false },
+      },
+      devices: {
+        androidOnly: { type: Boolean, required: true },
+        android: {
+          direction: {
+            type: String,
+            enum: Object.values(TrafficDirection),
+            required: false,
+          },
+          url: { type: String, required: false },
+        },
+        desktop: {
+          direction: {
+            type: String,
+            enum: Object.values(TrafficDirection),
+            required: false,
+          },
+          url: { type: String, required: false },
+        },
+        ios: {
+          direction: {
+            type: String,
+            enum: Object.values(TrafficDirection),
+            required: false,
+          },
+          url: { type: String, required: false },
+        },
+        telegram: {
+          direction: {
+            type: String,
+            enum: Object.values(TrafficDirection),
+            required: false,
+          },
+          url: { type: String, required: false },
+        },
+      },
+      cloaca: {
+        enabled: { type: Boolean, required: true },
+        direction: {
+          type: String,
+          enum: Object.values(TrafficDirection),
+          required: false,
+        },
+        url: { type: String, required: false },
+      },
+    },
+  })
+  trackerSettings?: {
+    offer: {
+      all: boolean;
+      offersMap: Record<string, string>;
+      irrelevantTrafficUrl?: string;
+    };
+    devices: {
+      androidOnly: boolean;
+      android?: { direction: TrafficDirection; url?: string };
+      desktop?: { direction: TrafficDirection; url?: string };
+      ios?: { direction: TrafficDirection; url?: string };
+      telegram?: { direction: TrafficDirection; url?: string };
+    };
+    cloaca: {
+      enabled: boolean;
+      direction?: TrafficDirection;
+      url?: string;
+    };
+  };
 }
 
 export const PWAContentSchema = SchemaFactory.createForClass(PWAContent);

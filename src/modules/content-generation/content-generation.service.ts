@@ -1,6 +1,8 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OpenAI } from 'openai';
+import axios from 'axios';
+import * as cheerio from 'cheerio';
 
 @Injectable()
 export class ContentGenerationService {
@@ -26,7 +28,8 @@ export class ContentGenerationService {
         messages: [
           {
             role: 'user',
-            content: 'You are user of application related with gambling',
+            content:
+              'You are a user of an application related to gambling. Your task is to produce human-like text.',
           },
           {
             role: 'user',
@@ -236,5 +239,77 @@ export class ContentGenerationService {
         ],
       ),
     };
+  }
+
+  async generateWhitePageFromUrl(pageUrl: string): Promise<string> {
+    try {
+      const response = await axios.get(pageUrl, {
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
+            '(KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+        },
+      });
+      const originalHtml: string = response.data;
+      const $ = cheerio.load(originalHtml);
+      const filteredHtml = $('a, img, span, h2').toString();
+      const prompt = `
+        Ты профессиональный веб-дизайнер. На основе предоставленного HTML кода оригинальной страницы приложения, сгенерируй уникальную карточку приложения. Результат должен быть:
+        - Полным и валидным HTML документом (с <!DOCTYPE html>, <html>, <head>, <body> и <footer>).
+        - Минифицированным, без лишних переносов строк, пробелов или комментариев.
+        - Содержать только необходимые элементы: информацию об иконке, названии, разработчике, рейтинге, кратком описании, скриншотах и рабочем футере.
+        - Все относительные URL изображений преобразуй в абсолютные, используя базовый URL "${pageUrl}".
+        - Обязательно добавь не менее 7 скриншотов (если они доступны) с оригинальными URL.
+        - В футере вставь работающие ссылки: "Terms of Service" и "Privacy Policy".
+        Ниже приведён отфильтрованный HTML код исходной страницы:
+        ${filteredHtml}
+      `;
+
+      const completion = await this.openai.chat.completions.create({
+        model: 'gpt-4.5-preview-2025-02-27',
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You are a professional web designer. Generate a full, minified, valid HTML page based solely on the provided HTML code of a web page.',
+          },
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        max_tokens: 1500,
+        temperature: 1.2,
+      });
+
+      let generatedHtml = completion.choices[0]?.message?.content?.trim();
+
+      if (!generatedHtml) {
+        throw new BadRequestException('Failed to generate white page HTML.');
+      }
+
+      generatedHtml = generatedHtml.replace(/^```html\s*|```$/g, '').trim();
+
+      if (!/^<!DOCTYPE html>/i.test(generatedHtml)) {
+        throw new BadRequestException(
+          'Generated HTML does not appear to be valid.',
+        );
+      }
+
+      const $$ = cheerio.load(generatedHtml);
+
+      if (!$$('html').length || !$$('head').length || !$$('body').length) {
+        throw new BadRequestException(
+          'Generated HTML is missing essential elements.',
+        );
+      }
+
+      return generatedHtml;
+    } catch (error) {
+      throw new BadRequestException(
+        'Error generating white page from the provided URL. Please try again later.',
+        error,
+      );
+    }
   }
 }

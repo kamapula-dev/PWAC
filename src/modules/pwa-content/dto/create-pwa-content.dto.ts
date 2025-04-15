@@ -15,6 +15,86 @@ import { Type } from 'class-transformer';
 import * as deepl from 'deepl-node';
 import { FacebookEvent, PwaEvent } from '../../../schemas/pixel-event.scheme';
 
+export enum TrafficDirection {
+  INSTALL_PAGE = 'INSTALL_PAGE',
+  WHITE_PAGE = 'WHITE_PAGE',
+  OFFER_URL = 'OFFER_URL',
+  CUSTOM_URL = 'CUSTOM_URL',
+}
+
+export class TrackerSettingsOfferDto {
+  @IsBoolean()
+  all: boolean;
+
+  @IsObject()
+  offersMap: Record<string, string>;
+
+  @IsOptional()
+  @IsString()
+  irrelevantTrafficUrl?: string;
+}
+
+export class TrackerSettingsDeviceDirectionDto {
+  @IsEnum(TrafficDirection)
+  direction: TrafficDirection;
+
+  @IsOptional()
+  @IsString()
+  url?: string;
+}
+
+export class TrackerSettingsDevicesDto {
+  @IsBoolean()
+  androidOnly: boolean;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => TrackerSettingsDeviceDirectionDto)
+  android?: TrackerSettingsDeviceDirectionDto;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => TrackerSettingsDeviceDirectionDto)
+  desktop?: TrackerSettingsDeviceDirectionDto;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => TrackerSettingsDeviceDirectionDto)
+  ios?: TrackerSettingsDeviceDirectionDto;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => TrackerSettingsDeviceDirectionDto)
+  telegram?: TrackerSettingsDeviceDirectionDto;
+}
+
+export class TrackerSettingsCloacaDto {
+  @IsBoolean()
+  enabled: boolean;
+
+  @IsOptional()
+  @IsEnum(TrafficDirection)
+  direction?: TrafficDirection;
+
+  @IsOptional()
+  @IsString()
+  url?: string;
+}
+
+export class TrackerSettingsDto {
+  @ValidateNested()
+  @Type(() => TrackerSettingsOfferDto)
+  offer: TrackerSettingsOfferDto;
+
+  @ValidateNested()
+  @Type(() => TrackerSettingsDevicesDto)
+  devices: TrackerSettingsDevicesDto;
+
+  @ValidateNested()
+  @Type(() => TrackerSettingsCloacaDto)
+  cloaca: TrackerSettingsCloacaDto;
+}
+
 export class PixelEventDto {
   @IsEnum(PwaEvent, { message: 'Invalid triggerEvent value' })
   triggerEvent: PwaEvent;
@@ -84,6 +164,7 @@ export enum MediaType {
   File = 'file',
   Video = 'video',
 }
+
 export class MediaDto {
   @IsOptional()
   @IsString()
@@ -95,6 +176,7 @@ export class MediaDto {
   @IsEnum(MediaType, { message: 'Type must be either image, file, or video' })
   type: MediaType;
 }
+
 export class ReviewDto {
   @IsString()
   reviewAuthorName: string;
@@ -266,4 +348,9 @@ export class CreatePWAContentDto {
   @IsNumber({}, { each: true, message: 'Each value must be a number' })
   @Max(5, { each: true, message: 'Each value must be at most 5' })
   sliders: number[];
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => TrackerSettingsDto)
+  trackerSettings?: TrackerSettingsDto;
 }
