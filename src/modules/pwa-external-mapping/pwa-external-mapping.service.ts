@@ -24,6 +24,8 @@ export class PWAExternalMappingService {
     phone?: string,
     email?: string,
     offerUrl?: string,
+    fbp?: string,
+    fbc?: string,
   ) {
     let mapping = await this.mappingModel.findOne({ externalId }).exec();
 
@@ -45,6 +47,8 @@ export class PWAExternalMappingService {
       phone,
       email,
       offerUrl,
+      fbp,
+      fbc,
     });
 
     return mapping.save();
