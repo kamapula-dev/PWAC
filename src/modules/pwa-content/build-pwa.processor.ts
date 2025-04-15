@@ -366,7 +366,7 @@ export class BuildPWAProcessor {
 
   private generatePixelScriptWithArray(pixelArrayString: string): string {
     return `
-      <script>
+ <script>
         !function(f,b,e,v,n,t,s){
           if(f.fbq)return;n=f.fbq=function(){n.callMethod?
           n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -379,9 +379,9 @@ export class BuildPWAProcessor {
           ${pixelArrayString}.forEach((item) => {
             if(item.pixelId) {
               fbq('init', item.pixelId);
-              fbq('track', 'PageView');
             }
           });
+          fbq('track', 'PageView');
       </script>`;
   }
 
