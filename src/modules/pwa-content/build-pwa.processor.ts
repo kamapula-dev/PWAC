@@ -183,8 +183,7 @@ export class BuildPWAProcessor {
             offer: {
               all: true,
               offersMap: {
-                offer1: 'https://example.com/offer1',
-                special_offer: 'https://example.com/special',
+                all: 'https://example.com/offer1',
               },
               irrelevantTrafficUrl: 'https://example.com/irrelevant',
             },
