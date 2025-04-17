@@ -1,13 +1,14 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-export interface CreateReadyDomainDto {
+export interface ProcessDomainDto {
+  cloudflare: {
+    email: string;
+    gApiKey: string;
+  };
   domain: string;
-  email: string;
-  gApiKey: string;
-  zoneId: string;
+  userEmail: string;
 }
-
 @Schema({ timestamps: true })
 export class ReadyDomain extends Document {
   @Prop({ required: true })

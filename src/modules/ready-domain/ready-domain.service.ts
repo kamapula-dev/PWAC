@@ -2,17 +2,26 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import {
-  CreateReadyDomainDto,
+  ProcessDomainDto,
   ReadyDomain,
 } from '../../schemas/ready-domain.scheme';
 import { DomainMappingService } from '../domain-mapping/domain-mapping.service';
 import { UserService } from '../user/user.service';
+import { User } from '../../schemas/user.schema';
+import { PWAContent } from '../../schemas/pwa-content.scheme';
+import { DomainMapping } from '../../schemas/domain-mapping.scheme';
 
 @Injectable()
 export class ReadyDomainService {
   constructor(
+    @InjectModel(User.name)
+    @InjectModel(PWAContent.name)
+    @InjectModel(DomainMapping.name)
     @InjectModel(ReadyDomain.name)
-    private readonly readyDomainModel: Model<ReadyDomain>,
+    private userModel: Model<User>,
+    private pwaContentModel: Model<PWAContent>,
+    private domainMappingModel: Model<DomainMapping>,
+    private readyDomainModel: Model<ReadyDomain>,
     private readonly domainMappingService: DomainMappingService,
     private readonly userService: UserService,
   ) {}
@@ -55,11 +64,6 @@ export class ReadyDomainService {
     return domain.save();
   }
 
-  async createReadyDomain(createDomainDto: CreateReadyDomainDto) {
-    const newDomain = new this.readyDomainModel(createDomainDto);
-    return newDomain.save();
-  }
-
   async detachFromPwa(userId: string, pwaId: string, id: string) {
     const domain = await this.readyDomainModel.findById(id);
 
@@ -76,5 +80,61 @@ export class ReadyDomainService {
     domain.pwaId = null;
 
     return domain.save();
+  }
+
+  async processDomain(
+    cloudflare: ProcessDomainDto['cloudflare'],
+    domain: string,
+    userEmail: string,
+  ) {
+    const userWithPwa = await this.userModel
+      .findOne({ 'pwas.domainName': domain })
+      .exec();
+    if (!userWithPwa) {
+      throw new NotFoundException('User with this domain not found');
+    }
+
+    const pwaEntry = userWithPwa.pwas.find((p) => p.domainName === domain);
+    if (!pwaEntry) {
+      throw new NotFoundException('PWA entry not found');
+    }
+
+    await this.userModel
+      .updateOne(
+        { _id: userWithPwa._id },
+        { $pull: { pwas: { domainName: domain } } },
+      )
+      .exec();
+
+    if (pwaEntry.pwaContentId) {
+      await this.pwaContentModel
+        .findByIdAndDelete(pwaEntry.pwaContentId)
+        .exec();
+    }
+
+    const domainMapping = await this.domainMappingModel
+      .findOne({ domainName: domain })
+      .exec();
+    if (!domainMapping) {
+      throw new NotFoundException('Domain mapping not found');
+    }
+    const zoneId = domainMapping.zoneId;
+    await this.domainMappingModel.deleteOne({ _id: domainMapping._id }).exec();
+
+    const user = await this.userModel.findOne({ email: userEmail }).exec();
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const readyDomain = new this.readyDomainModel({
+      domain,
+      email: cloudflare.email,
+      gApiKey: cloudflare.gApiKey,
+      zoneId,
+      userId: user._id,
+    });
+    await readyDomain.save();
+
+    return readyDomain;
   }
 }
