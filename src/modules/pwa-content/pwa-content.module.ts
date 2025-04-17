@@ -26,13 +26,13 @@ import { PushModule } from '../push/push.module';
     MediaModule,
     DomainManagementModule,
     DomainMappingModule,
-    ReadyDomainModule,
+    forwardRef(() => ReadyDomainModule),
     PWAEventLogModule,
     PWAExternalMappingModule,
     forwardRef(() => PushModule),
   ],
   controllers: [PWAContentController],
   providers: [PWAContentService, BuildPWAProcessor],
-  exports: [PWAContentService],
+  exports: [MongooseModule, PWAContentService],
 })
 export class PWAContentModule {}

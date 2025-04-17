@@ -15,12 +15,12 @@ import { DomainMapping } from '../../schemas/domain-mapping.scheme';
 export class ReadyDomainService {
   constructor(
     @InjectModel(User.name)
-    @InjectModel(PWAContent.name)
-    @InjectModel(DomainMapping.name)
-    @InjectModel(ReadyDomain.name)
     private userModel: Model<User>,
+    @InjectModel(PWAContent.name)
     private pwaContentModel: Model<PWAContent>,
+    @InjectModel(ReadyDomain.name)
     private domainMappingModel: Model<DomainMapping>,
+    @InjectModel(DomainMapping.name)
     private readyDomainModel: Model<ReadyDomain>,
     private readonly domainMappingService: DomainMappingService,
     private readonly userService: UserService,
