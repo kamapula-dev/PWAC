@@ -198,6 +198,37 @@ export class PWAContentService {
       });
     }
 
+    const hasWaitingNameServers = result.some(
+      ({ status }) => status === PwaStatus.WAITING_NS,
+    );
+
+    if (hasWaitingNameServers) {
+      return {
+        pwas: await Promise.all(
+          result.map(async (item) => {
+            if (item.status !== PwaStatus.WAITING_NS) {
+              return item;
+            }
+
+            try {
+              const actualStatus =
+                await this.domainManagementService.checkDomainStatus(
+                  item.pwaContent._id.toString(),
+                  userId,
+                );
+
+              return actualStatus === 'active'
+                ? { ...item, status: PwaStatus.ACTIVE }
+                : item;
+            } catch {
+              return item;
+            }
+          }),
+        ),
+        total,
+      };
+    }
+
     return { pwas: result, total };
   }
 
