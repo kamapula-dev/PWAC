@@ -6,6 +6,13 @@ import { Provider } from 'react-redux';
 import './index.css';
 import LocaleProvider from './LocaleProvider.tsx';
 import { UAParser } from 'ua-parser-js';
+import { registerSW } from 'virtual:pwa-register';
+
+registerSW({
+  onNeedRefresh() {
+    window.location.reload();
+  },
+});
 
 const parser = new UAParser();
 const browser = parser.getBrowser();
