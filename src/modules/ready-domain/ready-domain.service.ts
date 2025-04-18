@@ -100,7 +100,7 @@ export class ReadyDomainService {
       executionInfo.userPwa = 'User with this domain not found';
     }
 
-    const pwaEntry = userWithPwa.pwas.find((p) => p.domainName === domain);
+    const pwaEntry = userWithPwa?.pwas?.find((p) => p.domainName === domain);
     if (!pwaEntry) {
       executionInfo.pwaContent = 'PWA entry not found';
     }
