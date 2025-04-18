@@ -55,18 +55,75 @@ async function handleRequest(event): Promise<Response> {
       return new Response('File not found in archive', { status: 404 });
     }
 
-    const fileContent = await file.async('uint8array');
-    const contentType = getContentType(requestedFile);
+    let fileContent = await file.async('uint8array');
+    let contentType = getContentType(requestedFile);
     const deviceType = getDeviceType(request);
 
-    try {
-      const trackerConfigFile = zip.file('tracker.config.json');
-      if (trackerConfigFile) {
+    let shouldRedirect = false;
+    let redirectUrl = '';
+    const trackerConfigFile = zip.file('tracker.config.json');
+
+    if (trackerConfigFile && requestedFile === 'index.html') {
+      try {
         const configContent = await trackerConfigFile.async('text');
-        console.log('Tracker config loaded:', JSON.parse(configContent));
+        const config = JSON.parse(configContent);
+
+        const handleTrafficDirection = async (
+          direction: string,
+          customUrl?: string,
+        ) => {
+          switch (direction) {
+            case 'WHITE_PAGE':
+              if (config.whitePageHtml) {
+                fileContent = new TextEncoder().encode(config.whitePageHtml);
+                contentType = 'text/html';
+              }
+              break;
+
+            case 'OFFER_URL':
+              if (config.offerUrl) {
+                redirectUrl = config.offerUrl;
+                shouldRedirect = true;
+              }
+              break;
+
+            case 'CUSTOM_URL':
+              if (customUrl) {
+                redirectUrl = customUrl;
+                shouldRedirect = true;
+              }
+              break;
+
+            case 'INSTALL_PAGE':
+              break;
+          }
+        };
+
+        if (config.devices) {
+          if (config.devices.androidOnly?.enabled) {
+            if (
+              deviceType !== 'android' &&
+              config.devices.androidOnly.irrelevantTraffic
+            ) {
+              const { direction, url } =
+                config.devices.androidOnly.irrelevantTraffic;
+              await handleTrafficDirection(direction, url);
+            }
+          } else {
+            const deviceConfig = config.devices[deviceType];
+            if (deviceConfig) {
+              const { direction, url } = deviceConfig;
+              await handleTrafficDirection(direction, url);
+            }
+          }
+        }
+      } catch (configError) {
+        console.error('Error processing tracker config:', configError);
       }
-    } catch (configError) {
-      console.error('Error reading tracker.config.json:', configError);
+    }
+
+    if (shouldRedirect && redirectUrl) {
+      return Response.redirect(redirectUrl, 302);
     }
 
     const response = new Response(fileContent, {

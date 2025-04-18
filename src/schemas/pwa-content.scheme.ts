@@ -185,68 +185,134 @@ export class PWAContent extends Document {
     required: false,
     type: {
       offer: {
-        all: { type: Boolean, required: true },
-        offersMap: {
-          type: Map,
-          of: String,
-          required: true,
+        type: {
+          multiGeo: {
+            type: {
+              enabled: { type: Boolean, required: true },
+              irrelevantTraffic: {
+                type: {
+                  direction: {
+                    type: String,
+                    enum: Object.values(TrafficDirection),
+                    required: false,
+                  },
+                  url: { type: String, required: false },
+                },
+                required: false,
+              },
+            },
+            required: true,
+          },
+          offersMap: {
+            type: Map,
+            of: String,
+            required: true,
+          },
         },
-        irrelevantTrafficUrl: { type: String, required: false },
+        required: true,
       },
       devices: {
-        androidOnly: { type: Boolean, required: true },
-        android: {
-          direction: {
-            type: String,
-            enum: Object.values(TrafficDirection),
+        type: {
+          androidOnly: {
+            type: {
+              enabled: { type: Boolean, required: true },
+              irrelevantTraffic: {
+                type: {
+                  direction: {
+                    type: String,
+                    enum: Object.values(TrafficDirection),
+                    required: false,
+                  },
+                  url: { type: String, required: false },
+                },
+                required: false,
+              },
+            },
+            required: true,
+          },
+          android: {
+            type: {
+              direction: {
+                type: String,
+                enum: Object.values(TrafficDirection),
+                required: false,
+              },
+              url: { type: String, required: false },
+            },
             required: false,
           },
-          url: { type: String, required: false },
-        },
-        desktop: {
-          direction: {
-            type: String,
-            enum: Object.values(TrafficDirection),
+          desktop: {
+            type: {
+              direction: {
+                type: String,
+                enum: Object.values(TrafficDirection),
+                required: false,
+              },
+              url: { type: String, required: false },
+            },
             required: false,
           },
-          url: { type: String, required: false },
-        },
-        ios: {
-          direction: {
-            type: String,
-            enum: Object.values(TrafficDirection),
+          ios: {
+            type: {
+              direction: {
+                type: String,
+                enum: Object.values(TrafficDirection),
+                required: false,
+              },
+              url: { type: String, required: false },
+            },
             required: false,
           },
-          url: { type: String, required: false },
-        },
-        telegram: {
-          direction: {
-            type: String,
-            enum: Object.values(TrafficDirection),
+          telegram: {
+            type: {
+              direction: {
+                type: String,
+                enum: Object.values(TrafficDirection),
+                required: false,
+              },
+              url: { type: String, required: false },
+            },
             required: false,
           },
-          url: { type: String, required: false },
         },
+        required: true,
       },
       cloaca: {
-        enabled: { type: Boolean, required: true },
-        direction: {
-          type: String,
-          enum: Object.values(TrafficDirection),
-          required: false,
+        type: {
+          enabled: { type: Boolean, required: true },
+          irrelevantTraffic: {
+            type: {
+              direction: {
+                type: String,
+                enum: Object.values(TrafficDirection),
+                required: false,
+              },
+              url: { type: String, required: false },
+            },
+            required: false,
+          },
         },
-        url: { type: String, required: false },
+        required: true,
+      },
+      whitePageHtml: {
+        type: String,
+        required: false,
       },
     },
   })
   trackerSettings?: {
     offer: {
-      all: boolean;
+      multiGeo: {
+        enabled: boolean;
+        irrelevantTraffic?: { direction: TrafficDirection; url?: string };
+      };
       offersMap: Record<string, string>;
-      irrelevantTrafficUrl?: string;
     };
     devices: {
-      androidOnly: boolean;
+      androidOnly: {
+        enabled: boolean;
+        irrelevantTraffic?: { direction: TrafficDirection; url?: string };
+      };
       android?: { direction: TrafficDirection; url?: string };
       desktop?: { direction: TrafficDirection; url?: string };
       ios?: { direction: TrafficDirection; url?: string };
@@ -254,9 +320,9 @@ export class PWAContent extends Document {
     };
     cloaca: {
       enabled: boolean;
-      direction?: TrafficDirection;
-      url?: string;
+      irrelevantTraffic?: { direction: TrafficDirection; url?: string };
     };
+    whitePageHtml?: string;
   };
 }
 
