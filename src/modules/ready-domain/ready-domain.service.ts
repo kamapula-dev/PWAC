@@ -19,9 +19,9 @@ export class ReadyDomainService {
     @InjectModel(PWAContent.name)
     private pwaContentModel: Model<PWAContent>,
     @InjectModel(ReadyDomain.name)
-    private domainMappingModel: Model<DomainMapping>,
-    @InjectModel(DomainMapping.name)
     private readyDomainModel: Model<ReadyDomain>,
+    @InjectModel(DomainMapping.name)
+    private domainMappingModel: Model<DomainMapping>,
     private readonly domainMappingService: DomainMappingService,
     private readonly userService: UserService,
   ) {}
@@ -87,16 +87,22 @@ export class ReadyDomainService {
     domain: string,
     userEmail: string,
   ) {
+    const executionInfo = {
+      userPwa: 'Deleted',
+      pwaContent: 'Deleted',
+      domainMapping: 'Deleted',
+    };
     const userWithPwa = await this.userModel
       .findOne({ 'pwas.domainName': domain })
       .exec();
+
     if (!userWithPwa) {
-      throw new NotFoundException('User with this domain not found');
+      executionInfo.userPwa = 'User with this domain not found';
     }
 
     const pwaEntry = userWithPwa.pwas.find((p) => p.domainName === domain);
     if (!pwaEntry) {
-      throw new NotFoundException('PWA entry not found');
+      executionInfo.pwaContent = 'PWA entry not found';
     }
 
     await this.userModel
@@ -112,14 +118,13 @@ export class ReadyDomainService {
         .exec();
     }
 
-    const domainMapping = await this.domainMappingModel
-      .findOne({ domainName: domain })
-      .exec();
+    const domainMapping =
+      await this.domainMappingService.getMappingByDomain(domain);
     if (!domainMapping) {
-      throw new NotFoundException('Domain mapping not found');
+      executionInfo.domainMapping = 'Domain mapping not found';
     }
     const zoneId = domainMapping.zoneId;
-    await this.domainMappingModel.deleteOne({ _id: domainMapping._id }).exec();
+    await this.domainMappingModel.deleteOne({ domainName: domain }).exec();
 
     const user = await this.userModel.findOne({ email: userEmail }).exec();
     if (!user) {
@@ -135,6 +140,6 @@ export class ReadyDomainService {
     });
     await readyDomain.save();
 
-    return readyDomain;
+    return { readyDomain, executionInfo };
   }
 }
