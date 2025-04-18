@@ -114,7 +114,7 @@ export class ReadyDomainService {
         .exec();
     }
 
-    if (pwaEntry.pwaContentId) {
+    if (pwaEntry?.pwaContentId) {
       await this.pwaContentModel
         .findByIdAndDelete(pwaEntry.pwaContentId)
         .exec();
