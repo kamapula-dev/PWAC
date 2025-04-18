@@ -52,7 +52,11 @@ export class PWAContentService {
     if (!user) return [];
 
     const userPwaIds = user.pwas.map((pwa) => pwa.pwaContentId);
-    const jobs = [];
+    const jobs = await this.buildQueue.getJobs([
+      'waiting',
+      'active',
+      'delayed',
+    ]);
     const jobMap = new Map<string, Job>();
 
     for (const job of jobs) {
