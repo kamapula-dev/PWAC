@@ -8,11 +8,7 @@ import LocaleProvider from './LocaleProvider.tsx';
 import { UAParser } from 'ua-parser-js';
 import { registerSW } from 'virtual:pwa-register';
 
-registerSW({
-  onNeedRefresh() {
-    window.location.reload();
-  },
-});
+registerSW({ immediate: true });
 
 const parser = new UAParser();
 const browser = parser.getBrowser();
