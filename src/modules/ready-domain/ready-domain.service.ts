@@ -105,12 +105,14 @@ export class ReadyDomainService {
       executionInfo.pwaContent = 'PWA entry not found';
     }
 
-    await this.userModel
-      .updateOne(
-        { _id: userWithPwa._id },
-        { $pull: { pwas: { domainName: domain } } },
-      )
-      .exec();
+    if (userWithPwa) {
+      await this.userModel
+        .updateOne(
+          { _id: userWithPwa._id },
+          { $pull: { pwas: { domainName: domain } } },
+        )
+        .exec();
+    }
 
     if (pwaEntry.pwaContentId) {
       await this.pwaContentModel
