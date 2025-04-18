@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { ReadyDomainService } from './ready-domain.service';
 import { AuthGuard } from '@nestjs/passport';
-import { CreateReadyDomainDto } from '../../schemas/ready-domain.scheme';
+import { ProcessDomainDto } from '../../schemas/ready-domain.scheme';
 
 @Controller('ready-domain')
 export class ReadyDomainController {
@@ -21,11 +21,12 @@ export class ReadyDomainController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Post()
-  async createReadyDomain(
-    @Body()
-    createDomainDto: CreateReadyDomainDto,
-  ) {
-    return this.readyDomainService.createReadyDomain(createDomainDto);
+  @Post('process')
+  async processDomain(@Body() processDomainDto: ProcessDomainDto) {
+    return this.readyDomainService.processDomain(
+      processDomainDto.cloudflare,
+      processDomainDto.domain,
+      processDomainDto.userEmail,
+    );
   }
 }

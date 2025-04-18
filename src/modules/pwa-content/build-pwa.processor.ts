@@ -16,6 +16,7 @@ import { DomainManagementService } from '../domain-managemant/domain-management.
 import { ReadyDomainService } from '../ready-domain/ready-domain.service';
 import { PushService } from '../push/push.service';
 import { ConfigService } from '@nestjs/config';
+import { TrafficDirection } from './dto/create-pwa-content.dto';
 
 const execAsync = promisify(exec);
 
@@ -51,6 +52,7 @@ export class BuildPWAProcessor {
       theme,
       hasLoadingScreen,
       offerPreloader,
+      trackerSettings,
     } = job.data;
 
     let tempBuildFolder: string;
@@ -175,6 +177,57 @@ export class BuildPWAProcessor {
           });
         `;
         await fse.writeFile(serviceWorkerPath, serviceWorkerContent);
+
+        const testTrackerSettings = {
+          trackerSettings: {
+            offer: {
+              all: true,
+              offersMap: {
+                all: 'https://example.com/offer1',
+              },
+              irrelevantTrafficUrl: 'https://example.com/irrelevant',
+            },
+            devices: {
+              androidOnly: false,
+              android: {
+                direction: 'INSTALL_PAGE',
+              },
+              desktop: {
+                direction: 'WHITE_PAGE',
+              },
+              ios: {
+                direction: 'OFFER_URL',
+              },
+              telegram: {
+                direction: 'CUSTOM_URL',
+                url: 'https://vk.com',
+              },
+            },
+            cloaca: {
+              enabled: true,
+              direction: 'CUSTOM_URL',
+              url: 'https://example.com/cloaked',
+            },
+          },
+        };
+
+        const trackingConfigPath = path.join(
+          publicFolderPath,
+          'tracker.config.json',
+        );
+        await fse.writeJson(trackingConfigPath, testTrackerSettings, {
+          spaces: 2,
+        });
+
+        // if (trackerSettings) {
+        //   const trackingConfigPath = path.join(
+        //     publicFolderPath,
+        //     'tracker.config.json',
+        //   );
+        //   await fse.writeJson(trackingConfigPath, trackerSettings, {
+        //     spaces: 2,
+        //   });
+        // }
       } catch (error) {
         this.logger.error('Error creating public folder structure:', error);
         throw new Error('Failed to create public folder structure');
@@ -366,7 +419,7 @@ export class BuildPWAProcessor {
 
   private generatePixelScriptWithArray(pixelArrayString: string): string {
     return `
- <script>
+      <script>
         !function(f,b,e,v,n,t,s){
           if(f.fbq)return;n=f.fbq=function(){n.callMethod?
           n.callMethod.apply(n,arguments):n.queue.push(arguments)};

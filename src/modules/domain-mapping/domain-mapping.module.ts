@@ -15,6 +15,6 @@ import {
   ],
   providers: [DomainMappingService],
   controllers: [DomainMappingController],
-  exports: [DomainMappingService],
+  exports: [MongooseModule, DomainMappingService],
 })
 export class DomainMappingModule {}

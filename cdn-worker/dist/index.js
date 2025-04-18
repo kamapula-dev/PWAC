@@ -2774,10 +2774,21 @@
       }
       const fileContent = await file.async("uint8array");
       const contentType = getContentType(requestedFile);
+      const deviceType = getDeviceType(request);
+      try {
+        const trackerConfigFile = zip.file("tracker.config.json");
+        if (trackerConfigFile) {
+          const configContent = await trackerConfigFile.async("text");
+          console.log("Tracker config loaded:", JSON.parse(configContent));
+        }
+      } catch (configError) {
+        console.error("Error reading tracker.config.json:", configError);
+      }
       const response = new Response(fileContent, {
         headers: {
           "Content-Type": contentType,
-          "Cache-Control": `public, max-age=${CACHE_TTL_SECONDS}`
+          "Cache-Control": `public, max-age=${CACHE_TTL_SECONDS}`,
+          "X-Device-Type": deviceType
         }
       });
       event.waitUntil(cache.put(cacheKey, response.clone()));
@@ -2808,6 +2819,21 @@
       default:
         return "application/octet-stream";
     }
+  }
+  function getDeviceType(request) {
+    const ua = request.headers.get("User-Agent") || "";
+    const userAgent = ua.toLowerCase();
+    if (/telegram|telegrambot/i.test(ua)) {
+      return "telegram";
+    }
+    if (/\bandroid\b/.test(userAgent)) {
+      return "android";
+    }
+    const isIOS = /(iphone|ipad|ipod)/.test(userAgent) || /macintosh/.test(userAgent) && /mobile/.test(userAgent) || /safari/.test(userAgent) && !/chrome|android/.test(userAgent);
+    if (isIOS) {
+      return "ios";
+    }
+    return "desktop";
   }
 })();
 /*! Bundled license information:

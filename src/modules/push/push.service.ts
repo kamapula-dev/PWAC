@@ -218,15 +218,11 @@ export class PushService {
     for (const recipient of recipients) {
       const { pwas, filters } = recipient;
 
-      console.log(JSON.stringify(pwas, null, 2));
-
       const mappings = await this.mappingModel.find({
         pwaContentId: { $in: pwas.map((pwa) => pwa.id) },
         pushToken: { $exists: true, $ne: '' },
         ...(externalId && { externalId }),
       });
-
-      console.log(JSON.stringify(mappings, null, 2));
 
       let shouldSend: boolean[] = [];
 
@@ -251,13 +247,11 @@ export class PushService {
         shouldSend.push(true);
       }
 
-      console.log(shouldSend, 'shouldSend');
-
       if (shouldSend.every((should) => should) || !shouldSend.length) {
         const tokens = mappings
           .map((m) => ({
             token: m.pushToken,
-            url: m.offerUrl,
+            url: m.domain,
             language: m.language,
           }))
           .filter(({ token }) => !!token);
@@ -408,7 +402,7 @@ export class PushService {
             badge: push.content.badge,
             icon: push.content.icon,
             picture: push.content.picture,
-            url: push.content.url || pwaMapping.offerUrl,
+            url: push.content.url || pwaMapping.domain,
           },
         ],
       );
