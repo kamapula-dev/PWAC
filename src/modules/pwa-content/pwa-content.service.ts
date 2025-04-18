@@ -5,10 +5,11 @@ import { CreatePWAContentDto } from './dto/create-pwa-content.dto';
 import { UpdatePWAContentDto } from './dto/update-pwa-content.dto';
 import { PWAContent } from '../../schemas/pwa-content.scheme';
 import { Push } from '../../schemas/push.schema';
-import { User } from '../../schemas/user.schema';
+import { PwaStatus, User } from '../../schemas/user.schema';
 import { InjectQueue } from '@nestjs/bull';
 import { Job, Queue } from 'bull';
 import { USER_PWA } from './pwa-content.controller';
+import { DomainManagementService } from '../domain-managemant/domain-management.service';
 
 @Injectable()
 export class PWAContentService {
@@ -18,6 +19,8 @@ export class PWAContentService {
 
     @InjectModel(Push.name)
     private readonly pushModel: Model<Push>,
+
+    private readonly domainManagementService: DomainManagementService,
 
     @InjectModel('User') private readonly userModel: Model<User>,
     @InjectQueue('buildPWA') private readonly buildQueue: Queue,
@@ -49,11 +52,7 @@ export class PWAContentService {
     if (!user) return [];
 
     const userPwaIds = user.pwas.map((pwa) => pwa.pwaContentId);
-    const jobs = await this.buildQueue.getJobs([
-      'waiting',
-      'active',
-      'delayed',
-    ]);
+    const jobs = [];
     const jobMap = new Map<string, Job>();
 
     for (const job of jobs) {
@@ -83,7 +82,7 @@ export class PWAContentService {
       .limit(limit)
       .lean<PWAContent[]>();
 
-    const result = [];
+    const result: USER_PWA[] = [];
 
     for (const pwaContent of pwaContents) {
       const pwaContentId = pwaContent._id.toString();
@@ -96,6 +95,34 @@ export class PWAContentService {
         status: userPwa?.status,
         loading: !!job,
       });
+    }
+
+    const hasWaitingNameServers = result.some(
+      ({ status }) => status === PwaStatus.WAITING_NS,
+    );
+
+    if (hasWaitingNameServers) {
+      return await Promise.all(
+        result.map(async (item) => {
+          if (item.status !== PwaStatus.WAITING_NS) {
+            return item;
+          }
+
+          try {
+            const actualStatus =
+              await this.domainManagementService.checkDomainStatus(
+                item.pwaContent._id.toString(),
+                userId,
+              );
+
+            return actualStatus === 'active'
+              ? { ...item, status: PwaStatus.ACTIVE }
+              : item;
+          } catch {
+            return item;
+          }
+        }),
+      );
     }
 
     return result;
