@@ -3,7 +3,8 @@
   "short_name": "Plinko casino",
   "start_url": "/",
   "scope": "/",
-  "display": "standalone",
+  "display": "fullscreen",
+  "orientation": "portrait",
   "theme_color": "#ffffff",
   "icons": [
     {

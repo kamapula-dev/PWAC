@@ -223,9 +223,9 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const isPWAActivated = window.matchMedia(
-      '(display-mode: standalone)',
-    ).matches;
+    const isPWAActivated = ['fullscreen', 'standalone', 'minimal-ui'].some(
+      (mode) => window.matchMedia(`(display-mode: ${mode})`).matches,
+    );
     const preloader = document.getElementById('preloader');
 
     if (isPWAActivated && preloader) {
