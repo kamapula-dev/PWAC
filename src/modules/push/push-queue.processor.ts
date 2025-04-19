@@ -9,7 +9,7 @@ export class PushQueueProcessor {
 
   constructor(private readonly pushService: PushService) {}
 
-  @Process()
+  @Process({ concurrency: 10 })
   async handlePushJob(job: Job) {
     const { pushId, externalId } = job.data;
     this.logger.log(`Processing pushId=${pushId}`);

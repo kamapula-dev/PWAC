@@ -36,7 +36,7 @@ export class BuildPWAProcessor {
     private readonly pushService: PushService,
   ) {}
 
-  @Process()
+  @Process({ concurrency: 10 })
   async handleBuildPWAJob(job: Job) {
     const {
       pwaContentId,
