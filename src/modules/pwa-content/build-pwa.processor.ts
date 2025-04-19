@@ -52,6 +52,7 @@ export class BuildPWAProcessor {
       theme,
       hasLoadingScreen,
       offerPreloader,
+      appLink,
       trackerSettings,
     } = job.data;
 
@@ -178,62 +179,16 @@ export class BuildPWAProcessor {
         `;
         await fse.writeFile(serviceWorkerPath, serviceWorkerContent);
 
-        const trackerSettings = {
-          offer: {
-            multiGeo: {
-              enabled: true,
-            },
-            offersMap: {
-              multiGeo: 'https://offer.com/us',
-            },
-          },
-          devices: {
-            androidOnly: {
-              enabled: false,
-            },
-            android: {
-              direction: TrafficDirection.OFFER_URL,
-            },
-            desktop: {
-              direction: TrafficDirection.WHITE_PAGE,
-            },
-            ios: {
-              direction: TrafficDirection.INSTALL_PAGE,
-            },
-            telegram: {
-              direction: TrafficDirection.CUSTOM_URL,
-              url: 'https://youtube.com',
-            },
-          },
-          cloaca: {
-            enabled: true,
-            irrelevantTraffic: {
-              direction: TrafficDirection.CUSTOM_URL,
-              url: 'https://example.com/cloaca',
-            },
-          },
-          offerUrl: 'https://wolfpwa.xyz',
-          whitePageHtml:
-            '<html><head><meta charset="utf-8"><title>Doodle Jump App Card</title><style>body{font-family:\'Roboto\',Arial,sans-serif;margin:0;padding:0;background:#f5f5f5}.card{max-width:400px;margin:20px auto;background:#fff;border-radius:12px;box-shadow:0 4px 8px rgba(0,0,0,0.1);overflow:hidden}.header{display:flex;align-items:center;padding:16px;background:linear-gradient(135deg,#4285f4,#34a853)}.app-icon{width:64px;height:64px;border-radius:12px;margin-right:16px}.title{color:#fff}.app-name{font-size:20px;font-weight:500;margin:0}.developer{font-size:14px;opacity:0.9;margin-top:4px}.content{padding:16px}.rating{display:flex;align-items:center;margin-bottom:12px}.stars{color:#fbbc05;margin-right:8px}.rating-text{font-size:14px;color:#5f6368}.description{font-size:14px;line-height:1.5;color:#3c4043;margin-bottom:16px}.screenshots{display:flex;overflow-x:auto;padding-bottom:8px;scrollbar-width:none}.screenshots::-webkit-scrollbar{display:none}.screenshot{width:180px;height:320px;border-radius:8px;margin-right:8px;object-fit:cover}.badges{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}.badge{background:#f1f3f4;color:#5f6368;padding:4px 8px;border-radius:16px;font-size:12px}.footer{padding:16px;background:#f8f9fa;border-top:1px solid #e0e0e0}.footer-links{display:flex;justify-content:space-between}.footer-link{color:#5f6368;text-decoration:none;font-size:12px}</style></head><body><div class="card"><div class="header"><img src="https://play-lh.googleusercontent.com/aHnvdFTx0LVyfVHQLX51VcWBYkSVGvggr4FvIiP-iwBu4pKBiOQA1OnRi_nyFdCWqlU8=w240-h480-rw" class="app-icon"><div class="title"><div class="app-name">Doodle Jump</div><div class="developer">Lima Sky LLC</div></div></div><div class="content"><div class="rating"><div class="stars">★★★★☆</div><div class="rating-text">4.4 (1M+ reviews)</div></div><div class="description">The addictive platformer game where you guide your Doodler up never-ending platforms. Jump, dodge monsters, and collect power-ups in this classic mobile game.</div><div class="screenshots"><img src="https://play-lh.googleusercontent.com/nA6Xqkw3OlGxeGwlyje-jhxyZQY0q8cH7-kyAmMMLp6g2QtoWS6ZIFx2_T6t9IuXoPg=w526-h296-rw" class="screenshot"><img src="https://play-lh.googleusercontent.com/iFidFE6m5yocOVXHrWBKe6ZdDgr8A0LKJzXbEp54teCUmTMj1H6L4yr9XQsEKwcD5Lw=w526-h296-rw" class="screenshot"><img src="https://play-lh.googleusercontent.com/6IrSFRfrINOrF5j5t5MEgm954zS1A1iGJlHfyz15hUVt9gw1ccCgoknUUA-ao_MCWu4=w526-h296-rw" class="screenshot"><img src="https://play-lh.googleusercontent.com/JRFEFFvb_Dn-4O1dnwMCcnmdTkR2ilO5M9IpJuEKKxtfqlaelbjNxyi0EfZctVign6Y=w526-h296-rw" class="screenshot"><img src="https://play-lh.googleusercontent.com/7F9brR4u6hymiFff859k9XmbuaKGSclvNqHvYlS2WRhHmx7zufcko1mzMZjr9F0l7xHN=w526-h296-rw" class="screenshot"><img src="https://play-lh.googleusercontent.com/dYutkUAID_5SYGGBp7GDQw0aFYtLtvBIrIu9POKnRjHKsQ8K6GcemYlDqx3s-8ZFScYT=w526-h296-rw" class="screenshot"><img src="https://play-lh.googleusercontent.com/kbhreWp7PIS-ISTEMuUYB3l6mRadlSOmK_IPNaVY5QL6tPKeuHPA1kpjRNxgX5AnJA=w526-h296-rw" class="screenshot"></div><div class="badges"><span class="badge">Contains ads</span><span class="badge">In-app purchases</span><span class="badge">Action</span><span class="badge">Platformer</span><span class="badge">Single player</span></div></div><div class="footer"><div class="footer-links"><a href="https://policies.google.com/privacy" class="footer-link">Privacy Policy</a><a href="https://play.google.com/intl/en-US_us/about/play-terms.html" class="footer-link">Terms of Service</a></div></div></div></body></html>',
-        };
-
-        const trackingConfigPath = path.join(
-          publicFolderPath,
-          'tracker.config.json',
-        );
-        await fse.writeJson(trackingConfigPath, trackerSettings, {
-          spaces: 2,
-        });
-
-        // if (trackerSettings) {
-        //   const trackingConfigPath = path.join(
-        //     publicFolderPath,
-        //     'tracker.config.json',
-        //   );
-        //   await fse.writeJson(trackingConfigPath, trackerSettings, {
-        //     spaces: 2,
-        //   });
-        // }
+        if (trackerSettings) {
+          const trackingConfigPath = path.join(
+            publicFolderPath,
+            'tracker.config.json',
+          );
+          trackerSettings.offerUrl = appLink;
+          await fse.writeJson(trackingConfigPath, trackerSettings, {
+            spaces: 2,
+          });
+        }
       } catch (error) {
         this.logger.error('Error creating public folder structure:', error);
         throw new Error('Failed to create public folder structure');

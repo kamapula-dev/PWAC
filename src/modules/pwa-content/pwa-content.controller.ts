@@ -380,6 +380,7 @@ export class PWAContentController {
         hasLoadingScreen: pwaContent.hasLoadingScreen,
         offerPreloader: pwaContent.offerPreloader,
         trackerSettings: pwaContent.trackerSettings,
+        appLink: pwaContent.pwaLink,
         ...(pwaContent?.pixel && { pixel: pwaContent.pixel }),
       });
 
